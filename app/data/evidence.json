@@ -1,0 +1,634 @@
+[
+ {
+  "id": "pop_2026",
+  "domain": "Demography",
+  "claim": "India's population",
+  "value": "1.46",
+  "unit": "billion",
+  "source": "UN World Population Prospects 2024 / World Bank",
+  "org": "United Nations",
+  "year": 2026,
+  "url": "https://population.un.org/wpp/",
+  "note": "Projected 2026; India is the world's most populous country.",
+  "topics": [
+   "generic"
+  ]
+ },
+ {
+  "id": "median_age",
+  "domain": "Demography",
+  "claim": "Median age",
+  "value": "28.4",
+  "unit": "years",
+  "source": "UNFPA State of World Population 2024",
+  "org": "UNFPA",
+  "year": 2024,
+  "url": "https://www.unfpa.org/swp2024",
+  "note": "Young workforce, but ageing unevenly across states.",
+  "topics": [
+   "ai-jobs",
+   "gig-work",
+   "bnpl"
+  ]
+ },
+ {
+  "id": "urban_share",
+  "domain": "Demography",
+  "claim": "Urban population share",
+  "value": "36",
+  "unit": "%",
+  "source": "World Bank / Census 2011 projections",
+  "org": "World Bank",
+  "year": 2023,
+  "url": "https://data.worldbank.org/indicator/SP.URB.TOTL.IN.ZS?locations=IN",
+  "note": "Census 2011 measured 31.2%; definitions differ.",
+  "topics": [
+   "quick-commerce",
+   "ev-car",
+   "real-estate"
+  ]
+ },
+ {
+  "id": "internet_users",
+  "domain": "Digital",
+  "claim": "Active internet users",
+  "value": "958",
+  "unit": "million",
+  "source": "IAMAI-Kantar Internet in India 2025",
+  "org": "IAMAI",
+  "year": 2026,
+  "url": "https://www.iamai.in/sites/default/files/articles/India%26%23039%3Bs%20Internet%20user%20Base%20reaches.pdf",
+  "note": "57% of users are rural; 8% YoY growth.",
+  "topics": [
+   "upi-rural",
+   "language-ai",
+   "misinformation",
+   "ott",
+   "ai-jobs"
+  ]
+ },
+ {
+  "id": "smartphone_hh",
+  "domain": "Digital",
+  "claim": "Households with a smartphone",
+  "value": "85.5",
+  "unit": "%",
+  "source": "MoSPI Comprehensive Modular Survey: Telecom 2025",
+  "org": "MoSPI",
+  "year": 2025,
+  "url": "https://www.mospi.gov.in/sites/default/files/press_release/Final_press%20release_CMS_T.pdf",
+  "note": "Rural 82.1%, urban 91.3%; device sharing is common.",
+  "topics": [
+   "upi-rural",
+   "edtech",
+   "language-ai",
+   "misinformation"
+  ]
+ },
+ {
+  "id": "internet_hh",
+  "domain": "Digital",
+  "claim": "Households with internet access",
+  "value": "86.3",
+  "unit": "%",
+  "source": "MoSPI CMS:T 2025",
+  "org": "MoSPI",
+  "year": 2025,
+  "url": "https://www.mospi.gov.in/sites/default/files/press_release/Final_press%20release_CMS_T.pdf",
+  "note": "Rural 83.3%, urban 91.6%; mostly mobile data.",
+  "topics": [
+   "upi-rural",
+   "edtech",
+   "ott",
+   "language-ai"
+  ]
+ },
+ {
+  "id": "telecom_subs",
+  "domain": "Digital",
+  "claim": "Telecom subscribers",
+  "value": "1,173",
+  "unit": "million",
+  "source": "TRAI Quarterly Performance Indicator Report, Sep 2025",
+  "org": "TRAI",
+  "year": 2025,
+  "url": "https://trai.gov.in/sites/default/files/2025-12/QPIR_03122025.pdf",
+  "note": "Broadband subscribers 995.63 million; wired only 44.42 million.",
+  "topics": [
+   "upi-rural",
+   "ott",
+   "language-ai"
+  ]
+ },
+ {
+  "id": "upi_volume",
+  "domain": "Payments",
+  "claim": "UPI monthly transactions",
+  "value": "24.07",
+  "unit": "billion",
+  "source": "NPCI / PIB, Sep 2026",
+  "org": "NPCI",
+  "year": 2026,
+  "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2257087",
+  "note": "FY2025-26: 24,162 crore transactions; 85% of India's digital payments by volume.",
+  "topics": [
+   "upi-rural",
+   "bnpl",
+   "quick-commerce",
+   "premium-fmcg"
+  ]
+ },
+ {
+  "id": "lfpr",
+  "domain": "Labour",
+  "claim": "Labour force participation (15+)",
+  "value": "60.1",
+  "unit": "%",
+  "source": "PLFS Annual Report 2023-24",
+  "org": "MoSPI",
+  "year": 2024,
+  "url": "https://mospi.gov.in/sites/default/files/press_release/Press_note_AR_PLFS_2023_24_22092024.pdf",
+  "note": "Female LFPR 41.7%; unemployment rate 3.2% (usual status).",
+  "topics": [
+   "ai-jobs",
+   "gig-work",
+   "women-work",
+   "coaching"
+  ]
+ },
+ {
+  "id": "gig_workers",
+  "domain": "Labour",
+  "claim": "Gig workers",
+  "value": "7.7",
+  "unit": "million",
+  "source": "NITI Aayog India's Booming Gig and Platform Economy",
+  "org": "NITI Aayog",
+  "year": 2022,
+  "url": "https://niti.gov.in/sites/default/files/2022-06/India_Gig_and_Platform_Economy_Report_2022.pdf",
+  "note": "Projected 23.5 million by 2029-30; excludes informal platform-adjacent work.",
+  "topics": [
+   "gig-work",
+   "quick-commerce",
+   "ai-jobs"
+  ]
+ },
+ {
+  "id": "mpce",
+  "domain": "Consumption",
+  "claim": "Monthly per capita consumption",
+  "value": "₹3,773 rural / ₹6,459 urban",
+  "unit": "",
+  "source": "Household Consumption Expenditure Survey 2022-23",
+  "org": "MoSPI",
+  "year": 2023,
+  "url": "https://www.mospi.gov.in/",
+  "note": "Nominal; rural-urban gap remains ~1.7x. Useful as a realism check, not a budget.",
+  "topics": [
+   "premium-fmcg",
+   "quick-commerce",
+   "ev-scooter",
+   "health-insurance"
+  ]
+ },
+ {
+  "id": "mpi",
+  "domain": "Poverty",
+  "claim": "Multidimensional poverty",
+  "value": "11.28",
+  "unit": "%",
+  "source": "National Multidimensional Poverty Index 2023",
+  "org": "NITI Aayog",
+  "year": 2023,
+  "url": "https://niti.gov.in/",
+  "note": "Headcount ratio; huge state variation. Deprivation is multidimensional, not just income.",
+  "topics": [
+   "rural-credit",
+   "health-insurance",
+   "agri-tech"
+  ]
+ },
+ {
+  "id": "nfhs_tfr",
+  "domain": "Health",
+  "claim": "Total fertility rate",
+  "value": "2.0",
+  "unit": "births per woman",
+  "source": "NFHS-5 (2019-21)",
+  "org": "MoHFW / IIPS",
+  "year": 2021,
+  "url": "https://rchiips.org/nfhs/NFHS-5Reports/India.pdf",
+  "note": "Below replacement in 19 states/UTs; high in Bihar, Meghalaya, UP.",
+  "topics": [
+   "women-work",
+   "health-insurance",
+   "coaching"
+  ]
+ },
+ {
+  "id": "nfhs_women_internet",
+  "domain": "Gender",
+  "claim": "Women who have ever used the internet",
+  "value": "33.3",
+  "unit": "%",
+  "source": "NFHS-5 (2019-21)",
+  "org": "MoHFW / IIPS",
+  "year": 2021,
+  "url": "https://rchiips.org/nfhs/NFHS-5Reports/India.pdf",
+  "note": "Men 57.1%. The gap is a design constraint, not a niche.",
+  "topics": [
+   "women-work",
+   "language-ai",
+   "upi-rural",
+   "edtech"
+  ]
+ },
+ {
+  "id": "aser_smartphone",
+  "domain": "Education",
+  "claim": "14-18-year-olds who can use a smartphone",
+  "value": "82.2",
+  "unit": "%",
+  "source": "ASER 2024: Beyond Basics",
+  "org": "ASER Centre",
+  "year": 2025,
+  "url": "https://www.asercentre.org/",
+  "note": "57.1% use social media; 76% have a smartphone at home. Learning gaps persist.",
+  "topics": [
+   "edtech",
+   "coaching",
+   "misinformation"
+  ]
+ },
+ {
+  "id": "ev_2w",
+  "domain": "Mobility",
+  "claim": "Electric two-wheeler sales",
+  "value": "1.40",
+  "unit": "million FY2026",
+  "source": "Vahan / FADA / Autocar Professional",
+  "org": "MoRTH",
+  "year": 2026,
+  "url": "https://vahan.parivahan.gov.in/",
+  "note": "6.54% of two-wheeler retail in FY26; monthly penetration reached 10.7% in Aug 2026.",
+  "topics": [
+   "ev-scooter",
+   "gig-work"
+  ]
+ },
+ {
+  "id": "ev_3w",
+  "domain": "Mobility",
+  "claim": "Electric three-wheeler share",
+  "value": "64.9",
+  "unit": "%",
+  "source": "FADA registrations, Sep 2026",
+  "org": "FADA",
+  "year": 2026,
+  "url": "https://www.fada.in/",
+  "note": "The most electrified vehicle category; commercial economics dominate.",
+  "topics": [
+   "ev-scooter",
+   "gig-work"
+  ]
+ },
+ {
+  "id": "ev_car",
+  "domain": "Mobility",
+  "claim": "Electric car share",
+  "value": "8.45",
+  "unit": "% of PV registrations",
+  "source": "FADA, Sep 2026",
+  "org": "FADA",
+  "year": 2026,
+  "url": "https://www.fada.in/",
+  "note": "FY2026 average ~4.25%; monthly volatility is high. Charging and resale remain barriers.",
+  "topics": [
+   "ev-car"
+  ]
+ },
+ {
+  "id": "qcom_stores",
+  "domain": "Retail",
+  "claim": "Dark stores mapped",
+  "value": "5,625",
+  "unit": "stores",
+  "source": "Quick Commerce Map 2026",
+  "org": "QCM Research",
+  "year": 2026,
+  "url": "https://quickcommercemap.com/reports/india-quick-commerce-map-2026",
+  "note": "Network expanded ~48% YoY; metro concentration, tier-2 spillover.",
+  "topics": [
+   "quick-commerce"
+  ]
+ },
+ {
+  "id": "qcom_market",
+  "domain": "Retail",
+  "claim": "Quick commerce market",
+  "value": "$12.97",
+  "unit": "billion by 2029",
+  "source": "Research and Markets, 2026",
+  "org": "Research and Markets",
+  "year": 2026,
+  "url": "https://www.globenewswire.com/news-release/2026/04/20/3277255/0/en/india-quick-commerce-report-2026-market-to-reach-12-97-billion-by-2029-blinkit-zepto-and-swiggy-instamart-lead-surge-as-jiomart-and-bigbasket-scale-competitive-entry.html",
+  "note": "40% YoY growth; unit economics and worker conditions remain contested.",
+  "topics": [
+   "quick-commerce"
+  ]
+ },
+ {
+  "id": "kirana_share",
+  "domain": "Retail",
+  "claim": "Kirana share of grocery",
+  "value": "88.9",
+  "unit": "% projected 2028",
+  "source": "EY / industry estimates",
+  "org": "EY",
+  "year": 2024,
+  "url": "https://www.ey.com/en_in",
+  "note": "Still dominant; credit, proximity and trust are moats. Quick commerce is a metro-first channel.",
+  "topics": [
+   "quick-commerce",
+   "premium-fmcg"
+  ]
+ },
+ {
+  "id": "health_oop",
+  "domain": "Health",
+  "claim": "Out-of-pocket share of health spending",
+  "value": "47.1",
+  "unit": "%",
+  "source": "National Health Accounts 2019-20",
+  "org": "MoHFW",
+  "year": 2022,
+  "url": "https://www.nha.gov.in/",
+  "note": "Financial shock is a middle-class reality; insurance penetration is thin.",
+  "topics": [
+   "health-insurance"
+  ]
+ },
+ {
+  "id": "insurance_penetration",
+  "domain": "Insurance",
+  "claim": "Insurance penetration",
+  "value": "4.0",
+  "unit": "% of GDP",
+  "source": "IRDAI Annual Report 2023-24",
+  "org": "IRDAI",
+  "year": 2024,
+  "url": "https://irdai.gov.in/",
+  "note": "Life + non-life; health cover is uneven and claim experience drives trust.",
+  "topics": [
+   "health-insurance"
+  ]
+ },
+ {
+  "id": "agri_workforce",
+  "domain": "Agriculture",
+  "claim": "Workforce in agriculture",
+  "value": "46.1",
+  "unit": "%",
+  "source": "PLFS 2023-24",
+  "org": "MoSPI",
+  "year": 2024,
+  "url": "https://mospi.gov.in/",
+  "note": "Share of employment, not GDP. Disguised unemployment and seasonality persist.",
+  "topics": [
+   "agri-tech",
+   "rural-credit",
+   "ev-scooter"
+  ]
+ },
+ {
+  "id": "small_farmers",
+  "domain": "Agriculture",
+  "claim": "Small and marginal holdings",
+  "value": "86",
+  "unit": "% of holdings",
+  "source": "Agriculture Census 2015-16",
+  "org": "Ministry of Agriculture",
+  "year": 2019,
+  "url": "https://agcensus.dacnet.nic.in/",
+  "note": "Average holding ~1.08 hectares; technology must work at small scale.",
+  "topics": [
+   "agri-tech",
+   "rural-credit"
+  ]
+ },
+ {
+  "id": "languages",
+  "domain": "Language",
+  "claim": "Languages and mother tongues",
+  "value": "121 languages / 270 mother tongues",
+  "unit": "",
+  "source": "Census 2011",
+  "org": "Office of the Registrar General",
+  "year": 2011,
+  "url": "https://censusindia.gov.in/",
+  "note": "22 scheduled languages. English is a minority skill, not a default.",
+  "topics": [
+   "language-ai",
+   "edtech"
+  ]
+ },
+ {
+  "id": "english_speakers",
+  "domain": "Language",
+  "claim": "English speakers",
+  "value": "10.6",
+  "unit": "%",
+  "source": "Census 2011",
+  "org": "Office of the Registrar General",
+  "year": 2011,
+  "url": "https://censusindia.gov.in/",
+  "note": "Only ~13 crore people; vernacular-first products reach the rest.",
+  "topics": [
+   "language-ai",
+   "edtech",
+   "ai-jobs"
+  ]
+ },
+ {
+  "id": "internal_migrants",
+  "domain": "Migration",
+  "claim": "Internal migrants",
+  "value": "45.6",
+  "unit": "crore",
+  "source": "Census 2011",
+  "org": "Office of the Registrar General",
+  "year": 2011,
+  "url": "https://censusindia.gov.in/",
+  "note": "Inter-state and intra-state; remittance and language shape consumption.",
+  "topics": [
+   "gig-work",
+   "women-work",
+   "ev-scooter"
+  ]
+ },
+ {
+  "id": "ai_usage",
+  "domain": "AI",
+  "claim": "Internet users engaging with AI features",
+  "value": "44",
+  "unit": "%",
+  "source": "IAMAI Internet in India 2025",
+  "org": "IAMAI",
+  "year": 2026,
+  "url": "https://www.iamai.in/",
+  "note": "Voice, translation and assisted search are the mass-market entry points.",
+  "topics": [
+   "ai-jobs",
+   "language-ai",
+   "edtech"
+  ]
+ },
+ {
+  "id": "online_shoppers",
+  "domain": "E-commerce",
+  "claim": "Online shoppers",
+  "value": "270",
+  "unit": "million",
+  "source": "Bain India Online Shopping 2024",
+  "org": "Bain & Company",
+  "year": 2024,
+  "url": "https://www.bain.com/insights/how-india-shops-online-2024/",
+  "note": "Growth is shifting to tier-2/3 and vernacular users.",
+  "topics": [
+   "quick-commerce",
+   "premium-fmcg",
+   "bnpl"
+  ]
+ },
+ {
+  "id": "ott_viewers",
+  "domain": "Media",
+  "claim": "OTT viewers",
+  "value": "547",
+  "unit": "million",
+  "source": "Ormax Media India 2024",
+  "org": "Ormax",
+  "year": 2024,
+  "url": "https://www.ormaxmedia.com/",
+  "note": "Free ad-supported and telecom bundles dominate; paid ARPU is low.",
+  "topics": [
+   "ott"
+  ]
+ },
+ {
+  "id": "whatsapp_users",
+  "domain": "Media",
+  "claim": "WhatsApp users",
+  "value": "500+",
+  "unit": "million",
+  "source": "Meta India, 2023",
+  "org": "Meta",
+  "year": 2023,
+  "url": "https://about.meta.com/",
+  "note": "Default social layer for family, trade and misinformation.",
+  "topics": [
+   "misinformation",
+   "upi-rural",
+   "quick-commerce"
+  ]
+ },
+ {
+  "id": "dark_patterns",
+  "domain": "Consumer",
+  "claim": "Dark patterns identified by CCPA",
+  "value": "12",
+  "unit": "patterns",
+  "source": "CCPA Guidelines 2023",
+  "org": "Ministry of Consumer Affairs",
+  "year": 2023,
+  "url": "https://consumeraffairs.nic.in/",
+  "note": "False urgency, basket sneaking, subscription traps, confirm shaming.",
+  "topics": [
+   "quick-commerce",
+   "ott",
+   "bnpl",
+   "premium-fmcg"
+  ]
+ },
+ {
+  "id": "pm_surya_ghar",
+  "domain": "Energy",
+  "claim": "Rooftop solar target",
+  "value": "1",
+  "unit": "crore households",
+  "source": "PM Surya Ghar: Muft Bijli Yojana",
+  "org": "MNRE",
+  "year": 2024,
+  "url": "https://pmsuryaghar.gov.in/",
+  "note": "Subsidy up to ₹78,000; DISCOM approval and installer quality are bottlenecks.",
+  "topics": [
+   "solar-rooftop"
+  ]
+ },
+ {
+  "id": "msme",
+  "domain": "Economy",
+  "claim": "MSMEs",
+  "value": "6.3",
+  "unit": "crore enterprises",
+  "source": "Udyam registration / Ministry of MSME",
+  "org": "Ministry of MSME",
+  "year": 2024,
+  "url": "https://www.msme.gov.in/",
+  "note": "~11 crore jobs; credit gap and digital adoption are uneven.",
+  "topics": [
+   "rural-credit",
+   "gig-work",
+   "premium-fmcg"
+  ]
+ },
+ {
+  "id": "remittances",
+  "domain": "Economy",
+  "claim": "Remittances",
+  "value": "$129",
+  "unit": "billion (2024)",
+  "source": "World Bank Migration and Development Brief",
+  "org": "World Bank",
+  "year": 2024,
+  "url": "https://www.worldbank.org/en/topic/migrationremittancesdiasporaissues",
+  "note": "India is the world's largest remittance recipient; household consumption cushion.",
+  "topics": [
+   "rural-credit",
+   "women-work",
+   "premium-fmcg"
+  ]
+ },
+ {
+  "id": "neet_candidates",
+  "domain": "Education",
+  "claim": "NEET UG aspirants",
+  "value": "~24",
+  "unit": "lakh (2025)",
+  "source": "NTA / media reports",
+  "org": "NTA",
+  "year": 2025,
+  "url": "https://nta.ac.in/",
+  "note": "~1.1 lakh MBBS seats; competition and coaching intensity are structural.",
+  "topics": [
+   "coaching",
+   "edtech"
+  ]
+ },
+ {
+  "id": "upi_ten_years",
+  "domain": "Payments",
+  "claim": "UPI annual transactions",
+  "value": "24,162",
+  "unit": "crore (FY2025-26)",
+  "source": "NPCI / PIB",
+  "org": "NPCI",
+  "year": 2026,
+  "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2257087",
+  "note": "~66 crore transactions/day; average ticket size is falling.",
+  "topics": [
+   "upi-rural",
+   "bnpl"
+  ]
+ }
+]

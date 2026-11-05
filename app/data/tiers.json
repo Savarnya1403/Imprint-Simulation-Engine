@@ -1,0 +1,135 @@
+[
+ {
+  "id": 1,
+  "label": "Tier 1",
+  "name": "Metro / global city",
+  "share": 0.1,
+  "cities": "Mumbai, Delhi, Bengaluru, Hyderabad, Chennai, Kolkata, Pune, Ahmedabad",
+  "worldview": "Cosmopolitan, time-poor, optionality-seeking. Buys outcomes and identity, not just products.",
+  "decision": "Research online, compare three options, consult 2-3 trusted people, then buy fast. High expectation of service.",
+  "trust": "Peer reviews, creators, global media, evidence. Low patience for bad UX.",
+  "money": "Cash-flow comfortable but leveraged. EMI normalised. Price sensitivity is 'value per month', not sticker.",
+  "media": "X, Instagram, LinkedIn, Reddit, YouTube, podcasts, OTT",
+  "language": "English / Hinglish",
+  "risk": "Medium",
+  "digital": "Very high",
+  "optimizes": [
+   "Time",
+   "Status",
+   "Optionality",
+   "Experience"
+  ],
+  "breaks_trust": [
+   "Hidden charges",
+   "Bad service",
+   "Woke-washing",
+   "Astroturfed reviews"
+  ],
+  "ground_truth": [
+   "Dark patterns in subscriptions",
+   "Fake reviews on marketplaces",
+   "Credit-card churning",
+   "Housing rent trapping 40% of income"
+  ]
+ },
+ {
+  "id": 2,
+  "label": "Tier 2",
+  "name": "Emerging city",
+  "share": 0.15,
+  "cities": "Lucknow, Jaipur, Indore, Kochi, Coimbatore, Nagpur, Patna, Bhopal, Chandigarh, Surat",
+  "worldview": "Aspirational and family-anchored. Wants metro amenities without metro anonymity.",
+  "decision": "WhatsApp the family, watch 2 YouTube reviews, ask the local dealer, negotiate hard, then commit.",
+  "trust": "Family, local dealer, YouTube reviewer, community. Authority matters.",
+  "money": "EMI-driven, festival-cycle spending, gold as savings, cash still king for big tickets.",
+  "media": "YouTube, WhatsApp, Instagram, Facebook, local news, ShareChat",
+  "language": "Regional + Hindi + some English",
+  "risk": "Medium-low",
+  "digital": "High",
+  "optimizes": [
+   "Family approval",
+   "Status",
+   "Durability",
+   "Resale"
+  ],
+  "breaks_trust": [
+   "Poor after-sales",
+   "Hidden repair cost",
+   "Public embarrassment",
+   "Disrespect"
+  ],
+  "ground_truth": [
+   "Dealer 'administration charges'",
+   "Insurance mis-selling",
+   "Coaching fee opacity",
+   "Local monopoly pricing"
+  ]
+ },
+ {
+  "id": 3,
+  "label": "Tier 3",
+  "name": "District town",
+  "share": 0.28,
+  "cities": "Gorakhpur, Bareilly, Warangal, Belagavi, Jabalpur, Agra, Siliguri, Udaipur, Hisar, Nanded",
+  "worldview": "Transitional. Sees the metro on a screen and lives the district on the ground. Highly relational.",
+  "decision": "Ask the person who already bought it, check the service centre, bargain, consult a 'knowledgeable' cousin.",
+  "trust": "Known people, local repairman, doctor/teacher, shopkeeper. Sceptical of distant brands.",
+  "money": "Seasonal, cash + UPI, small-ticket EMIs, high penalty for a wrong purchase.",
+  "media": "YouTube, WhatsApp, ShareChat, Facebook, TV",
+  "language": "Regional / Hindi / Bhojpuri / Odia",
+  "risk": "Low-medium",
+  "digital": "Medium",
+  "optimizes": [
+   "Reliability",
+   "Service access",
+   "Price",
+   "Social proof"
+  ],
+  "breaks_trust": [
+   "No service centre",
+   "Fake warranty",
+   "Public failure",
+   "Outsider attitude"
+  ],
+  "ground_truth": [
+   "Substandard spare parts",
+   "Local 'setting' with officials",
+   "Loan recovery harassment",
+   "Fake reviews in local groups"
+  ]
+ },
+ {
+  "id": 4,
+  "label": "Tier 4",
+  "name": "Rural / small town",
+  "share": 0.47,
+  "cities": "Sitapur, Purnia, Kalahandi, Yavatmal, Barmer, Dumka, Bastar, Barpeta",
+  "worldview": "Subsistence-first, community-shaped. Weather, harvest and family events set the calendar.",
+  "decision": "Consult family/community, rely on the dealer/ASHA/panchayat, avoid unfamiliar commitments, prefer cash.",
+  "trust": "Family, village institutions, local authority, religious/community networks. Low trust in distant institutions.",
+  "money": "Irregular income, cash, chit funds, SHG loans, gold, informal credit.",
+  "media": "WhatsApp, YouTube, TV, radio, ShareChat, word of mouth",
+  "language": "Regional dialect, voice notes",
+  "risk": "Low",
+  "digital": "Low-medium",
+  "optimizes": [
+   "Survival",
+   "Food security",
+   "Family honour",
+   "Low regret"
+  ],
+  "breaks_trust": [
+   "Complex paperwork",
+   "Distance",
+   "Humiliation",
+   "Hidden cost"
+  ],
+  "ground_truth": [
+   "Predatory digital loans",
+   "Fake fertiliser/seed",
+   "Ghost beneficiaries",
+   "Middleman price capture",
+   "Misinformation forwarded as news"
+  ]
+ }
+]

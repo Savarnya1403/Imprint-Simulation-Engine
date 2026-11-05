@@ -1,0 +1,1609 @@
+[
+ {
+  "id": "metro_it",
+  "label": "Metro knowledge worker",
+  "short": "IT / GCC / product",
+  "category": "white_collar",
+  "tiers": {
+   "1": 0.7843,
+   "2": 0.1961,
+   "3": 0.0196,
+   "4": 0.0
+  },
+  "income": [
+   45000,
+   190000
+  ],
+  "digital": 0.96,
+  "risk": 0.62,
+  "patience": 0.7,
+  "conformity": 0.42,
+  "status": 0.78,
+  "price": 0.34,
+  "jugaad": 0.52,
+  "fatalism": 0.18,
+  "optimism": 0.74,
+  "trust_gov": 0.42,
+  "trust_media": 0.34,
+  "education": 0.96,
+  "social_radius": 0.7,
+  "voice": 0.82,
+  "horizon": 8,
+  "aspiration": "Global career, financial independence, better city",
+  "fears": [
+   "Job loss to AI",
+   "EMI trap",
+   "Lifestyle inflation"
+  ],
+  "values": [
+   "Efficiency",
+   "Merit",
+   "Optionality"
+  ],
+  "info": [
+   "X",
+   "LinkedIn",
+   "Reddit",
+   "YouTube",
+   "Podcasts"
+  ],
+  "quirk": "Reads the fine print, but only after buying."
+ },
+ {
+  "id": "founder",
+  "label": "Founder / SMB owner",
+  "short": "Startup or family business",
+  "category": "business",
+  "tiers": {
+   "1": 0.3478,
+   "2": 0.4348,
+   "3": 0.1739,
+   "4": 0.0435
+  },
+  "income": [
+   35000,
+   250000
+  ],
+  "digital": 0.9,
+  "risk": 0.86,
+  "patience": 0.52,
+  "conformity": 0.32,
+  "status": 0.86,
+  "price": 0.42,
+  "jugaad": 0.82,
+  "fatalism": 0.2,
+  "optimism": 0.86,
+  "trust_gov": 0.36,
+  "trust_media": 0.4,
+  "education": 0.86,
+  "social_radius": 0.82,
+  "voice": 0.78,
+  "horizon": 5,
+  "aspiration": "Scale, respect, generational wealth",
+  "fears": [
+   "Cash-flow squeeze",
+   "Regulatory shock",
+   "Talent churn"
+  ],
+  "values": [
+   "Ownership",
+   "Speed",
+   "Risk"
+  ],
+  "info": [
+   "X",
+   "LinkedIn",
+   "WhatsApp groups",
+   "News"
+  ],
+  "quirk": "Calls every cost a 'learning'."
+ },
+ {
+  "id": "corporate_manager",
+  "label": "Corporate manager",
+  "short": "Mid/senior salaried",
+  "category": "white_collar",
+  "tiers": {
+   "1": 0.4545,
+   "2": 0.4545,
+   "3": 0.0909,
+   "4": 0.0
+  },
+  "income": [
+   40000,
+   150000
+  ],
+  "digital": 0.86,
+  "risk": 0.44,
+  "patience": 0.76,
+  "conformity": 0.66,
+  "status": 0.76,
+  "price": 0.4,
+  "jugaad": 0.45,
+  "fatalism": 0.24,
+  "optimism": 0.66,
+  "trust_gov": 0.52,
+  "trust_media": 0.46,
+  "education": 0.9,
+  "social_radius": 0.6,
+  "voice": 0.52,
+  "horizon": 7,
+  "aspiration": "Stability, children's education, second home",
+  "fears": [
+   "Medical bill",
+   "School fees",
+   "Downgrade"
+  ],
+  "values": [
+   "Security",
+   "Family",
+   "Protocol"
+  ],
+  "info": [
+   "LinkedIn",
+   "WhatsApp",
+   "YouTube",
+   "Newspaper"
+  ],
+  "quirk": "Keeps a spreadsheet for everything except emotions."
+ },
+ {
+  "id": "govt_employee",
+  "label": "Government employee",
+  "short": "Sarkari service",
+  "category": "public",
+  "tiers": {
+   "1": 0.1667,
+   "2": 0.4167,
+   "3": 0.3333,
+   "4": 0.0833
+  },
+  "income": [
+   22000,
+   85000
+  ],
+  "digital": 0.66,
+  "risk": 0.28,
+  "patience": 0.82,
+  "conformity": 0.86,
+  "status": 0.7,
+  "price": 0.56,
+  "jugaad": 0.62,
+  "fatalism": 0.34,
+  "optimism": 0.56,
+  "trust_gov": 0.82,
+  "trust_media": 0.54,
+  "education": 0.76,
+  "social_radius": 0.62,
+  "voice": 0.44,
+  "horizon": 8,
+  "aspiration": "Pension, transfer posting, family security",
+  "fears": [
+   "Policy change",
+   "Transfer",
+   "Health shock"
+  ],
+  "values": [
+   "Order",
+   "Seniority",
+   "Certainty"
+  ],
+  "info": [
+   "WhatsApp",
+   "Newspaper",
+   "YouTube",
+   "DD News"
+  ],
+  "quirk": "Trusts the file more than the app."
+ },
+ {
+  "id": "teacher",
+  "label": "Teacher / lecturer",
+  "short": "School or college",
+  "category": "public",
+  "tiers": {
+   "1": 0.1538,
+   "2": 0.3077,
+   "3": 0.3846,
+   "4": 0.1538
+  },
+  "income": [
+   15000,
+   62000
+  ],
+  "digital": 0.71,
+  "risk": 0.34,
+  "patience": 0.86,
+  "conformity": 0.74,
+  "status": 0.64,
+  "price": 0.62,
+  "jugaad": 0.56,
+  "fatalism": 0.3,
+  "optimism": 0.62,
+  "trust_gov": 0.66,
+  "trust_media": 0.5,
+  "education": 0.92,
+  "social_radius": 0.66,
+  "voice": 0.56,
+  "horizon": 10,
+  "aspiration": "Respect, student success, stable savings",
+  "fears": [
+   "Fee inflation",
+   "Health",
+   "Social isolation"
+  ],
+  "values": [
+   "Knowledge",
+   "Discipline",
+   "Service"
+  ],
+  "info": [
+   "YouTube",
+   "WhatsApp",
+   "Newspaper",
+   "Facebook"
+  ],
+  "quirk": "Corrects fake forwards, then forwards a different one."
+ },
+ {
+  "id": "doctor",
+  "label": "Doctor / healthcare professional",
+  "short": "Clinic or hospital",
+  "category": "elite",
+  "tiers": {
+   "1": 0.4348,
+   "2": 0.3478,
+   "3": 0.1739,
+   "4": 0.0435
+  },
+  "income": [
+   45000,
+   220000
+  ],
+  "digital": 0.83,
+  "risk": 0.4,
+  "patience": 0.82,
+  "conformity": 0.54,
+  "status": 0.88,
+  "price": 0.28,
+  "jugaad": 0.34,
+  "fatalism": 0.18,
+  "optimism": 0.72,
+  "trust_gov": 0.56,
+  "trust_media": 0.42,
+  "education": 0.99,
+  "social_radius": 0.62,
+  "voice": 0.52,
+  "horizon": 10,
+  "aspiration": "Clinical reputation, secure family, ethical practice",
+  "fears": [
+   "Malpractice claim",
+   "Burnout",
+   "Quack competition"
+  ],
+  "values": [
+   "Evidence",
+   "Dignity",
+   "Autonomy"
+  ],
+  "info": [
+   "Journals",
+   "LinkedIn",
+   "WhatsApp",
+   "News"
+  ],
+  "quirk": "Says 'evidence' in a room full of anecdotes."
+ },
+ {
+  "id": "kirana",
+  "label": "Kirana / small trader",
+  "short": "Neighbourhood retail",
+  "category": "informal",
+  "tiers": {
+   "1": 0.1739,
+   "2": 0.3043,
+   "3": 0.3478,
+   "4": 0.1739
+  },
+  "income": [
+   12000,
+   70000
+  ],
+  "digital": 0.56,
+  "risk": 0.5,
+  "patience": 0.62,
+  "conformity": 0.6,
+  "status": 0.54,
+  "price": 0.92,
+  "jugaad": 0.92,
+  "fatalism": 0.34,
+  "optimism": 0.56,
+  "trust_gov": 0.42,
+  "trust_media": 0.44,
+  "education": 0.56,
+  "social_radius": 0.84,
+  "voice": 0.46,
+  "horizon": 4,
+  "aspiration": "More footfall, child's education, a second shutter",
+  "fears": [
+   "Quick-commerce",
+   "Credit default",
+   "Price war"
+  ],
+  "values": [
+   "Margin",
+   "Relationship",
+   "Cash"
+  ],
+  "info": [
+   "WhatsApp",
+   "YouTube",
+   "Trade groups",
+   "Local news"
+  ],
+  "quirk": "Gives credit to the neighbour, not the app."
+ },
+ {
+  "id": "street_vendor",
+  "label": "Street vendor / hawker",
+  "short": "Footpath economy",
+  "category": "informal",
+  "tiers": {
+   "1": 0.2632,
+   "2": 0.3158,
+   "3": 0.3158,
+   "4": 0.1053
+  },
+  "income": [
+   7000,
+   38000
+  ],
+  "digital": 0.42,
+  "risk": 0.56,
+  "patience": 0.46,
+  "conformity": 0.5,
+  "status": 0.34,
+  "price": 0.96,
+  "jugaad": 0.97,
+  "fatalism": 0.5,
+  "optimism": 0.52,
+  "trust_gov": 0.3,
+  "trust_media": 0.34,
+  "education": 0.4,
+  "social_radius": 0.78,
+  "voice": 0.36,
+  "horizon": 2,
+  "aspiration": "Daily cash, no eviction, kids in school",
+  "fears": [
+   "Eviction",
+   "Rain",
+   "Police extortion"
+  ],
+  "values": [
+   "Survival",
+   "Hustle",
+   "Loyalty"
+  ],
+  "info": [
+   "WhatsApp",
+   "Word of mouth",
+   "YouTube"
+  ],
+  "quirk": "Prices by face, discounts by familiarity."
+ },
+ {
+  "id": "auto_driver",
+  "label": "Auto / taxi driver",
+  "short": "Last-mile mobility",
+  "category": "informal",
+  "tiers": {
+   "1": 0.2941,
+   "2": 0.3529,
+   "3": 0.2941,
+   "4": 0.0588
+  },
+  "income": [
+   9000,
+   42000
+  ],
+  "digital": 0.56,
+  "risk": 0.56,
+  "patience": 0.46,
+  "conformity": 0.52,
+  "status": 0.42,
+  "price": 0.92,
+  "jugaad": 0.96,
+  "fatalism": 0.5,
+  "optimism": 0.5,
+  "trust_gov": 0.34,
+  "trust_media": 0.46,
+  "education": 0.46,
+  "social_radius": 0.82,
+  "voice": 0.52,
+  "horizon": 2,
+  "aspiration": "Own the vehicle, steady school fees, fuel savings",
+  "fears": [
+   "Fuel price",
+   "Accident",
+   "App commission"
+  ],
+  "values": [
+   "Independence",
+   "Cash",
+   "Respect"
+  ],
+  "info": [
+   "WhatsApp",
+   "YouTube",
+   "FM radio",
+   "Passenger talk"
+  ],
+  "quirk": "Has an opinion on every route and every policy."
+ },
+ {
+  "id": "gig_rider",
+  "label": "Gig delivery rider",
+  "short": "Platform worker",
+  "category": "gig",
+  "tiers": {
+   "1": 0.4103,
+   "2": 0.359,
+   "3": 0.2051,
+   "4": 0.0256
+  },
+  "income": [
+   10000,
+   38000
+  ],
+  "digital": 0.82,
+  "risk": 0.66,
+  "patience": 0.34,
+  "conformity": 0.44,
+  "status": 0.36,
+  "price": 0.92,
+  "jugaad": 0.88,
+  "fatalism": 0.46,
+  "optimism": 0.62,
+  "trust_gov": 0.3,
+  "trust_media": 0.5,
+  "education": 0.56,
+  "social_radius": 0.62,
+  "voice": 0.62,
+  "horizon": 2,
+  "aspiration": "Higher earnings, own bike, exit the algorithm",
+  "fears": [
+   "Accident",
+   "ID block",
+   "Petrol price"
+  ],
+  "values": [
+   "Speed",
+   "Freedom",
+   "Survival"
+  ],
+  "info": [
+   "WhatsApp",
+   "YouTube",
+   "Instagram",
+   "Telegram"
+  ],
+  "quirk": "Knows the city better than the map."
+ },
+ {
+  "id": "factory_worker",
+  "label": "Factory / industrial worker",
+  "short": "Manufacturing",
+  "category": "blue_collar",
+  "tiers": {
+   "1": 0.1333,
+   "2": 0.2667,
+   "3": 0.4,
+   "4": 0.2
+  },
+  "income": [
+   9000,
+   35000
+  ],
+  "digital": 0.46,
+  "risk": 0.36,
+  "patience": 0.56,
+  "conformity": 0.72,
+  "status": 0.36,
+  "price": 0.96,
+  "jugaad": 0.72,
+  "fatalism": 0.56,
+  "optimism": 0.46,
+  "trust_gov": 0.46,
+  "trust_media": 0.4,
+  "education": 0.46,
+  "social_radius": 0.56,
+  "voice": 0.32,
+  "horizon": 4,
+  "aspiration": "Overtime, permanent job, own house",
+  "fears": [
+   "Layoff",
+   "Injury",
+   "Wage theft"
+  ],
+  "values": [
+   "Security",
+   "Solidarity",
+   "Fairness"
+  ],
+  "info": [
+   "WhatsApp",
+   "YouTube",
+   "Union talk",
+   "Local news"
+  ],
+  "quirk": "Calculates in shifts, not months."
+ },
+ {
+  "id": "farmer",
+  "label": "Farmer (small / marginal)",
+  "short": "Agriculture",
+  "category": "agri",
+  "tiers": {
+   "1": 0.0,
+   "2": 0.0667,
+   "3": 0.2667,
+   "4": 0.6667
+  },
+  "income": [
+   6000,
+   30000
+  ],
+  "digital": 0.36,
+  "risk": 0.42,
+  "patience": 0.62,
+  "conformity": 0.7,
+  "status": 0.42,
+  "price": 0.96,
+  "jugaad": 0.92,
+  "fatalism": 0.66,
+  "optimism": 0.46,
+  "trust_gov": 0.52,
+  "trust_media": 0.34,
+  "education": 0.36,
+  "social_radius": 0.78,
+  "voice": 0.36,
+  "horizon": 5,
+  "aspiration": "Predictable yield, fair mandi price, debt-free",
+  "fears": [
+   "Monsoon failure",
+   "Input counterfeit",
+   "Debt"
+  ],
+  "values": [
+   "Land",
+   "Lineage",
+   "Reciprocity"
+  ],
+  "info": [
+   "WhatsApp",
+   "Kisan groups",
+   "Local dealer",
+   "Radio"
+  ],
+  "quirk": "Trusts the seed dealer more than the app."
+ },
+ {
+  "id": "agri_labour",
+  "label": "Agricultural labourer",
+  "short": "Farm labour",
+  "category": "agri",
+  "tiers": {
+   "1": 0.0,
+   "2": 0.0435,
+   "3": 0.1739,
+   "4": 0.7826
+  },
+  "income": [
+   4000,
+   18000
+  ],
+  "digital": 0.26,
+  "risk": 0.3,
+  "patience": 0.42,
+  "conformity": 0.76,
+  "status": 0.24,
+  "price": 0.99,
+  "jugaad": 0.86,
+  "fatalism": 0.72,
+  "optimism": 0.4,
+  "trust_gov": 0.44,
+  "trust_media": 0.3,
+  "education": 0.24,
+  "social_radius": 0.72,
+  "voice": 0.22,
+  "horizon": 1,
+  "aspiration": "Daily wage, food security, children's schooling",
+  "fears": [
+   "Illness",
+   "Drought",
+   "Wage delay"
+  ],
+  "values": [
+   "Endurance",
+   "Community",
+   "Faith"
+  ],
+  "info": [
+   "Word of mouth",
+   "WhatsApp",
+   "Panchayat"
+  ],
+  "quirk": "Understands risk as weather, not volatility."
+ },
+ {
+  "id": "homemaker",
+  "label": "Homemaker",
+  "short": "Household anchor",
+  "category": "care",
+  "tiers": {
+   "1": 0.1538,
+   "2": 0.2308,
+   "3": 0.3077,
+   "4": 0.3077
+  },
+  "income": [
+   0,
+   18000
+  ],
+  "digital": 0.58,
+  "risk": 0.26,
+  "patience": 0.74,
+  "conformity": 0.82,
+  "status": 0.56,
+  "price": 0.96,
+  "jugaad": 0.97,
+  "fatalism": 0.46,
+  "optimism": 0.56,
+  "trust_gov": 0.5,
+  "trust_media": 0.56,
+  "education": 0.56,
+  "social_radius": 0.72,
+  "voice": 0.46,
+  "horizon": 6,
+  "aspiration": "Family wellbeing, children's future, respect",
+  "fears": [
+   "Price rise",
+   "Health emergency",
+   "Safety"
+  ],
+  "values": [
+   "Care",
+   "Thrift",
+   "Family"
+  ],
+  "info": [
+   "WhatsApp",
+   "YouTube",
+   "ShareChat",
+   "TV"
+  ],
+  "quirk": "Runs the household CFO function unpaid."
+ },
+ {
+  "id": "student",
+  "label": "Student",
+  "short": "School / college",
+  "category": "student",
+  "tiers": {
+   "1": 0.25,
+   "2": 0.25,
+   "3": 0.2917,
+   "4": 0.2083
+  },
+  "income": [
+   0,
+   12000
+  ],
+  "digital": 0.92,
+  "risk": 0.7,
+  "patience": 0.56,
+  "conformity": 0.54,
+  "status": 0.82,
+  "price": 0.86,
+  "jugaad": 0.76,
+  "fatalism": 0.24,
+  "optimism": 0.78,
+  "trust_gov": 0.34,
+  "trust_media": 0.7,
+  "education": 0.72,
+  "social_radius": 0.82,
+  "voice": 0.94,
+  "horizon": 6,
+  "aspiration": "Good job, social validation, escape the hometown",
+  "fears": [
+   "Unemployment",
+   "Comparison",
+   "Exam failure"
+  ],
+  "values": [
+   "Aspiration",
+   "Identity",
+   "Friendship"
+  ],
+  "info": [
+   "Instagram",
+   "YouTube",
+   "X",
+   "Reddit",
+   "Discord"
+  ],
+  "quirk": "Researches for 4 hours, buys in 4 minutes."
+ },
+ {
+  "id": "jobseeker",
+  "label": "Graduate jobseeker",
+  "short": "First job / gig",
+  "category": "student",
+  "tiers": {
+   "1": 0.1765,
+   "2": 0.2941,
+   "3": 0.3529,
+   "4": 0.1765
+  },
+  "income": [
+   0,
+   22000
+  ],
+  "digital": 0.86,
+  "risk": 0.6,
+  "patience": 0.6,
+  "conformity": 0.56,
+  "status": 0.82,
+  "price": 0.82,
+  "jugaad": 0.72,
+  "fatalism": 0.42,
+  "optimism": 0.66,
+  "trust_gov": 0.34,
+  "trust_media": 0.64,
+  "education": 0.82,
+  "social_radius": 0.78,
+  "voice": 0.88,
+  "horizon": 4,
+  "aspiration": "First offer, financial independence, marriage market",
+  "fears": [
+   "Rejection",
+   "Skill obsolescence",
+   "Family pressure"
+  ],
+  "values": [
+   "Ambition",
+   "Fairness",
+   "Belonging"
+  ],
+  "info": [
+   "LinkedIn",
+   "Telegram",
+   "YouTube",
+   "Instagram"
+  ],
+  "quirk": "Sends 40 applications and one very honest tweet."
+ },
+ {
+  "id": "asha",
+  "label": "ASHA / Anganwadi worker",
+  "short": "Frontline health",
+  "category": "care",
+  "tiers": {
+   "1": 0.0588,
+   "2": 0.1176,
+   "3": 0.3529,
+   "4": 0.4706
+  },
+  "income": [
+   5000,
+   22000
+  ],
+  "digital": 0.42,
+  "risk": 0.3,
+  "patience": 0.78,
+  "conformity": 0.7,
+  "status": 0.52,
+  "price": 0.9,
+  "jugaad": 0.92,
+  "fatalism": 0.4,
+  "optimism": 0.66,
+  "trust_gov": 0.66,
+  "trust_media": 0.46,
+  "education": 0.52,
+  "social_radius": 0.94,
+  "voice": 0.56,
+  "horizon": 6,
+  "aspiration": "Community respect, regular honorarium, child health",
+  "fears": [
+   "Stock-out",
+   "Unpaid work",
+   "Safety"
+  ],
+  "values": [
+   "Service",
+   "Trust",
+   "Local knowledge"
+  ],
+  "info": [
+   "WhatsApp",
+   "Anganwadi network",
+   "Radio"
+  ],
+  "quirk": "Is the last mile of every government scheme."
+ },
+ {
+  "id": "artisan",
+  "label": "Artisan / weaver",
+  "short": "Handicraft / handloom",
+  "category": "informal",
+  "tiers": {
+   "1": 0.0714,
+   "2": 0.1429,
+   "3": 0.3571,
+   "4": 0.4286
+  },
+  "income": [
+   5000,
+   26000
+  ],
+  "digital": 0.36,
+  "risk": 0.36,
+  "patience": 0.72,
+  "conformity": 0.66,
+  "status": 0.46,
+  "price": 0.92,
+  "jugaad": 0.96,
+  "fatalism": 0.56,
+  "optimism": 0.5,
+  "trust_gov": 0.42,
+  "trust_media": 0.32,
+  "education": 0.36,
+  "social_radius": 0.66,
+  "voice": 0.32,
+  "horizon": 7,
+  "aspiration": "Fair price, GI tag, next generation stays",
+  "fears": [
+   "Middleman margin",
+   "Copycats",
+   "Craft loss"
+  ],
+  "values": [
+   "Craft",
+   "Dignity",
+   "Continuity"
+  ],
+  "info": [
+   "WhatsApp",
+   "Exhibitions",
+   "Word of mouth"
+  ],
+  "quirk": "Can price a month of labour, not a minute of attention."
+ },
+ {
+  "id": "retired",
+  "label": "Retired / pensioner",
+  "short": "Post-work",
+  "category": "retired",
+  "tiers": {
+   "1": 0.2143,
+   "2": 0.3571,
+   "3": 0.2857,
+   "4": 0.1429
+  },
+  "income": [
+   8000,
+   60000
+  ],
+  "digital": 0.38,
+  "risk": 0.14,
+  "patience": 0.88,
+  "conformity": 0.82,
+  "status": 0.52,
+  "price": 0.82,
+  "jugaad": 0.72,
+  "fatalism": 0.46,
+  "optimism": 0.52,
+  "trust_gov": 0.72,
+  "trust_media": 0.58,
+  "education": 0.62,
+  "social_radius": 0.52,
+  "voice": 0.32,
+  "horizon": 3,
+  "aspiration": "Health, family visits, capital preservation",
+  "fears": [
+   "Fraud",
+   "Health cost",
+   "Being a burden"
+  ],
+  "values": [
+   "Thrift",
+   "Legacy",
+   "Order"
+  ],
+  "info": [
+   "Newspaper",
+   "TV",
+   "WhatsApp",
+   "Family"
+  ],
+  "quirk": "Has seen every scheme since 1975 and trusts none of the new ones."
+ },
+ {
+  "id": "salesperson",
+  "label": "Salesperson / field agent",
+  "short": "On-ground sales",
+  "category": "sales",
+  "tiers": {
+   "1": 0.1905,
+   "2": 0.3333,
+   "3": 0.3333,
+   "4": 0.1429
+  },
+  "income": [
+   10000,
+   45000
+  ],
+  "digital": 0.72,
+  "risk": 0.62,
+  "patience": 0.52,
+  "conformity": 0.56,
+  "status": 0.7,
+  "price": 0.64,
+  "jugaad": 0.87,
+  "fatalism": 0.34,
+  "optimism": 0.72,
+  "trust_gov": 0.36,
+  "trust_media": 0.56,
+  "education": 0.62,
+  "social_radius": 0.88,
+  "voice": 0.78,
+  "horizon": 3,
+  "aspiration": "Incentives, promotion, respect in the market",
+  "fears": [
+   "Target miss",
+   "Chargeback",
+   "Rejection"
+  ],
+  "values": [
+   "Persuasion",
+   "Relationships",
+   "Commission"
+  ],
+  "info": [
+   "WhatsApp",
+   "YouTube",
+   "Instagram",
+   "Local network"
+  ],
+  "quirk": "Can sell ice to a glacier and a warranty to a saint."
+ },
+ {
+  "id": "influencer",
+  "label": "Creator / influencer",
+  "short": "Attention economy",
+  "category": "media",
+  "tiers": {
+   "1": 0.3571,
+   "2": 0.3571,
+   "3": 0.2143,
+   "4": 0.0714
+  },
+  "income": [
+   8000,
+   180000
+  ],
+  "digital": 0.99,
+  "risk": 0.82,
+  "patience": 0.38,
+  "conformity": 0.34,
+  "status": 0.96,
+  "price": 0.4,
+  "jugaad": 0.72,
+  "fatalism": 0.18,
+  "optimism": 0.88,
+  "trust_gov": 0.24,
+  "trust_media": 0.92,
+  "education": 0.72,
+  "social_radius": 0.96,
+  "voice": 1.0,
+  "horizon": 3,
+  "aspiration": "Reach, brand deals, cultural relevance",
+  "fears": [
+   "Algorithm change",
+   "Cancellation",
+   "Irrelevance"
+  ],
+  "values": [
+   "Attention",
+   "Authenticity",
+   "Growth"
+  ],
+  "info": [
+   "Every platform",
+   "Analytics",
+   "Brand decks"
+  ],
+  "quirk": "Calls a paid post a 'community recommendation'."
+ },
+ {
+  "id": "journalist",
+  "label": "Journalist / fact-checker",
+  "short": "Newsroom",
+  "category": "media",
+  "tiers": {
+   "1": 0.5455,
+   "2": 0.3636,
+   "3": 0.0909,
+   "4": 0.0
+  },
+  "income": [
+   20000,
+   90000
+  ],
+  "digital": 0.96,
+  "risk": 0.5,
+  "patience": 0.78,
+  "conformity": 0.3,
+  "status": 0.7,
+  "price": 0.4,
+  "jugaad": 0.5,
+  "fatalism": 0.28,
+  "optimism": 0.6,
+  "trust_gov": 0.3,
+  "trust_media": 0.82,
+  "education": 0.92,
+  "social_radius": 0.72,
+  "voice": 0.84,
+  "horizon": 5,
+  "aspiration": "Truth, impact, byline",
+  "fears": [
+   "Misinformation",
+   "Pressure",
+   "Layoffs"
+  ],
+  "values": [
+   "Verification",
+   "Public interest",
+   "Skepticism"
+  ],
+  "info": [
+   "X",
+   "Newsrooms",
+   "Databases",
+   "WhatsApp tips"
+  ],
+  "quirk": "Says 'source?' before 'hello'."
+ },
+ {
+  "id": "ward_politician",
+  "label": "Ward politician / local leader",
+  "short": "Local power",
+  "category": "public",
+  "tiers": {
+   "1": 0.0667,
+   "2": 0.2,
+   "3": 0.3333,
+   "4": 0.4
+  },
+  "income": [
+   15000,
+   90000
+  ],
+  "digital": 0.62,
+  "risk": 0.72,
+  "patience": 0.62,
+  "conformity": 0.5,
+  "status": 0.98,
+  "price": 0.5,
+  "jugaad": 0.96,
+  "fatalism": 0.28,
+  "optimism": 0.72,
+  "trust_gov": 0.6,
+  "trust_media": 0.6,
+  "education": 0.56,
+  "social_radius": 1.0,
+  "voice": 0.82,
+  "horizon": 3,
+  "aspiration": "Constituency, visibility, legacy",
+  "fears": [
+   "Loss of relevance",
+   "Scandal",
+   "Opposition"
+  ],
+  "values": [
+   "Power",
+   "Patronage",
+   "Visibility"
+  ],
+  "info": [
+   "WhatsApp",
+   "Local news",
+   "Community meetings"
+  ],
+  "quirk": "Turns every ribbon-cutting into a photo-op."
+ },
+ {
+  "id": "police",
+  "label": "Police / constable",
+  "short": "Public order",
+  "category": "public",
+  "tiers": {
+   "1": 0.1538,
+   "2": 0.3077,
+   "3": 0.3077,
+   "4": 0.2308
+  },
+  "income": [
+   15000,
+   55000
+  ],
+  "digital": 0.56,
+  "risk": 0.4,
+  "patience": 0.6,
+  "conformity": 0.88,
+  "status": 0.66,
+  "price": 0.72,
+  "jugaad": 0.82,
+  "fatalism": 0.4,
+  "optimism": 0.5,
+  "trust_gov": 0.82,
+  "trust_media": 0.44,
+  "education": 0.56,
+  "social_radius": 0.62,
+  "voice": 0.36,
+  "horizon": 6,
+  "aspiration": "Posting, family stability, respect",
+  "fears": [
+   "Transfer",
+   "Public anger",
+   "Injury"
+  ],
+  "values": [
+   "Order",
+   "Hierarchy",
+   "Security"
+  ],
+  "info": [
+   "WhatsApp",
+   "Local news",
+   "Briefings"
+  ],
+  "quirk": "Believes rules are for the public, discretion is for the job."
+ },
+ {
+  "id": "bank_agent",
+  "label": "Bank / insurance agent",
+  "short": "Financial last mile",
+  "category": "sales",
+  "tiers": {
+   "1": 0.1667,
+   "2": 0.3333,
+   "3": 0.3333,
+   "4": 0.1667
+  },
+  "income": [
+   12000,
+   55000
+  ],
+  "digital": 0.76,
+  "risk": 0.42,
+  "patience": 0.72,
+  "conformity": 0.62,
+  "status": 0.72,
+  "price": 0.5,
+  "jugaad": 0.72,
+  "fatalism": 0.24,
+  "optimism": 0.62,
+  "trust_gov": 0.62,
+  "trust_media": 0.46,
+  "education": 0.76,
+  "social_radius": 0.84,
+  "voice": 0.58,
+  "horizon": 6,
+  "aspiration": "AUM, trust, cross-sell",
+  "fears": [
+   "Mis-selling backlash",
+   "Regulatory action",
+   "Default"
+  ],
+  "values": [
+   "Trust",
+   "Compliance",
+   "Commission"
+  ],
+  "info": [
+   "WhatsApp",
+   "CRM",
+   "YouTube",
+   "Training"
+  ],
+  "quirk": "Sells trust by the gram and commission by the basis point."
+ },
+ {
+  "id": "tailor_beauty",
+  "label": "Tailor / beauty worker",
+  "short": "Hyperlocal services",
+  "category": "informal",
+  "tiers": {
+   "1": 0.1667,
+   "2": 0.2778,
+   "3": 0.3333,
+   "4": 0.2222
+  },
+  "income": [
+   6000,
+   32000
+  ],
+  "digital": 0.5,
+  "risk": 0.46,
+  "patience": 0.62,
+  "conformity": 0.66,
+  "status": 0.5,
+  "price": 0.92,
+  "jugaad": 0.96,
+  "fatalism": 0.4,
+  "optimism": 0.56,
+  "trust_gov": 0.4,
+  "trust_media": 0.42,
+  "education": 0.5,
+  "social_radius": 0.72,
+  "voice": 0.42,
+  "horizon": 4,
+  "aspiration": "Steady clients, own shop, daughter's education",
+  "fears": [
+   "Seasonality",
+   "Rent",
+   "Health"
+  ],
+  "values": [
+   "Craft",
+   "Trust",
+   "Independence"
+  ],
+  "info": [
+   "WhatsApp",
+   "Instagram",
+   "YouTube",
+   "Word of mouth"
+  ],
+  "quirk": "Knows every family's measurements and secrets."
+ },
+ {
+  "id": "migrant_worker",
+  "label": "Migrant construction worker",
+  "short": "Interstate labour",
+  "category": "blue_collar",
+  "tiers": {
+   "1": 0.2667,
+   "2": 0.2667,
+   "3": 0.3333,
+   "4": 0.1333
+  },
+  "income": [
+   8000,
+   30000
+  ],
+  "digital": 0.32,
+  "risk": 0.52,
+  "patience": 0.42,
+  "conformity": 0.62,
+  "status": 0.3,
+  "price": 0.98,
+  "jugaad": 0.92,
+  "fatalism": 0.66,
+  "optimism": 0.46,
+  "trust_gov": 0.34,
+  "trust_media": 0.26,
+  "education": 0.3,
+  "social_radius": 0.66,
+  "voice": 0.26,
+  "horizon": 1,
+  "aspiration": "Send money home, return for harvest, build a house",
+  "fears": [
+   "Wage theft",
+   "Injury",
+   "Police harassment"
+  ],
+  "values": [
+   "Remittance",
+   "Family",
+   "Endurance"
+  ],
+  "info": [
+   "WhatsApp",
+   "Contractor",
+   "Fellow workers"
+  ],
+  "quirk": "Lives in one city, plans in another."
+ },
+ {
+  "id": "tea_stall",
+  "label": "Tea stall / food vendor",
+  "short": "Street food",
+  "category": "informal",
+  "tiers": {
+   "1": 0.2778,
+   "2": 0.2778,
+   "3": 0.2778,
+   "4": 0.1667
+  },
+  "income": [
+   6000,
+   35000
+  ],
+  "digital": 0.46,
+  "risk": 0.5,
+  "patience": 0.5,
+  "conformity": 0.54,
+  "status": 0.4,
+  "price": 0.96,
+  "jugaad": 0.98,
+  "fatalism": 0.44,
+  "optimism": 0.56,
+  "trust_gov": 0.34,
+  "trust_media": 0.4,
+  "education": 0.4,
+  "social_radius": 0.86,
+  "voice": 0.46,
+  "horizon": 2,
+  "aspiration": "More customers, stable rent, children's schooling",
+  "fears": [
+   "Eviction",
+   "Price rise",
+   "Health inspection"
+  ],
+  "values": [
+   "Hustle",
+   "Gossip",
+   "Hospitality"
+  ],
+  "info": [
+   "WhatsApp",
+   "YouTube",
+   "Customer chatter"
+  ],
+  "quirk": "Runs the neighbourhood's unofficial intelligence agency."
+ },
+ {
+  "id": "nurse_pharmacist",
+  "label": "Nurse / pharmacist",
+  "short": "Frontline care",
+  "category": "care",
+  "tiers": {
+   "1": 0.125,
+   "2": 0.25,
+   "3": 0.375,
+   "4": 0.25
+  },
+  "income": [
+   12000,
+   48000
+  ],
+  "digital": 0.58,
+  "risk": 0.32,
+  "patience": 0.76,
+  "conformity": 0.64,
+  "status": 0.6,
+  "price": 0.76,
+  "jugaad": 0.82,
+  "fatalism": 0.34,
+  "optimism": 0.62,
+  "trust_gov": 0.64,
+  "trust_media": 0.44,
+  "education": 0.74,
+  "social_radius": 0.76,
+  "voice": 0.46,
+  "horizon": 6,
+  "aspiration": "Stable income, respect, better clinic",
+  "fears": [
+   "Burnout",
+   "Stock-out",
+   "Abuse"
+  ],
+  "values": [
+   "Care",
+   "Accuracy",
+   "Dignity"
+  ],
+  "info": [
+   "WhatsApp",
+   "YouTube",
+   "Medical reps"
+  ],
+  "quirk": "Knows which medicine is real and which is 'same-to-same'."
+ },
+ {
+  "id": "ngo_worker",
+  "label": "NGO / community worker",
+  "short": "Civil society",
+  "category": "public",
+  "tiers": {
+   "1": 0.1875,
+   "2": 0.25,
+   "3": 0.3125,
+   "4": 0.25
+  },
+  "income": [
+   10000,
+   45000
+  ],
+  "digital": 0.72,
+  "risk": 0.46,
+  "patience": 0.82,
+  "conformity": 0.5,
+  "status": 0.56,
+  "price": 0.72,
+  "jugaad": 0.82,
+  "fatalism": 0.28,
+  "optimism": 0.78,
+  "trust_gov": 0.5,
+  "trust_media": 0.62,
+  "education": 0.82,
+  "social_radius": 0.96,
+  "voice": 0.72,
+  "horizon": 8,
+  "aspiration": "Dignity, systemic change, community agency",
+  "fears": [
+   "Funding cut",
+   "Elite capture",
+   "Burnout"
+  ],
+  "values": [
+   "Justice",
+   "Participation",
+   "Dignity"
+  ],
+  "info": [
+   "WhatsApp",
+   "X",
+   "Reports",
+   "Field networks"
+  ],
+  "quirk": "Has a theory of change for everything, including lunch."
+ },
+ {
+  "id": "electrician",
+  "label": "Electrician / repair technician",
+  "short": "Repair economy",
+  "category": "informal",
+  "tiers": {
+   "1": 0.1875,
+   "2": 0.25,
+   "3": 0.3125,
+   "4": 0.25
+  },
+  "income": [
+   8000,
+   34000
+  ],
+  "digital": 0.54,
+  "risk": 0.5,
+  "patience": 0.56,
+  "conformity": 0.5,
+  "status": 0.44,
+  "price": 0.86,
+  "jugaad": 0.99,
+  "fatalism": 0.4,
+  "optimism": 0.6,
+  "trust_gov": 0.4,
+  "trust_media": 0.4,
+  "education": 0.5,
+  "social_radius": 0.82,
+  "voice": 0.42,
+  "horizon": 3,
+  "aspiration": "More service calls, own tools, steady cash",
+  "fears": [
+   "Competition",
+   "Spare-part fraud",
+   "Injury"
+  ],
+  "values": [
+   "Skill",
+   "Jugaad",
+   "Reputation"
+  ],
+  "info": [
+   "WhatsApp",
+   "YouTube repair channels",
+   "Local network"
+  ],
+  "quirk": "Fixes a 2026 machine with a 1998 jugaad."
+ },
+ {
+  "id": "cable_operator",
+  "label": "Cable / internet operator",
+  "short": "Last-mile connectivity",
+  "category": "informal",
+  "tiers": {
+   "1": 0.1429,
+   "2": 0.2143,
+   "3": 0.3571,
+   "4": 0.2857
+  },
+  "income": [
+   7000,
+   30000
+  ],
+  "digital": 0.82,
+  "risk": 0.5,
+  "patience": 0.5,
+  "conformity": 0.5,
+  "status": 0.48,
+  "price": 0.74,
+  "jugaad": 0.96,
+  "fatalism": 0.34,
+  "optimism": 0.6,
+  "trust_gov": 0.4,
+  "trust_media": 0.58,
+  "education": 0.58,
+  "social_radius": 0.7,
+  "voice": 0.48,
+  "horizon": 3,
+  "aspiration": "Subscriber base, better margin, respect",
+  "fears": [
+   "OTT bundling",
+   "Fiber competition",
+   "Non-payment"
+  ],
+  "values": [
+   "Connectivity",
+   "Service",
+   "Cash"
+  ],
+  "info": [
+   "WhatsApp",
+   "YouTube",
+   "Telegram",
+   "Local news"
+  ],
+  "quirk": "Knows which neighbour is streaming what."
+ },
+ {
+  "id": "erickshaw_driver",
+  "label": "E-rickshaw driver",
+  "short": "Short-distance mobility",
+  "category": "informal",
+  "tiers": {
+   "1": 0.1176,
+   "2": 0.2353,
+   "3": 0.3529,
+   "4": 0.2941
+  },
+  "income": [
+   5000,
+   26000
+  ],
+  "digital": 0.36,
+  "risk": 0.5,
+  "patience": 0.42,
+  "conformity": 0.62,
+  "status": 0.36,
+  "price": 0.98,
+  "jugaad": 0.96,
+  "fatalism": 0.56,
+  "optimism": 0.5,
+  "trust_gov": 0.34,
+  "trust_media": 0.36,
+  "education": 0.34,
+  "social_radius": 0.78,
+  "voice": 0.42,
+  "horizon": 2,
+  "aspiration": "Own the rickshaw, daily cash, children's school",
+  "fears": [
+   "Battery replacement",
+   "Police",
+   "Loan"
+  ],
+  "values": [
+   "Survival",
+   "Freedom",
+   "Cash"
+  ],
+  "info": [
+   "WhatsApp",
+   "Word of mouth",
+   "YouTube"
+  ],
+  "quirk": "Will debate policy for 20 minutes, then charge ₹10 extra."
+ }
+]

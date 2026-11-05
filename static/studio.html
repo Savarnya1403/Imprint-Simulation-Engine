@@ -1,0 +1,893 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Imprint Studio — Bharat simulation</title>
+<link rel="stylesheet" href="/static/css/studio.css" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230A0A0C'/%3E%3Cg fill='none' stroke='white' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M32 10c-12 0-21 9-21 21 0 6 2 10 5 14'/%3E%3Cpath d='M32 17c-8 0-14 6-14 14 0 5 1 9 4 13'/%3E%3Cpath d='M32 24c-4 0-7 3-7 7 0 5 1 8 3 12'/%3E%3Cpath d='M32 31c-1 0-1 1-1 2 0 4 1 7 3 10'/%3E%3Cpath d='M38 18c5 2 8 7 8 13 0 5-1 9-3 13'/%3E%3Cpath d='M42 26c2 2 2 5 2 8 0 4-1 7-2 10'/%3E%3C/g%3E%3C/svg%3E" />
+</head>
+<body>
+
+<header class="st-top">
+  <a class="st-brand" href="/">
+    <svg class="fingerprint" viewBox="0 0 64 64" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M32 9.5c-12.7 0-22.5 9.8-22.5 22 0 5.6 1.7 10.4 4.8 14.6"/><path d="M32 16.5c-8.4 0-15 6.6-15 15 0 5 1.3 9.4 3.9 13.2"/><path d="M32 23.5c-4.5 0-8 3.5-8 8 0 5 1.2 8.8 3.3 12.4"/><path d="M32 30.5c-1.2 0-1.8 1.1-1.8 2.4 0 4.2 1 7.4 2.7 10.7"/><path d="M38.4 17.3c5.4 2.2 8.8 7.4 8.8 13.8 0 5.1-1 9.4-2.9 13.4"/><path d="M42.4 25.1c1.8 2 2.5 4.7 2.5 7.7 0 4.2-.9 7.6-2.3 10.7"/></g></svg>
+    <span class="wordmark">Imprint</span><span class="divider"></span><span class="product">Studio</span>
+  </a>
+  <div class="st-crumbs"><span>Bharat</span><i>/</i><span id="crumbTopic">Electric two-wheeler</span><i>/</i><b>Simulation</b></div>
+  <div class="st-status"><span class="dot" id="runDot"></span><span id="statusText">Ready</span></div>
+  <div class="st-actions">
+    <button class="text-btn" id="cmdBtn" title="Command palette (⌘K)"><span>⌘K</span></button>
+    <button class="icon-btn" id="exportBtn" title="Export run JSON"><span data-icon="download"></span></button>
+    <button class="icon-btn" id="helpBtn" title="Method notes"><span data-icon="help"></span></button>
+    <a class="text-btn" href="/">Landing <span>↗</span></a>
+  </div>
+</header>
+
+<div class="st-layout">
+  <aside class="st-rail" id="rail">
+    <div class="rail-head">
+      <span class="rail-eyebrow">Hypothesis</span>
+      <button class="rail-collapse" id="railCollapse" title="Collapse">‹</button>
+    </div>
+
+    <label class="field">
+      <span class="field__label">What do you want to test?</span>
+      <textarea id="briefInput" rows="3" maxlength="400" spellcheck="false">A ₹1.2 lakh electric scooter for tier-2 India. Will service trust decide adoption?</textarea>
+    </label>
+
+    <div class="field">
+      <span class="field__label">Scenario pack <em id="topicCategory">Mobility</em></span>
+      <select id="topicSelect" class="select"></select>
+      <div class="chips" id="topicChips"></div>
+    </div>
+
+    <div class="field">
+      <span class="field__label">Shock <em>scenario</em></span>
+      <div class="scenario-grid" id="scenarioGrid"></div>
+    </div>
+
+    <div class="field field--row">
+      <label class="mini">
+        <span>Agents <b id="agentsVal">240</b></span>
+        <input type="range" id="agentsRange" min="80" max="800" step="40" value="240" />
+      </label>
+      <label class="mini">
+        <span>Rounds <b id="roundsVal">36</b></span>
+        <input type="range" id="roundsRange" min="12" max="72" step="4" value="36" />
+      </label>
+    </div>
+
+    <div class="field">
+      <span class="field__label">Tier mix <em id="tierTotal">100%</em></span>
+      <div class="tier-mix" id="tierMix"></div>
+    </div>
+
+    <div class="field field--row">
+      <label class="mini mini--select">
+        <span>Focus state</span>
+        <select id="stateSelect" class="select select--sm"><option value="">All India</option></select>
+      </label>
+      <label class="mini mini--seed">
+        <span>Seed</span>
+        <input id="seedInput" class="input input--sm" type="number" min="0" max="999999" value="" placeholder="random" />
+        <label class="seed-lock"><input type="checkbox" id="seedLock" /> lock</label>
+      </label>
+    </div>
+
+    <label class="field">
+      <span class="field__label">Question the room must answer</span>
+      <input id="questionInput" class="input" maxlength="300" value="Would you adopt this? Why or why not?" />
+    </label>
+
+    <button class="run-btn" id="runBtn">
+      <span class="run-btn__icon" data-icon="play"></span>
+      <span class="run-btn__label">Run simulation</span>
+      <span class="run-btn__hint">⌘↵</span>
+    </button>
+    <button class="btn btn--ghost" id="compareBtn"><span>↔</span>Compare runs</button>
+    <button class="btn btn--ghost" id="reasonBtn"><span data-icon="bolt"></span>Deep reason</button>
+
+    <div class="field">
+      <span class="field__label">Parameter lab <em>(calibration weights)</em></span>
+      <div class="param-lab" id="paramLab"></div>
+      <button class="btn btn--ghost btn--sm" id="paramApply"><span>↻</span>Apply &amp; re-run</button>
+    </div>
+
+    <div class="run-meta" id="runMeta">
+      <div><span>Model</span><b>Reasoning Core v2</b></div>
+      <div><span>Forecast</span><b>TimesFM 3.0</b></div>
+      <div><span>Run</span><b id="runId">—</b></div>
+    </div>
+
+    <p class="rail-note">Synthetic rehearsal, not a representative survey. Every parameter is explicit and auditable. Change the seed to test sensitivity.</p>
+    <div class="rail-foot">
+      <div class="sys-strip"><span class="sys-chip" id="sysForecast">TimesFM: —</span><span class="sys-chip" id="sysLLM">LLM: —</span><span class="sys-chip" id="sysContext">Context: —</span></div>
+      <div class="rail-shortcuts">⌘K jump · Space play · R run · E export · ? help</div>
+    </div>
+  </aside>
+
+  <main class="st-main">
+    <nav class="tabs" id="tabs">
+      <button class="tab active" data-tab="world">World</button>
+      <button class="tab" data-tab="social">Social</button>
+      <button class="tab" data-tab="debate">Debate</button>
+      <button class="tab" data-tab="focus">Focus group</button>
+      <button class="tab" data-tab="cognition">Cognition</button>
+      <button class="tab" data-tab="forecast">Forecast</button>
+      <button class="tab" data-tab="evidence">Evidence</button>
+      <button class="tab" data-tab="research">Research</button>
+      <button class="tab" data-tab="atlas">Atlas</button>
+      <button class="tab" data-tab="precedents">Precedents</button>
+      <button class="tab" data-tab="causal">Causal</button>
+      <button class="tab" data-tab="calibration">Calibration</button>
+      <button class="tab" data-tab="reasoning">Reasoning</button>
+      <button class="tab" data-tab="report">Report</button>
+      <span class="tabs__spacer"></span>
+      <span class="tabs__meta" id="tabsMeta">—</span>
+    </nav>
+
+    <div class="views" id="views">
+
+      <!-- WORLD -->
+      <section class="view active" id="view-world">
+        <div class="metrics" id="worldMetrics"></div>
+
+        <div class="world-grid">
+          <div class="panel scene-panel">
+            <div class="panel__head">
+              <div>
+                <span class="panel__eyebrow">The world</span>
+                <h2 class="panel__title">Day <b id="sceneDay">36</b> · <span id="scenePlace">Jaipur, Rajasthan</span></h2>
+              </div>
+              <div class="scene-legend"><span class="dot"></span> live diffusion</div>
+            </div>
+
+            <div class="scene-wrap">
+              <svg class="scene" viewBox="0 0 900 540" role="img" aria-label="Animated Indian street market scene">
+                <defs>
+                  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#141416"/><stop offset="60%" stop-color="#0e0e10"/><stop offset="100%" stop-color="#09090a"/>
+                  </linearGradient>
+                  <linearGradient id="road" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#1b1b1d"/><stop offset="100%" stop-color="#101012"/>
+                  </linearGradient>
+                  <radialGradient id="lamp" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#fff" stop-opacity=".22"/><stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+                  </radialGradient>
+                  <filter id="rough" x="-10%" y="-10%" width="120%" height="120%">
+                    <feTurbulence type="fractalNoise" baseFrequency=".012 .09" numOctaves="2" seed="7" result="n"/>
+                    <feDisplacementMap in="SourceGraphic" in2="n" scale="1.4" xChannelSelector="R" yChannelSelector="G"/>
+                  </filter>
+                  <filter id="soft"><feGaussianBlur stdDeviation="6"/></filter>
+                  <filter id="grain">
+                    <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="4"/>
+                    <feColorMatrix type="saturate" values="0"/>
+                    <feComponentTransfer><feFuncA type="linear" slope=".10"/></feComponentTransfer>
+                  </filter>
+                </defs>
+
+                <rect width="900" height="540" fill="url(#sky)"/>
+                <circle cx="735" cy="92" r="30" fill="none" stroke="rgba(255,255,255,.20)" stroke-width="1"/>
+                <circle cx="735" cy="92" r="2" fill="rgba(255,255,255,.4)"/>
+                <g stroke="rgba(255,255,255,.18)" fill="none" stroke-width="1" class="birds">
+                  <path d="M560 108 q6 -5 12 0 q6 -5 12 0"/><path d="M600 88 q5 -4 10 0 q5 -4 10 0"/><path d="M646 122 q4 -3 8 0 q4 -3 8 0"/>
+                </g>
+
+                <!-- skyline -->
+                <g filter="url(#rough)" stroke="rgba(255,255,255,.22)" fill="#121214" stroke-width="1.1">
+                  <rect x="40" y="176" width="90" height="150"/>
+                  <rect x="132" y="140" width="62" height="186"/>
+                  <rect x="198" y="196" width="74" height="130"/>
+                  <rect x="276" y="166" width="54" height="160"/>
+                  <rect x="336" y="210" width="92" height="116"/>
+                  <rect x="432" y="184" width="46" height="142"/>
+                  <rect x="482" y="150" width="76" height="176"/>
+                  <rect x="562" y="200" width="66" height="126"/>
+                  <rect x="632" y="172" width="86" height="154"/>
+                  <rect x="722" y="206" width="60" height="120"/>
+                  <rect x="786" y="158" width="74" height="168"/>
+                  <!-- water tanks & rooftop details -->
+                  <path d="M138 140 v-12 h20 v12 M145 128 v-8 M151 128 v-8"/>
+                  <path d="M492 150 l16 -22 l16 22"/>
+                  <path d="M648 172 v-16 M640 156 h16 M662 156 h-6"/>
+                  <!-- temple -->
+                  <path d="M360 210 l0 -30 l14 -18 l14 18 v30z"/>
+                  <path d="M374 162 l0 -14"/><circle cx="374" cy="144" r="3"/>
+                  <!-- dome -->
+                  <path d="M790 158 a18 18 0 0 1 36 0" />
+                  <path d="M804 140 v-8"/>
+                </g>
+
+                <!-- windows -->
+                <g fill="rgba(255,255,255,.30)" class="windows">
+                  <rect x="54" y="192" width="8" height="10"/><rect x="76" y="192" width="8" height="10"/><rect x="98" y="214" width="8" height="10"/>
+                  <rect x="146" y="158" width="8" height="10"/><rect x="166" y="184" width="8" height="10"/><rect x="146" y="210" width="8" height="10"/>
+                  <rect x="214" y="212" width="8" height="10"/><rect x="238" y="236" width="8" height="10"/>
+                  <rect x="290" y="184" width="8" height="10"/><rect x="306" y="212" width="8" height="10"/>
+                  <rect x="500" y="170" width="8" height="10"/><rect x="526" y="196" width="8" height="10"/><rect x="500" y="222" width="8" height="10"/>
+                  <rect x="650" y="192" width="8" height="10"/><rect x="690" y="216" width="8" height="10"/>
+                  <rect x="800" y="180" width="8" height="10"/><rect x="828" y="206" width="8" height="10"/>
+                </g>
+
+                <!-- overhead wires -->
+                <g stroke="rgba(255,255,255,.13)" fill="none" stroke-width=".9">
+                  <path d="M0 248 Q220 268 450 246 T900 252"/>
+                  <path d="M0 258 Q260 284 520 258 T900 266"/>
+                  <path d="M120 250 l0 26 M320 252 l0 22 M700 254 l0 24"/>
+                </g>
+                <g fill="rgba(255,255,255,.55)">
+                  <circle cx="160" cy="252" r="1.6"/><circle cx="400" cy="254" r="1.4"/><circle cx="620" cy="252" r="1.5"/><circle cx="840" cy="256" r="1.4"/>
+                </g>
+
+                <!-- ground -->
+                <rect x="0" y="326" width="900" height="214" fill="url(#road)"/>
+                <path d="M0 326 H900" stroke="rgba(255,255,255,.17)" stroke-width="1.2"/>
+                <path d="M0 448 H900" stroke="rgba(255,255,255,.07)" stroke-width="1"/>
+                <g stroke="rgba(255,255,255,.09)" stroke-width=".8">
+                  <path d="M60 540 L210 326"/><path d="M300 540 L360 326"/><path d="M600 540 L540 326"/><path d="M840 540 L690 326"/>
+                </g>
+
+                <!-- stalls -->
+                <g filter="url(#rough)">
+                  <!-- chai stall -->
+                  <g>
+                    <rect x="58" y="286" width="132" height="70" fill="#151517" stroke="rgba(255,255,255,.30)" stroke-width="1.2"/>
+                    <path d="M52 286 h144 l-10 -22 H62z" fill="#1c1c1f" stroke="rgba(255,255,255,.30)" stroke-width="1.2"/>
+                    <path d="M62 264 h124" stroke="rgba(255,255,255,.12)" stroke-dasharray="4 5"/>
+                    <text x="74" y="314" font-size="10" letter-spacing="2" fill="rgba(255,255,255,.7)" font-family="Inter">CHAI · चाय</text>
+                    <path d="M84 338 h26 v-14 H84z" fill="none" stroke="rgba(255,255,255,.3)"/>
+                    <path d="M110 330 q8 0 8 5 t-8 5" fill="none" stroke="rgba(255,255,255,.3)"/>
+                    <g class="steam" stroke="rgba(255,255,255,.22)" fill="none" stroke-width="1">
+                      <path d="M90 322 q-4 -8 2 -14 q6 -6 2 -14"/><path d="M102 322 q4 -8 -2 -14 q-6 -6 -2 -14"/>
+                    </g>
+                  </g>
+                  <!-- mobile / EV stall -->
+                  <g>
+                    <rect x="668" y="278" width="176" height="82" fill="#141416" stroke="rgba(255,255,255,.30)" stroke-width="1.2"/>
+                    <path d="M660 278 h192 l-12 -26 H672z" fill="#1c1c1f" stroke="rgba(255,255,255,.30)" stroke-width="1.2"/>
+                    <text x="682" y="306" font-size="9.5" letter-spacing="1.6" fill="rgba(255,255,255,.72)" font-family="Inter">SHARMA MOBILE</text>
+                    <text x="682" y="321" font-size="8" letter-spacing="1" fill="rgba(74,222,128,.75)" font-family="Inter">EV CHARGE POINT</text>
+                    <g stroke="rgba(255,255,255,.28)" fill="none">
+                      <rect x="688" y="332" width="22" height="16"/><rect x="718" y="332" width="22" height="16"/><rect x="748" y="332" width="22" height="16"/>
+                    </g>
+                  </g>
+                  <!-- vegetable cart -->
+                  <g>
+                    <path d="M352 334 h120 l-10 34 H362z" fill="#161618" stroke="rgba(255,255,255,.26)"/>
+                    <circle cx="372" cy="372" r="10" fill="none" stroke="rgba(255,255,255,.3)"/>
+                    <circle cx="452" cy="372" r="10" fill="none" stroke="rgba(255,255,255,.3)"/>
+                    <g fill="rgba(255,255,255,.16)" stroke="rgba(255,255,255,.25)">
+                      <circle cx="382" cy="326" r="8"/><circle cx="402" cy="322" r="7"/><circle cx="422" cy="327" r="8"/><circle cx="442" cy="323" r="7"/>
+                    </g>
+                  </g>
+                </g>
+
+                <!-- string lights -->
+                <g class="lights" stroke="rgba(255,255,255,.18)" fill="none">
+                  <path d="M52 264 Q200 306 348 268"/><path d="M660 252 Q760 292 860 260"/>
+                  <g fill="rgba(255,255,255,.75)" stroke="none">
+                    <circle cx="108" cy="280" r="1.8"/><circle cx="158" cy="289" r="1.8"/><circle cx="208" cy="290" r="1.8"/><circle cx="258" cy="284" r="1.8"/><circle cx="308" cy="274" r="1.8"/>
+                    <circle cx="700" cy="266" r="1.8"/><circle cx="748" cy="276" r="1.8"/><circle cx="796" cy="280" r="1.8"/><circle cx="844" cy="272" r="1.8"/>
+                  </g>
+                </g>
+
+                <!-- auto rickshaw -->
+                <g class="auto" transform="translate(560 414)">
+                  <path d="M0 30 q0 -26 24 -30 l46 -4 q20 2 24 18 l4 16z" fill="#151517" stroke="rgba(255,255,255,.45)" stroke-width="1.3"/>
+                  <path d="M14 8 h34 v18 H14z" fill="none" stroke="rgba(255,255,255,.3)"/>
+                  <path d="M52 4 h18 l8 22 H52z" fill="none" stroke="rgba(255,255,255,.3)"/>
+                  <path d="M0 30 h98" stroke="rgba(255,255,255,.45)"/>
+                  <circle cx="18" cy="34" r="9" fill="#0d0d0f" stroke="rgba(255,255,255,.5)" stroke-width="1.2"/>
+                  <circle cx="78" cy="34" r="9" fill="#0d0d0f" stroke="rgba(255,255,255,.5)" stroke-width="1.2"/>
+                  <g class="wheelspin" style="transform-origin:18px 34px"><path d="M18 25 v18 M9 34 h18" stroke="rgba(255,255,255,.3)"/></g>
+                  <g class="wheelspin" style="transform-origin:78px 34px"><path d="M78 25 v18 M69 34 h18" stroke="rgba(255,255,255,.3)"/></g>
+                  <text x="26" y="-6" font-size="7" letter-spacing="1.4" fill="rgba(255,255,255,.45)" font-family="Inter">AUTO</text>
+                </g>
+
+                <!-- cyclist -->
+                <g class="cycle" transform="translate(250 420)">
+                  <circle cx="0" cy="20" r="13" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.2"/>
+                  <circle cx="48" cy="20" r="13" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.2"/>
+                  <path d="M0 20 L16 0 L38 0 L48 20 M16 0 L24 20 L38 0 M24 20 L0 20" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.1"/>
+                  <circle cx="24" cy="4" r="3" fill="none" stroke="rgba(255,255,255,.45)"/>
+                  <path d="M24 4 L20 14 M20 14 L28 16 M24 4 L30 10" stroke="rgba(255,255,255,.4)"/>
+                  <g class="wheelspin" style="transform-origin:0px 20px"><path d="M0 7 v26 M-13 20 h26" stroke="rgba(255,255,255,.28)"/></g>
+                  <g class="wheelspin" style="transform-origin:48px 20px"><path d="M48 7 v26 M35 20 h26" stroke="rgba(255,255,255,.28)"/></g>
+                </g>
+
+                <!-- people -->
+                <g class="person woman" transform="translate(150 360)" filter="url(#rough)">
+                  <circle cx="0" cy="0" r="12" fill="#1b1b1d" stroke="rgba(255,255,255,.55)" stroke-width="1.2"/>
+                  <path d="M-2 -10 q10 -3 12 6" fill="none" stroke="rgba(255,255,255,.5)"/>
+                  <path d="M-10 12 q10 -8 20 0 l10 52 q-20 8 -40 0z" fill="#171719" stroke="rgba(255,255,255,.45)" stroke-width="1.2"/>
+                  <path d="M-8 20 q-10 18 -4 30 M8 20 q10 14 4 28" fill="none" stroke="rgba(255,255,255,.38)" stroke-width="1.2"/>
+                  <g class="legs">
+                    <path d="M-7 62 l-5 30 M7 62 l6 30" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.4"/>
+                    <path d="M-12 92 h12 M13 92 h-10" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.2"/>
+                  </g>
+                  <path d="M12 20 q14 4 22 14" fill="none" stroke="rgba(255,255,255,.38)"/>
+                  <path d="M34 34 h10 v8 h-10z" fill="none" stroke="rgba(255,255,255,.4)"/>
+                </g>
+
+                <g class="person man" transform="translate(300 372)" filter="url(#rough)">
+                  <circle cx="0" cy="0" r="11" fill="#1b1b1d" stroke="rgba(255,255,255,.55)" stroke-width="1.2"/>
+                  <path d="M-11 -4 q11 -10 22 0" fill="none" stroke="rgba(255,255,255,.5)"/>
+                  <path d="M-9 11 q9 -6 18 0 l6 52 q-15 6 -30 0z" fill="#171719" stroke="rgba(255,255,255,.45)" stroke-width="1.2"/>
+                  <path d="M9 18 q14 8 16 26" fill="none" stroke="rgba(255,255,255,.4)"/>
+                  <path d="M25 42 q4 -6 8 -2 q2 3 -2 6" fill="none" stroke="rgba(255,255,255,.4)"/>
+                  <g class="legs"><path d="M-6 63 l-4 28 M6 63 l5 28" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.4"/></g>
+                  <path d="M-9 22 q-10 12 -8 26" fill="none" stroke="rgba(255,255,255,.36)"/>
+                </g>
+
+                <g class="person vendor" transform="translate(560 336)" filter="url(#rough)">
+                  <circle cx="0" cy="0" r="11" fill="#1b1b1d" stroke="rgba(255,255,255,.55)" stroke-width="1.2"/>
+                  <path d="M-12 -6 q12 -12 24 0 l-3 6 q-9 -4 -18 0z" fill="#1f1f22" stroke="rgba(255,255,255,.45)"/>
+                  <path d="M-9 11 q9 -6 18 0 l4 46 q-13 6 -26 0z" fill="#171719" stroke="rgba(255,255,255,.45)" stroke-width="1.2"/>
+                  <path d="M-8 16 q-14 10 -12 28" fill="none" stroke="rgba(255,255,255,.4)"/>
+                  <path d="M8 18 q14 4 18 14" fill="none" stroke="rgba(255,255,255,.4)"/>
+                  <g class="wave"><path d="M26 32 q8 -12 14 -8" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.4"/></g>
+                </g>
+
+                <g class="person rider" transform="translate(410 430)">
+                  <circle cx="0" cy="0" r="10" fill="#1b1b1d" stroke="rgba(255,255,255,.55)" stroke-width="1.2"/>
+                  <path d="M-11 -4 a11 11 0 0 1 22 0" fill="none" stroke="rgba(255,255,255,.55)"/>
+                  <path d="M-8 10 q8 -5 16 0 l4 30 q-12 5 -24 0z" fill="#171719" stroke="rgba(255,255,255,.45)" stroke-width="1.2"/>
+                  <path d="M-10 14 q-12 12 -8 24 M10 14 q12 10 10 22" fill="none" stroke="rgba(255,255,255,.38)"/>
+                  <g class="scooter">
+                    <rect x="-8" y="38" width="22" height="8" rx="3" fill="#19191b" stroke="rgba(255,255,255,.45)"/>
+                    <path d="M-10 46 h28" stroke="rgba(255,255,255,.45)"/>
+                    <circle cx="-8" cy="54" r="6" fill="#0e0e10" stroke="rgba(255,255,255,.5)"/>
+                    <circle cx="18" cy="54" r="6" fill="#0e0e10" stroke="rgba(255,255,255,.5)"/>
+                    <path d="M8 38 l8 -18 h8" fill="none" stroke="rgba(255,255,255,.4)"/>
+                  </g>
+                </g>
+
+                <g class="person elder" transform="translate(810 368)" filter="url(#rough)">
+                  <circle cx="0" cy="0" r="10" fill="#1b1b1d" stroke="rgba(255,255,255,.55)" stroke-width="1.2"/>
+                  <path d="M-9 -6 q9 -6 18 0" fill="none" stroke="rgba(255,255,255,.5)"/>
+                  <path d="M-8 10 q8 -5 16 0 l5 50 q-13 5 -26 0z" fill="#171719" stroke="rgba(255,255,255,.45)" stroke-width="1.2"/>
+                  <path d="M-10 18 q-10 12 -8 26" fill="none" stroke="rgba(255,255,255,.38)"/>
+                  <path d="M14 22 v48" stroke="rgba(255,255,255,.4)" stroke-width="1.4"/>
+                  <g class="legs"><path d="M-6 60 l-4 24 M6 60 l4 24" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.3"/></g>
+                </g>
+
+                <g class="person child" transform="translate(238 444)" filter="url(#rough)">
+                  <circle cx="0" cy="0" r="7" fill="#1b1b1d" stroke="rgba(255,255,255,.5)" stroke-width="1"/>
+                  <path d="M-6 7 q6 -4 12 0 l2 22 q-8 3 -16 0z" fill="#171719" stroke="rgba(255,255,255,.42)" stroke-width="1"/>
+                  <g class="legs"><path d="M-3 29 l-3 12 M3 29 l3 12" fill="none" stroke="rgba(255,255,255,.45)"/></g>
+                  <path d="M-6 10 l-8 6 M6 10 l8 4" fill="none" stroke="rgba(255,255,255,.38)"/>
+                </g>
+
+                <!-- speech bubbles -->
+                <g class="bubbles" font-family="Inter" font-size="10">
+                  <g class="bubble b1" transform="translate(92 300)">
+                    <rect x="-20" y="-30" width="170" height="30" rx="8" fill="rgba(12,12,14,.86)" stroke="rgba(255,255,255,.24)"/>
+                    <path d="M18 0 l6 8 l6 -8" fill="rgba(12,12,14,.86)" stroke="rgba(255,255,255,.24)"/>
+                    <text x="0" y="-11" fill="rgba(255,255,255,.8)" id="bubbleA">Service kaisa hai?</text>
+                  </g>
+                  <g class="bubble b2" transform="translate(622 296)">
+                    <rect x="-10" y="-30" width="196" height="30" rx="8" fill="rgba(12,12,14,.86)" stroke="rgba(255,255,255,.24)"/>
+                    <path d="M160 0 l-6 8 l-6 -8" fill="rgba(12,12,14,.86)" stroke="rgba(255,255,255,.24)"/>
+                    <text x="4" y="-11" fill="rgba(255,255,255,.8)" id="bubbleB">Pehle charge point, phir baat.</text>
+                  </g>
+                </g>
+
+                <rect width="900" height="540" filter="url(#grain)" opacity=".6" fill="transparent"/>
+              </svg>
+
+              <div class="scene-hud">
+                <span class="hud-pill" id="hudAware">awareness 64%</span>
+                <span class="hud-pill hud-pill--green" id="hudAdopt">adoption 3.1%</span>
+                <span class="hud-pill" id="hudSent">sentiment +0.04</span>
+              </div>
+            </div>
+
+            <div class="timeline">
+              <button class="play-btn" id="playBtn" aria-label="Play simulation"><span data-icon="play"></span></button>
+              <span class="timeline__day" id="timelineDay">Day 36</span>
+              <input type="range" id="dayRange" min="1" max="36" value="36" step="1" class="range range--timeline" />
+              <span class="timeline__end" id="timelineEnd">36</span>
+            </div>
+          </div>
+
+          <div class="world-side">
+            <div class="panel map-panel">
+              <div class="panel__head">
+                <div><span class="panel__eyebrow">Geography</span><h2 class="panel__title">Where it is moving</h2></div>
+                <span class="panel__meta" id="mapMeta">Tier-weighted</span>
+              </div>
+              <div class="map-wrap"><svg id="indiaMap" viewBox="0 0 720 820" aria-label="India adoption map"></svg></div>
+              <div class="map-legend"><span>Low</span><i></i><span>High</span><b id="mapCaption">internet penetration base</b></div>
+              <div class="top-states" id="topStates"></div>
+            </div>
+
+            <div class="panel feed-panel">
+              <div class="panel__head">
+                <div><span class="panel__eyebrow">World feed</span><h2 class="panel__title">What just happened</h2></div>
+                <span class="live-chip"><span class="dot"></span>live</span>
+              </div>
+              <div class="feed" id="worldFeed"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="world-bottom">
+          <div class="panel chart-panel">
+            <div class="panel__head">
+              <div><span class="panel__eyebrow">Diffusion</span><h2 class="panel__title">Awareness, adoption, sentiment</h2></div>
+              <div class="chart-legend"><span class="lg lg--a">awareness</span><span class="lg lg--b">adoption</span><span class="lg lg--c">sentiment</span></div>
+            </div>
+            <div id="worldChart" class="chart-box"></div>
+          </div>
+          <div class="panel verdict-panel" id="worldVerdict"></div>
+        </div>
+
+        <div class="panel provenance-panel">
+          <div class="panel__head"><div><span class="panel__eyebrow">Provenance</span><h2 class="panel__title">Where each number comes from</h2></div></div>
+          <div class="prov-grid">
+            <div class="prov-item"><span class="prov-tag">Simulation</span><span>Awareness · adoption · sentiment · rejection · tier conversion — agent-based diffusion, explicit parameters, auditable seed.</span></div>
+            <div class="prov-item"><span class="prov-tag">TimesFM 3.0</span><span>Category demand history & counterfactual — Google Research zero-shot forecast, non-commercial checkpoint.</span></div>
+            <div class="prov-item"><span class="prov-tag">Atlas</span><span>Sourced context graph — 60 sources, 123 curated facts, 267 nodes; per-agent citations.</span></div>
+            <div class="prov-item"><span class="prov-tag">Precedents</span><span>16 reconstructed Indian market perception arcs — illustrative, not measured panels or causal estimates.</span></div>
+            <div class="prov-item"><span class="prov-tag">Research</span><span>Live public-record lookup (Wikipedia) for custom briefs; cached by brief text.</span></div>
+            <div class="prov-item"><span class="prov-tag">LLM</span><span>Optional open-source/hosted model for citizen replies & debate challenges; deterministic fallback when unavailable.</span></div>
+          </div>
+          <p class="causal-note">Nothing here is a representative survey, poll, or prediction of any individual. Confidence is a model-stability indicator, not sampling error. Every run is reproducible by seed.</p>
+        </div>
+
+        <div class="world-live">
+          <div class="panel agent-field-panel">
+            <div class="panel__head">
+              <div><span class="panel__eyebrow">Live agent field</span><h2 class="panel__title">Who is talking, who is moving</h2></div>
+              <span class="live-chip"><span class="dot"></span>live</span>
+            </div>
+            <canvas id="agentField" width="900" height="260" aria-label="Animated agent field"></canvas>
+            <div class="field-legend">
+              <span><i style="background:#3a3a3e"></i>unaware</span>
+              <span><i style="background:#fbbf24"></i>aware</span>
+              <span><i style="background:#4ADE80"></i>adopted</span>
+              <span><i style="background:#f87171"></i>rejected</span>
+              <span class="field-legend__note">edges = same city or tier · bubbles = today's posts</span>
+            </div>
+          </div>
+          <div class="panel venn-panel">
+            <div class="panel__head">
+              <div><span class="panel__eyebrow">Driver overlap</span><h2 class="panel__title">What the objections share</h2></div>
+            </div>
+            <svg id="vennDiagram" viewBox="0 0 360 260" aria-label="Venn diagram of drivers"></svg>
+            <p class="causal-note" id="vennNote"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SOCIAL -->
+      <section class="view" id="view-social">
+        <div class="view-head">
+          <div><span class="panel__eyebrow">Synthetic social feed</span><h1 class="view-title">The conversation, <em>as it happens.</em></h1></div>
+          <div class="view-head__stats" id="socialStats"></div>
+        </div>
+        <div class="social-layout">
+          <div class="panel social-feed-panel">
+            <div class="filters" id="socialFilters">
+              <div class="chips chips--filters" id="platformFilters"></div>
+              <div class="filters__right">
+                <select class="select select--sm" id="tierFilter"><option value="">All tiers</option><option value="1">Tier 1</option><option value="2">Tier 2</option><option value="3">Tier 3</option><option value="4">Tier 4</option></select>
+                <select class="select select--sm" id="sortFilter"><option value="impact">Top impact</option><option value="recent">Most recent</option><option value="contested">Most contested</option></select>
+              </div>
+            </div>
+            <div class="feed-list" id="socialFeed"></div>
+            <button class="load-more" id="loadMorePosts">Load more posts</button>
+          </div>
+          <aside class="social-side">
+            <div class="panel">
+              <div class="panel__head"><div><span class="panel__eyebrow">Signal</span><h2 class="panel__title">What is moving</h2></div></div>
+              <div id="trendingWords" class="trend-list"></div>
+            </div>
+            <div class="panel">
+              <div class="panel__head"><div><span class="panel__eyebrow">Sentiment</span><h2 class="panel__title">Mood by tier</h2></div></div>
+              <div id="moodByTier" class="mood-list"></div>
+            </div>
+            <div class="panel">
+              <div class="panel__head"><div><span class="panel__eyebrow">Channels</span><h2 class="panel__title">Where it spreads</h2></div></div>
+              <div id="platformMix" class="mix-list"></div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- DEBATE -->
+      <section class="view" id="view-debate">
+        <div class="view-head">
+          <div><span class="panel__eyebrow">Six citizens · four tiers · one motion</span><h1 class="view-title">The argument <em>before the purchase.</em></h1></div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn-sm" id="playDebate"><span data-icon="play"></span>Play debate</button>
+            <button class="btn-sm" id="challengeDebate"><span data-icon="bolt"></span>Challenge last point</button>
+          </div>
+        </div>
+        <div class="debate-layout">
+          <div class="panel debate-panel">
+            <div class="motion" id="debateMotion"></div>
+            <div class="debate-balance" id="debateBalance">
+              <span class="pro">Pro</span>
+              <div class="bar"><i id="debateBalanceBar" style="width:50%"></i></div>
+              <span class="con">Con</span>
+              <b id="debateBalanceVal">50 / 50</b>
+            </div>
+            <div class="transcript" id="debateTranscript"></div>
+          </div>
+          <aside class="debate-side">
+            <div class="panel">
+              <div class="panel__head"><div><span class="panel__eyebrow">The room</span><h2 class="panel__title">Who is speaking</h2></div></div>
+              <div id="debateSpeakers" class="speaker-list"></div>
+            </div>
+            <div class="panel">
+              <div class="panel__head"><div><span class="panel__eyebrow">Ground rules</span><h2 class="panel__title">How to read it</h2></div></div>
+              <p class="small-copy">Every line is generated from the agent's traits, money, tier and the public evidence attached to the topic. Claims are marked. Disagreement is the point: the transcript is a map of the fault lines, not a consensus.</p>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- FOCUS -->
+      <section class="view" id="view-focus">
+        <div class="view-head">
+          <div><span class="panel__eyebrow">Stratified focus group</span><h1 class="view-title">The room, <em>without the conference table.</em></h1></div>
+          <span class="chip chip--muted" id="focusMeta">8 participants</span>
+        </div>
+        <div class="focus-layout">
+          <div class="panel focus-members">
+            <div class="panel__head"><div><span class="panel__eyebrow">Panel</span><h2 class="panel__title">Eight citizens</h2></div></div>
+            <div id="focusMembers"></div>
+          </div>
+          <div class="panel focus-chat-panel">
+            <div class="focus-question" id="focusQuestion"></div>
+            <div class="chat-scroll" id="focusChat"></div>
+            <form class="ask-bar" id="focusForm">
+              <input id="focusInput" placeholder="Ask the group a question…" maxlength="300" autocomplete="off" />
+              <button class="ask-send" type="submit"><span data-icon="arrow"></span></button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- COGNITION -->
+      <section class="view" id="view-cognition">
+        <div class="view-head">
+          <div><span class="panel__eyebrow">Cognition model</span><h1 class="view-title">Not a persona. <em>A decision function.</em></h1></div>
+          <span class="chip chip--muted">4 tiers · 33 occupations · 16 biases</span>
+        </div>
+        <div class="tier-cards" id="tierCards"></div>
+        <div class="cognition-grid">
+          <div class="panel">
+            <div class="panel__head"><div><span class="panel__eyebrow">Drivers</span><h2 class="panel__title">What correlates with adoption</h2></div></div>
+            <div id="traitDrivers" class="bar-list"></div>
+          </div>
+          <div class="panel">
+            <div class="panel__head"><div><span class="panel__eyebrow">Biases</span><h2 class="panel__title">The shortcuts in the room</h2></div></div>
+            <div id="biasDrivers" class="bar-list"></div>
+          </div>
+        </div>
+        <div class="panel agent-panel">
+          <div class="panel__head">
+            <div><span class="panel__eyebrow">Agent explorer</span><h2 class="panel__title">Pick a citizen. Ask them anything.</h2></div>
+            <div class="agent-filters">
+              <input class="input input--sm" id="agentSearch" placeholder="Search name, city, occupation…" />
+              <select class="select select--sm" id="agentTier"><option value="">All tiers</option><option value="1">Tier 1</option><option value="2">Tier 2</option><option value="3">Tier 3</option><option value="4">Tier 4</option></select>
+            </div>
+          </div>
+          <div class="agent-grid" id="agentGrid"></div>
+          <button class="load-more" id="loadMoreAgents">Show more citizens</button>
+        </div>
+      </section>
+
+      <!-- FORECAST -->
+      <section class="view" id="view-forecast">
+        <div class="view-head">
+          <div><span class="panel__eyebrow">Google Research · TimesFM 3.0</span><h1 class="view-title">The curve, <em>before the story.</em></h1></div>
+          <div class="forecast-controls">
+            <select class="select select--sm" id="forecastTopic"></select>
+            <select class="select select--sm" id="forecastHorizon"><option value="6">6 months</option><option value="12" selected>12 months</option><option value="24">24 months</option></select>
+            <button class="btn-sm" id="forecastRun"><span data-icon="bolt"></span>Forecast</button>
+          </div>
+        </div>
+        <div class="forecast-layout">
+          <div class="panel forecast-chart-panel">
+            <div class="panel__head">
+              <div><span class="panel__eyebrow" id="forecastUnit">% of new car buyers</span><h2 class="panel__title" id="forecastTitle">Premium electric car</h2></div>
+              <span class="engine-chip" id="forecastEngine">TimesFM 3.0</span>
+            </div>
+            <div id="forecastChart" class="chart-box chart-box--tall"></div>
+            <div class="forecast-stats" id="forecastStats"></div>
+          </div>
+          <aside class="forecast-side">
+            <div class="panel">
+              <div class="panel__head"><div><span class="panel__eyebrow">Read</span><h2 class="panel__title">What the model sees</h2></div></div>
+              <p class="small-copy" id="forecastNote"></p>
+              <div class="kv" id="forecastKV"></div>
+              <p class="license-note" id="forecastLicense"></p>
+            </div>
+            <div class="panel">
+              <div class="panel__head"><div><span class="panel__eyebrow">Scenario fan</span><h2 class="panel__title">The simulation, stressed</h2></div><button class="btn-xs" id="scenarioRun">Run 7</button></div>
+              <div id="scenarioChart" class="chart-box"></div>
+              <div id="scenarioList" class="scenario-list"></div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- EVIDENCE -->
+      <section class="view" id="view-evidence">
+        <div class="view-head">
+          <div><span class="panel__eyebrow">Cited public data</span><h1 class="view-title">Every claim <em>has a source.</em></h1></div>
+          <span class="chip chip--muted" id="evidenceCount">38 cards</span>
+        </div>
+        <div class="filters evidence-filters">
+          <input class="input input--search" id="evidenceSearch" placeholder="Search evidence, organisations, claims…" />
+          <div class="chips" id="domainChips"></div>
+        </div>
+        <div class="evidence-grid" id="evidenceGrid"></div>
+      </section>
+
+      <!-- RESEARCH -->
+      <section class="view" id="view-research">
+        <div class="view-head">
+          <div><span class="panel__eyebrow">Live research on your hypothesis</span><h1 class="view-title">What the public record <em>says about it.</em></h1></div>
+          <span class="chip chip--muted" id="researchStatus">—</span>
+          <span class="chip chip--muted" id="llmStatus">LLM: …</span>
+        </div>
+        <div class="research-grid">
+          <div class="panel research-summary">
+            <div class="panel__head"><div><span class="panel__eyebrow">Source</span><h2 class="panel__title" id="researchTitle">—</h2></div><span class="panel__meta" id="researchCached"></span></div>
+            <p class="research-extract" id="researchExtract">Run a simulation on any phrase. The engine searches the public record, caches the result, and feeds it into the generic priors.</p>
+            <div class="research-links" id="researchLinks"></div>
+          </div>
+          <div class="panel">
+            <div class="panel__head"><div><span class="panel__eyebrow">How it informs the run</span><h2 class="panel__title">What changed</h2></div></div>
+            <ul class="research-notes" id="researchNotes"></ul>
+            <p class="causal-note" id="researchNote"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ATLAS -->
+      <section class="view" id="view-atlas">
+        <div class="view-head">
+          <div><span class="panel__eyebrow">Sourced context graph</span><h1 class="view-title">The context <em>behind every citizen.</em></h1></div>
+          <span class="chip chip--muted" id="atlasCount">Loading…</span>
+        </div>
+        <div class="metrics" id="atlasMetrics"></div>
+        <div class="filters evidence-filters">
+          <input class="input input--search" id="atlasSearch" placeholder="Search states, castes, categories, norms, supply constraints, festivals…" />
+          <div class="chips" id="atlasDims"></div>
+        </div>
+        <div class="atlas-layout">
+          <div class="panel">
+            <div class="panel__head"><div><span class="panel__eyebrow">Retrieval</span><h2 class="panel__title" id="atlasResultTitle">Most relevant nodes</h2></div><span class="panel__meta" id="atlasResultCount"></span></div>
+            <div id="atlasResults" class="atlas-results"></div>
+          </div>
+          <aside class="panel">
+            <div class="panel__head"><div><span class="panel__eyebrow">Integrity</span><h2 class="panel__title">Coverage &amp; audit</h2></div></div>
+            <div id="atlasAudit" class="atlas-audit"></div>
+            <p class="small-copy" id="atlasNote" style="margin-top:12px"></p>
+          </aside>
+        </div>
+        <div class="panel">
+          <div class="panel__head"><div><span class="panel__eyebrow">Sources</span><h2 class="panel__title">What the graph is built from</h2></div><span class="panel__meta" id="atlasSourceCount"></span></div>
+          <div class="source-grid" id="atlasSources"></div>
+        </div>
+      </section>
+
+      <!-- PRECEDENTS -->
+      <section class="view" id="view-precedents">
+        <div class="view-head">
+          <div><span class="panel__eyebrow">Soft precedent layer</span><h1 class="view-title">Perception, <em>not a rulebook.</em></h1></div>
+          <span class="chip chip--warn">Reconstructed · not measured</span>
+        </div>
+        <div class="metrics" id="precedentMetrics"></div>
+        <p class="small-copy" id="precedentNote" style="max-width:820px;margin-bottom:14px"></p>
+        <div class="precedents-grid" id="precedentGrid"></div>
+      </section>
+
+      <!-- CAUSAL -->
+      <section class="view" id="view-causal">
+        <div class="view-head">
+          <div><span class="panel__eyebrow">Counterfactual · conformal · placebo</span><h1 class="view-title">What moved, <em>and what might have anyway.</em></h1></div>
+          <span class="chip chip--muted">Decision support, not identification</span>
+        </div>
+        <div class="causal-controls">
+          <select class="select select--sm" id="causalTopic"></select>
+          <label class="mini-field"><span>Pre-period</span><input class="input input--sm" id="causalPre" type="number" min="18" max="90" value="72"></label>
+          <label class="mini-field"><span>Horizon</span><input class="input input--sm" id="causalHorizon" type="number" min="3" max="24" value="12"></label>
+          <label class="mini-field"><span>Sim prior %</span><input class="input input--sm" id="causalPrior" type="number" min="-100" max="200" value="0"></label>
+          <label class="mini-field"><span>Monthly value ₹</span><input class="input input--sm" id="causalValue" type="number" min="0" step="100000" value="1000000"></label>
+          <button class="btn-sm" id="causalRun"><span data-icon="bolt"></span>Analyse</button>
+        </div>
+        <p class="causal-note" style="margin:-6px 0 12px">Set the pre-period split at the decision month. The post window is compared with a TimesFM no-change counterfactual. Without a labelled decision date, read this as a drift decomposition, not an impact estimate.</p>
+        <div class="metrics" id="causalMetrics"></div>
+        <div class="causal-grid">
+          <div class="panel causal-chart-panel">
+            <div class="panel__head"><div><span class="panel__eyebrow" id="causalUnit">Observed vs counterfactual</span><h2 class="panel__title" id="causalTitle">—</h2></div><span class="engine-chip" id="causalEngine">—</span></div>
+            <div id="causalChart" class="chart-box chart-box--tall"></div>
+            <div class="forecast-stats" id="causalStats"></div>
+          </div>
+          <div class="panel">
+            <div class="panel__head"><div><span class="panel__eyebrow">Refutation</span><h2 class="panel__title">Try to break it</h2></div></div>
+            <div id="causalRefute"></div>
+          </div>
+          <div class="panel">
+            <div class="panel__head"><div><span class="panel__eyebrow">Decision distribution</span><h2 class="panel__title">Monte Carlo &amp; NPV</h2></div></div>
+            <div id="causalMC"></div>
+          </div>
+          <div class="panel">
+            <div class="panel__head"><div><span class="panel__eyebrow">Analogies</span><h2 class="panel__title">Perception precedents</h2></div></div>
+            <div id="causalPrecedents"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel__head"><div><span class="panel__eyebrow">Read before deciding</span><h2 class="panel__title">Caveats</h2></div></div>
+          <ul class="report-caveats" id="causalCaveats"></ul>
+        </div>
+      </section>
+
+      <!-- CALIBRATION -->
+      <section class="view" id="view-calibration">
+        <div class="view-head">
+          <div><span class="panel__eyebrow">Self-auditing calibration</span><h1 class="view-title">Learned within <em>declared bounds.</em></h1></div>
+          <button class="btn-sm" id="calibrationRun"><span data-icon="bolt"></span>Calibrate</button>
+        </div>
+        <div class="metrics" id="calibrationMetrics"></div>
+        <div class="calibration-grid">
+          <div class="panel">
+            <div class="panel__head"><div><span class="panel__eyebrow">Weights</span><h2 class="panel__title">Current parameters</h2></div><span class="panel__meta" id="calibrationUpdated"></span></div>
+            <div id="calibrationParams" class="param-list"></div>
+            <p class="small-copy" id="calibrationNote" style="margin-top:12px"></p>
+          </div>
+          <div class="panel">
+            <div class="panel__head"><div><span class="panel__eyebrow">Anchors</span><h2 class="panel__title">Public ranges vs simulation</h2></div><span class="panel__meta" id="calibrationWithin"></span></div>
+            <div id="calibrationAnchors"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel__head"><div><span class="panel__eyebrow">History</span><h2 class="panel__title">Every adopted change is logged</h2></div></div>
+          <div id="calibrationHistory"></div>
+        </div>
+      </section>
+
+      <!-- REASONING -->
+      <section class="view" id="view-reasoning">
+        <div class="view-head">
+          <div><span class="panel__eyebrow">Visible deliberation loop</span><h1 class="view-title">It argues with itself, <em>then shows the work.</em></h1></div>
+          <div class="view-head__stats">
+            <span class="chip chip--muted">No multiplier claimed</span>
+            <button class="btn-sm" id="reasonRun"><span data-icon="bolt"></span>Deep reason</button>
+          </div>
+        </div>
+        <p class="reason-note">Frame → retrieve → simulate → replicate → stress → challenge → revise → verify. The loop is allowed to lower its own confidence, downgrade a scale call and name what would change its mind. That is the quality claim — not a multiplier.</p>
+        <div class="reason-posture" id="reasonPosture"><div class="skeleton" style="height:88px"></div></div>
+        <div class="metrics" id="reasonMetrics"></div>
+        <div class="reason-grid">
+          <div class="panel reason-memo">
+            <div class="panel__head"><div><span class="panel__eyebrow">Decision memo</span><h2 class="panel__title">What it would tell a human</h2></div><span class="panel__meta" id="reasonElapsed"></span></div>
+            <div id="reasonMemo"></div>
+          </div>
+          <div class="panel">
+            <div class="panel__head"><div><span class="panel__eyebrow">System dynamics</span><h2 class="panel__title">Belief ODE · temperature annealing · phase transition</h2></div></div>
+            <div class="reason-dynamics" id="reasonDynamics"></div>
+          </div>
+          <div class="panel">
+            <div class="panel__head"><div><span class="panel__eyebrow">Challenge</span><h2 class="panel__title">Competing explanations</h2></div></div>
+            <div id="reasonHypotheses"></div>
+          </div>
+          <div class="panel">
+            <div class="panel__head"><div><span class="panel__eyebrow">Loop trace</span><h2 class="panel__title">Eight auditable steps</h2></div></div>
+            <div id="reasonTrace" class="reason-trace"></div>
+          </div>
+          <div class="panel">
+            <div class="panel__head"><div><span class="panel__eyebrow">Critique</span><h2 class="panel__title">What failed its own checks</h2></div><span class="panel__meta" id="reasonPassed"></span></div>
+            <div id="reasonChecks" class="reason-checks"></div>
+          </div>
+          <div class="panel">
+            <div class="panel__head"><div><span class="panel__eyebrow">Replication &amp; stress</span><h2 class="panel__title">Does the call survive?</h2></div></div>
+            <div id="reasonRobust"></div>
+          </div>
+          <div class="panel">
+            <div class="panel__head"><div><span class="panel__eyebrow">External check</span><h2 class="panel__title">Category drift, not impact</h2></div></div>
+            <div id="reasonCausal"></div>
+          </div>
+        </div>
+        <div class="reason-grid reason-grid--lower">
+          <div class="panel">
+            <div class="panel__head"><div><span class="panel__eyebrow">Next evidence</span><h2 class="panel__title">The test that would settle it</h2></div></div>
+            <div id="reasonNext"></div>
+          </div>
+          <div class="panel">
+            <div class="panel__head"><div><span class="panel__eyebrow">Limits</span><h2 class="panel__title">What this loop cannot do</h2></div></div>
+            <ul class="reason-limits" id="reasonLimits"></ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- REPORT -->
+      <section class="view" id="view-report">
+        <div class="report-head" id="reportHead"></div>
+        <div class="report-grid">
+          <div class="panel report-main" id="reportMain"></div>
+          <aside class="report-side">
+            <div class="panel" id="reportVerdict"></div>
+            <div class="panel" id="reportSegments"></div>
+            <div class="panel" id="reportCaveats"></div>
+          </aside>
+        </div>
+        <div class="panel report-method" id="reportMethod"></div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<!-- OPERATIONS CONSOLE (bottom bar) -->
+<div class="ops-bar" id="opsBar">
+  <div class="ops-bar__inner">
+    <span class="ops-bar__title">OPERATIONS</span>
+    <div class="ops-bar__stream" id="opsStream"></div>
+    <div class="ops-bar__ctrl">
+      <button class="icon-btn icon-btn--tiny" id="opsPause" title="Pause log"><span data-icon="pause"></span></button>
+      <button class="icon-btn icon-btn--tiny" id="opsClear" title="Clear"><span data-icon="close"></span></button>
+    </div>
+  </div>
+</div>
+
+<!-- RUN COMPARISON (overlay) -->
+<div class="modal" id="compareModal" aria-hidden="true">
+  <div class="modal__card modal__card--compare">
+    <div class="modal__head">
+      <span class="panel__eyebrow">Run comparison</span>
+      <button class="icon-btn" id="compareClose"><span data-icon="close"></span></button>
+    </div>
+    <div class="compare-grid">
+      <div class="compare-side compare-side--a">
+        <span class="compare-label">Run A</span>
+        <div class="compare-sel" id="compareSelA"></div>
+        <div class="compare-metrics" id="compareMetricsA"></div>
+      </div>
+      <div class="compare-side compare-side--b">
+        <span class="compare-label">Run B</span>
+        <div class="compare-sel" id="compareSelB"></div>
+        <div class="compare-metrics" id="compareMetricsB"></div>
+      </div>
+    </div>
+    <div class="compare-diff" id="compareDiff"></div>
+  </div>
+</div>
+
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<aside class="agent-drawer" id="agentDrawer" aria-hidden="true">
+  <div class="drawer-head">
+    <span class="panel__eyebrow">Citizen file</span>
+    <button class="icon-btn" id="drawerClose"><span data-icon="close"></span></button>
+  </div>
+  <div id="drawerBody"></div>
+</aside>
+
+<div class="toast" id="toast"></div>
+<div class="modal" id="cmdPalette" aria-hidden="true">
+  <div class="modal__card modal__card--cmd">
+    <input class="cmd-input" id="cmdInput" placeholder="Jump to tab, run, or search…" autocomplete="off" />
+    <div class="cmd-list" id="cmdList"></div>
+  </div>
+</div>
+
+<div class="modal" id="helpModal" aria-hidden="true">
+  <div class="modal__card">
+    <div class="modal__head"><span class="panel__eyebrow">Method</span><button class="icon-btn" id="helpClose"><span data-icon="close"></span></button></div>
+    <h2>What this is — and what it is not.</h2>
+    <p><b>It is</b> a deterministic agent-based rehearsal. Synthetic citizens are drawn from public distributions of state, tier, income, digital access and occupation. Each decision is an explicit function of affordability, relative advantage, social proof, trust and perceived risk.</p>
+    <p><b>It is not</b> a representative survey, a poll, or a prediction of any individual. The confidence score is a model-stability indicator, not a sampling error. Treat every output as a hypothesis to test with real people.</p>
+    <p><b>Forecasts</b> use Google Research's TimesFM 3.0 in zero-shot mode on cited monthly series. TimesFM weights are non-commercial. A fallback baseline is labelled explicitly if the model is unavailable.</p>
+    <p class="modal__foot">Imprint Bharat · Reasoning Core v2 · TimesFM 3.0 · 2026</p>
+  </div>
+</div>
+
+<script src="/static/js/studio.js"></script>
+</body>
+</html>

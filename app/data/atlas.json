@@ -1,0 +1,3947 @@
+{
+ "version": "2026.11-seed",
+ "built": "2026-11-05",
+ "scope_note": "Curated public-data seed. It is not a census and not a trained foundation model. Indicators are cited; derived context nodes are generated from public distributions. Add documents with app/ingest.py to expand the corpus.",
+ "sources": [
+  {
+   "id": "census2011",
+   "org": "Office of the Registrar General & Census Commissioner, India",
+   "title": "Census of India 2011",
+   "year": 2011,
+   "url": "https://censusindia.gov.in/census.website/",
+   "type": "government census",
+   "coverage": "national / state / district",
+   "note": "Primary census tables: population, urbanisation, households, amenities."
+  },
+  {
+   "id": "census_religion",
+   "org": "Census of India",
+   "title": "C-1 Religion tables, 2011",
+   "year": 2011,
+   "url": "https://censusindia.gov.in/nada/index.php/catalog/11361",
+   "type": "government census",
+   "coverage": "national / state",
+   "note": "Religion composition by state; used only for structural context."
+  },
+  {
+   "id": "census_migration",
+   "org": "Census of India",
+   "title": "D-Series migration tables, 2011",
+   "year": 2011,
+   "url": "https://censusindia.gov.in/nada/index.php/catalog/11363",
+   "type": "government census",
+   "coverage": "national / state / district",
+   "note": "Internal migration, place of birth and last residence."
+  },
+  {
+   "id": "nfhs5",
+   "org": "International Institute for Population Sciences / MoHFW",
+   "title": "National Family Health Survey 5 (2019-21), India Report",
+   "year": 2021,
+   "url": "https://rchiips.org/nfhs/NFHS-5Reports/India.pdf",
+   "type": "government survey",
+   "coverage": "national / state / district",
+   "note": "Health, gender, fertility, household amenities, internet use."
+  },
+  {
+   "id": "nfhs5_state",
+   "org": "IIPS / MoHFW",
+   "title": "NFHS-5 State Fact Sheets",
+   "year": 2021,
+   "url": "https://rchiips.org/nfhs/NFHS-5_FCTS/India.pdf",
+   "type": "government survey",
+   "coverage": "state / district",
+   "note": "State-level indicators used to vary context, not to type individuals."
+  },
+  {
+   "id": "niti_mpi",
+   "org": "NITI Aayog / UNDP",
+   "title": "National Multidimensional Poverty Index 2023",
+   "year": 2023,
+   "url": "https://www.niti.gov.in/sites/default/files/2023-12/National-Multidimensional-Poverty-Index-2023.pdf",
+   "type": "government report",
+   "coverage": "national / state / district",
+   "note": "MPI headcount and inter-temporal escape from poverty."
+  },
+  {
+   "id": "niti_adp",
+   "org": "NITI Aayog",
+   "title": "Aspirational Districts Programme",
+   "year": 2024,
+   "url": "https://www.niti.gov.in/aspirational-districts-programme",
+   "type": "government programme",
+   "coverage": "district",
+   "note": "District-level development gaps in health, education, agriculture, finance."
+  },
+  {
+   "id": "hces2223",
+   "org": "Ministry of Statistics and Programme Implementation",
+   "title": "Household Consumption Expenditure Survey 2022-23",
+   "year": 2023,
+   "url": "https://www.mospi.gov.in/sites/default/files/publication_reports/Household_Consumption_Expenditure_Survey_2022_23.pdf",
+   "type": "government survey",
+   "coverage": "national / state",
+   "note": "MPCE, food/non-food shares, consumption inequality."
+  },
+  {
+   "id": "plfs2324",
+   "org": "Ministry of Statistics and Programme Implementation",
+   "title": "Periodic Labour Force Survey Annual Report 2023-24",
+   "year": 2024,
+   "url": "https://www.mospi.gov.in/sites/default/files/publication_reports/PLFS_Annual_Report_2023_24.pdf",
+   "type": "government survey",
+   "coverage": "national / state",
+   "note": "LFPR, unemployment, informality, female participation."
+  },
+  {
+   "id": "cms_telecom",
+   "org": "Ministry of Statistics and Programme Implementation",
+   "title": "Comprehensive Modular Survey: Telecom 2025",
+   "year": 2025,
+   "url": "https://www.mospi.gov.in/sites/default/files/press_release/Final_press%20release_CMS_T.pdf",
+   "type": "government survey",
+   "coverage": "national / state",
+   "note": "Household phone and internet access, digital divides."
+  },
+  {
+   "id": "trai",
+   "org": "Telecom Regulatory Authority of India",
+   "title": "Telecom Subscription Reports",
+   "year": 2025,
+   "url": "https://www.trai.gov.in/release-publication/reports/telecom-subscription-reports",
+   "type": "regulator data",
+   "coverage": "national / circle",
+   "note": "Subscribers, rural/urban split, broadband, ARPU."
+  },
+  {
+   "id": "npci_upi",
+   "org": "National Payments Corporation of India",
+   "title": "UPI Ecosystem Statistics",
+   "year": 2025,
+   "url": "https://www.npci.org.in/what-we-do/upi/upi-ecosystem-statistics",
+   "type": "payments data",
+   "coverage": "national",
+   "note": "Transaction volume and value; adoption is not the same as usage intensity."
+  },
+  {
+   "id": "rbi_payments",
+   "org": "Reserve Bank of India",
+   "title": "Payments System Indicators",
+   "year": 2025,
+   "url": "https://www.rbi.org.in/Scripts/Statistics.aspx",
+   "type": "central bank data",
+   "coverage": "national",
+   "note": "Digital payment mix, currency in circulation, financial access."
+  },
+  {
+   "id": "rbi_fi",
+   "org": "Reserve Bank of India",
+   "title": "Financial Inclusion Index",
+   "year": 2024,
+   "url": "https://www.rbi.org.in/Scripts/PublicationReportDetails.aspx",
+   "type": "central bank report",
+   "coverage": "national / state",
+   "note": "Access, usage and quality of financial services."
+  },
+  {
+   "id": "irdai",
+   "org": "Insurance Regulatory and Development Authority of India",
+   "title": "Annual Report 2023-24",
+   "year": 2024,
+   "url": "https://irdai.gov.in/",
+   "type": "regulator data",
+   "coverage": "national / state",
+   "note": "Insurance penetration and density; protection gap."
+  },
+  {
+   "id": "nha",
+   "org": "National Health Systems Resource Centre",
+   "title": "National Health Accounts 2021-22",
+   "year": 2024,
+   "url": "https://nhsrcindia.org/national-health-accounts-records",
+   "type": "government report",
+   "coverage": "national / state",
+   "note": "Health spending, out-of-pocket share, insurance coverage."
+  },
+  {
+   "id": "udise",
+   "org": "Ministry of Education",
+   "title": "UDISE+ 2023-24",
+   "year": 2024,
+   "url": "https://udiseplus.gov.in/",
+   "type": "government data",
+   "coverage": "national / state / district",
+   "note": "School enrolment, infrastructure, digital access."
+  },
+  {
+   "id": "aishe",
+   "org": "Ministry of Education",
+   "title": "All India Survey on Higher Education 2021-22",
+   "year": 2023,
+   "url": "https://aishe.gov.in/",
+   "type": "government survey",
+   "coverage": "national / state",
+   "note": "College enrolment, GER, gender and discipline mix."
+  },
+  {
+   "id": "aser",
+   "org": "ASER Centre",
+   "title": "Annual Status of Education Report 2023 (Beyond Basics)",
+   "year": 2024,
+   "url": "https://asercentre.org/aser-2023/",
+   "type": "public survey",
+   "coverage": "district / rural",
+   "note": "14-18 learning, digital access and work aspirations."
+  },
+  {
+   "id": "jjm",
+   "org": "Department of Drinking Water and Sanitation",
+   "title": "Jal Jeevan Mission Dashboard",
+   "year": 2025,
+   "url": "https://jaljeevanmission.gov.in/",
+   "type": "government dashboard",
+   "coverage": "national / state / district",
+   "note": "Tap-water coverage and rural infrastructure gaps."
+  },
+  {
+   "id": "mgnrega",
+   "org": "Ministry of Rural Development",
+   "title": "MGNREGA Public Dashboard",
+   "year": 2025,
+   "url": "https://nrega.nic.in/",
+   "type": "government dashboard",
+   "coverage": "national / state / district",
+   "note": "Rural wage demand, women's participation, distress signals."
+  },
+  {
+   "id": "pmayg",
+   "org": "Ministry of Rural Development",
+   "title": "PMAY-Gramin Dashboard",
+   "year": 2025,
+   "url": "https://pmayg.nic.in/",
+   "type": "government dashboard",
+   "coverage": "national / state / district",
+   "note": "Rural housing, asset creation and credit linkage."
+  },
+  {
+   "id": "mohua",
+   "org": "Ministry of Housing and Urban Affairs",
+   "title": "Urban Transport and Smart Cities",
+   "year": 2024,
+   "url": "https://mohua.gov.in/",
+   "type": "government programme",
+   "coverage": "city",
+   "note": "Urban services, mobility and municipal capacity."
+  },
+  {
+   "id": "ppac",
+   "org": "Petroleum Planning & Analysis Cell",
+   "title": "Snapshots of Petroleum Statistics",
+   "year": 2025,
+   "url": "https://ppac.gov.in/",
+   "type": "government data",
+   "coverage": "national / state",
+   "note": "LPG, diesel, petrol consumption and import dependence."
+  },
+  {
+   "id": "mnre",
+   "org": "Ministry of New and Renewable Energy",
+   "title": "Renewable Energy Statistics",
+   "year": 2024,
+   "url": "https://mnre.gov.in/",
+   "type": "government data",
+   "coverage": "national / state",
+   "note": "Solar rooftop, RE capacity and state-wise progress."
+  },
+  {
+   "id": "siam",
+   "org": "Society of Indian Automobile Manufacturers",
+   "title": "Automobile Statistics",
+   "year": 2025,
+   "url": "https://www.siam.in/statistics.aspx",
+   "type": "industry data",
+   "coverage": "national",
+   "note": "Two-wheeler, car and commercial vehicle sales."
+  },
+  {
+   "id": "bnef",
+   "org": "BloombergNEF",
+   "title": "Electric Vehicle Outlook",
+   "year": 2024,
+   "url": "https://about.bnef.com/electric-vehicle-outlook/",
+   "type": "industry research",
+   "coverage": "global / India",
+   "note": "EV penetration and charging infrastructure."
+  },
+  {
+   "id": "iamai",
+   "org": "IAMAI / Kantar",
+   "title": "Internet in India",
+   "year": 2025,
+   "url": "https://www.iamai.in/",
+   "type": "industry survey",
+   "coverage": "national / state",
+   "note": "Active internet users, rural share, language use."
+  },
+  {
+   "id": "kantar",
+   "org": "Kantar",
+   "title": "Brand Footprint India",
+   "year": 2024,
+   "url": "https://www.kantar.com/",
+   "type": "industry research",
+   "coverage": "national / state",
+   "note": "FMCG penetration, frequency and rural reach."
+  },
+  {
+   "id": "nielseniq",
+   "org": "NielsenIQ",
+   "title": "India Consumer Outlook",
+   "year": 2024,
+   "url": "https://nielseniq.com/global/en/insights/",
+   "type": "industry research",
+   "coverage": "national / state",
+   "note": "FMCG value/volume, premiumisation and channel mix."
+  },
+  {
+   "id": "bain_flipkart",
+   "org": "Bain & Company / Flipkart",
+   "title": "How India Shops Online",
+   "year": 2024,
+   "url": "https://www.bain.com/insights/how-india-shops-online/",
+   "type": "industry report",
+   "coverage": "national / city tier",
+   "note": "E-commerce shoppers, categories, tier-2/3 growth."
+  },
+  {
+   "id": "redseer",
+   "org": "Redseer Strategy Consultants",
+   "title": "India Internet and Quick Commerce",
+   "year": 2024,
+   "url": "https://redseer.com/reports/",
+   "type": "industry research",
+   "coverage": "national / city",
+   "note": "Quick commerce size, dark stores, usage frequency."
+  },
+  {
+   "id": "gs_consumer",
+   "org": "Goldman Sachs",
+   "title": "India Consumer Market",
+   "year": 2023,
+   "url": "https://www.goldmansachs.com/insights/",
+   "type": "investment research",
+   "coverage": "national",
+   "note": "Consumer class, premiumisation and category expansion."
+  },
+  {
+   "id": "mckinsey",
+   "org": "McKinsey & Company",
+   "title": "India Consumer Insights",
+   "year": 2024,
+   "url": "https://www.mckinsey.com/featured-insights/india",
+   "type": "consulting research",
+   "coverage": "national",
+   "note": "Consumption, income growth and channel shifts."
+  },
+  {
+   "id": "bcg",
+   "org": "Boston Consulting Group",
+   "title": "India Consumer and Retail",
+   "year": 2024,
+   "url": "https://www.bcg.com/publications",
+   "type": "consulting research",
+   "coverage": "national",
+   "note": "Premiumisation, Bharat consumers and distribution."
+  },
+  {
+   "id": "meta_bcg",
+   "org": "BCG / Meta",
+   "title": "Bharat Consumer Survey",
+   "year": 2023,
+   "url": "https://www.bcg.com/publications",
+   "type": "industry survey",
+   "coverage": "national / tier 2-4",
+   "note": "Digital behaviour and aspiration in smaller towns."
+  },
+  {
+   "id": "hul",
+   "org": "Hindustan Unilever Limited",
+   "title": "Annual Report 2023-24",
+   "year": 2024,
+   "url": "https://www.hul.co.in/investor-relations/annual-reports/",
+   "type": "company filing",
+   "coverage": "national",
+   "note": "Rural/urban FMCG demand, premium portfolio, distribution."
+  },
+  {
+   "id": "price",
+   "org": "People Research on India's Consumer Economy",
+   "title": "Indian Consumer Economy",
+   "year": 2024,
+   "url": "https://www.priceindia.org/",
+   "type": "independent research",
+   "coverage": "national / state",
+   "note": "Household income classes and consumption segments."
+  },
+  {
+   "id": "cmie",
+   "org": "Centre for Monitoring Indian Economy",
+   "title": "Consumer Pyramids Household Survey",
+   "year": 2024,
+   "url": "https://www.cmie.com/",
+   "type": "private survey",
+   "coverage": "national / state",
+   "note": "Income, employment and consumption panel."
+  },
+  {
+   "id": "oxfam",
+   "org": "Oxfam India",
+   "title": "India Inequality Report",
+   "year": 2022,
+   "url": "https://www.oxfamindia.org/inequality-report-2022",
+   "type": "civil society report",
+   "coverage": "national",
+   "note": "Wealth and consumption inequality; treat as advocacy evidence."
+  },
+  {
+   "id": "pew",
+   "org": "Pew Research Center",
+   "title": "Religion in India: Tolerance and Segregation",
+   "year": 2021,
+   "url": "https://www.pewresearch.org/religion/2021/06/29/religion-in-india-tolerance-and-segregation/",
+   "type": "public survey",
+   "coverage": "national",
+   "note": "Religious identity, practice, mixing and attitudes."
+  },
+  {
+   "id": "ihds",
+   "org": "University of Maryland / NCAER",
+   "title": "India Human Development Survey",
+   "year": 2018,
+   "url": "https://ihds.umd.edu/",
+   "type": "public survey",
+   "coverage": "national / state",
+   "note": "Caste, gender, education, health and social networks."
+  },
+  {
+   "id": "sec_census",
+   "org": "Ministry of Rural Development",
+   "title": "Socio-Economic and Caste Census 2011",
+   "year": 2011,
+   "url": "https://secc.gov.in/",
+   "type": "government census",
+   "coverage": "national / state",
+   "note": "Rural deprivation, caste and household assets."
+  },
+  {
+   "id": "worldbank",
+   "org": "World Bank",
+   "title": "India Development Update and Data",
+   "year": 2025,
+   "url": "https://data.worldbank.org/country/india",
+   "type": "multilateral data",
+   "coverage": "national",
+   "note": "Poverty, urbanisation, growth and service access."
+  },
+  {
+   "id": "imf",
+   "org": "International Monetary Fund",
+   "title": "India Country Data",
+   "year": 2025,
+   "url": "https://www.imf.org/en/Countries/IND",
+   "type": "multilateral data",
+   "coverage": "national",
+   "note": "Macro context and consumption growth."
+  },
+  {
+   "id": "mpa",
+   "org": "Media Partners Asia",
+   "title": "India Video and OTT",
+   "year": 2024,
+   "url": "https://www.mediapartnersasia.com/",
+   "type": "industry research",
+   "coverage": "national",
+   "note": "OTT subscribers, revenue and content spend."
+  },
+  {
+   "id": "counterpoint",
+   "org": "Counterpoint Research",
+   "title": "India Smartphone and Device Market",
+   "year": 2025,
+   "url": "https://www.counterpointresearch.com/",
+   "type": "industry research",
+   "coverage": "national",
+   "note": "Smartphone ASP, replacement cycles and premium mix."
+  },
+  {
+   "id": "idc",
+   "org": "IDC India",
+   "title": "Consumer Device Tracker",
+   "year": 2024,
+   "url": "https://www.idc.com/",
+   "type": "industry research",
+   "coverage": "national",
+   "note": "PC, tablet and wearable adoption."
+  },
+  {
+   "id": "nrai",
+   "org": "National Restaurant Association of India",
+   "title": "India Food Services Report",
+   "year": 2024,
+   "url": "https://www.nrai.in/",
+   "type": "industry report",
+   "coverage": "national / city",
+   "note": "Eating out, QSR and food delivery."
+  },
+  {
+   "id": "barc",
+   "org": "Broadcast Audience Research Council",
+   "title": "TV Audience Measurement",
+   "year": 2024,
+   "url": "https://www.barcindia.co.in/",
+   "type": "industry data",
+   "coverage": "national / state",
+   "note": "TV households, viewing and language markets."
+  },
+  {
+   "id": "prasar_bharati",
+   "org": "Prasar Bharati",
+   "title": "Doordarshan and All India Radio",
+   "year": 2024,
+   "url": "https://prasarbharati.gov.in/",
+   "type": "public broadcaster",
+   "coverage": "national",
+   "note": "Terrestrial and free-to-air reach in remote areas."
+  },
+  {
+   "id": "fssai",
+   "org": "Food Safety and Standards Authority of India",
+   "title": "Food Safety and Nutrition Regulations",
+   "year": 2024,
+   "url": "https://fssai.gov.in/",
+   "type": "regulator",
+   "coverage": "national",
+   "note": "Claims, fortification and labelling."
+  },
+  {
+   "id": "icmr",
+   "org": "Indian Council of Medical Research / NIN",
+   "title": "Dietary Guidelines for Indians",
+   "year": 2024,
+   "url": "https://www.icmr.gov.in/",
+   "type": "government research",
+   "coverage": "national",
+   "note": "Nutrition gaps, protein and ultra-processed food."
+  },
+  {
+   "id": "ministry_education",
+   "org": "Ministry of Education",
+   "title": "Education Statistics",
+   "year": 2024,
+   "url": "https://www.education.gov.in/",
+   "type": "government data",
+   "coverage": "national / state",
+   "note": "Enrolment, dropout and institutions."
+  },
+  {
+   "id": "niti_sdg",
+   "org": "NITI Aayog",
+   "title": "SDG India Index",
+   "year": 2024,
+   "url": "https://www.niti.gov.in/sdg-india-index",
+   "type": "government index",
+   "coverage": "state / district",
+   "note": "State performance on health, education, gender, infrastructure."
+  },
+  {
+   "id": "google_temasek_bain",
+   "org": "Google / Temasek / Bain",
+   "title": "e-Conomy India",
+   "year": 2024,
+   "url": "https://www.bain.com/insights/e-conomy-india/",
+   "type": "industry report",
+   "coverage": "national",
+   "note": "Internet economy, digital consumption and inclusion."
+  },
+  {
+   "id": "crisil",
+   "org": "CRISIL",
+   "title": "India Consumption and Mobility",
+   "year": 2024,
+   "url": "https://www.crisil.com/",
+   "type": "rating agency research",
+   "coverage": "national / state",
+   "note": "Income, spending and category resilience."
+  },
+  {
+   "id": "ncaer",
+   "org": "NCAER",
+   "title": "National Council of Applied Economic Research",
+   "year": 2024,
+   "url": "https://www.ncaer.org/",
+   "type": "independent research",
+   "coverage": "national / state",
+   "note": "Household income and consumer sentiment."
+  },
+  {
+   "id": "lokniti",
+   "org": "Lokniti-CSDS",
+   "title": "National Election and Society Surveys",
+   "year": 2024,
+   "url": "https://www.lokniti.org/",
+   "type": "public survey",
+   "coverage": "national / state",
+   "note": "Social attitudes, trust and political economy."
+  },
+  {
+   "id": "ficci",
+   "org": "FICCI",
+   "title": "India Consumer and Retail Reports",
+   "year": 2024,
+   "url": "https://www.ficci.in/",
+   "type": "industry body",
+   "coverage": "national",
+   "note": "Retail, FMCG and MSME context."
+  }
+ ],
+ "facts": [
+  {
+   "id": "geo_urban_share",
+   "dimension": "geography",
+   "claim": "Urban share of population",
+   "value": "31.2",
+   "unit": "%",
+   "year": 2011,
+   "source_ids": [
+    "census2011"
+   ],
+   "tags": [
+    "urban",
+    "rural",
+    "tier"
+   ],
+   "detail": "Census 2011. The 2011 definition undercounts peri-urban growth; World Bank later estimates are higher.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "geo_urban_pop",
+   "dimension": "geography",
+   "claim": "Urban population",
+   "value": "377",
+   "unit": "million",
+   "year": 2011,
+   "source_ids": [
+    "census2011"
+   ],
+   "tags": [
+    "urban"
+   ],
+   "detail": "Census 2011. India added more urban residents in 2001-11 than in any previous decade.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "geo_rural_pop",
+   "dimension": "geography",
+   "claim": "Rural population",
+   "value": "834",
+   "unit": "million",
+   "year": 2011,
+   "source_ids": [
+    "census2011"
+   ],
+   "tags": [
+    "rural",
+    "village"
+   ],
+   "detail": "Census 2011. Rural India is not a residual category; it is the majority of demand for many categories.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "geo_villages",
+   "dimension": "geography",
+   "claim": "Census villages",
+   "value": "640,867",
+   "unit": "villages",
+   "year": 2011,
+   "source_ids": [
+    "census2011"
+   ],
+   "tags": [
+    "village",
+    "rural",
+    "last mile"
+   ],
+   "detail": "Census 2011. Roughly 6 lakh inhabited villages; a single district can contain more than 1,000.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "geo_statutory_towns",
+   "dimension": "geography",
+   "claim": "Statutory towns",
+   "value": "4,041",
+   "unit": "towns",
+   "year": 2011,
+   "source_ids": [
+    "census2011"
+   ],
+   "tags": [
+    "town",
+    "urban"
+   ],
+   "detail": "Census 2011. Municipal boundaries lag settlement growth, so many 'rural' households are functionally urban.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "geo_census_towns",
+   "dimension": "geography",
+   "claim": "Census towns",
+   "value": "3,894",
+   "unit": "towns",
+   "year": 2011,
+   "source_ids": [
+    "census2011"
+   ],
+   "tags": [
+    "town",
+    "peri-urban"
+   ],
+   "detail": "Census 2011. Census towns are settlements that cross the urban threshold without a municipal government.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "geo_metros_1m",
+   "dimension": "geography",
+   "claim": "Urban agglomerations above 1 million",
+   "value": "53",
+   "unit": "agglomerations",
+   "year": 2011,
+   "source_ids": [
+    "census2011"
+   ],
+   "tags": [
+    "metro",
+    "tier 1"
+   ],
+   "detail": "Census 2011. Metro India is a small share of population but a large share of premium demand.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "geo_tn_urban",
+   "dimension": "geography",
+   "claim": "Tamil Nadu urbanisation",
+   "value": "48.4",
+   "unit": "%",
+   "year": 2011,
+   "source_ids": [
+    "census2011"
+   ],
+   "tags": [
+    "tamil nadu",
+    "south",
+    "urban"
+   ],
+   "detail": "Census 2011. Among the most urbanised large states; strong secondary towns, not just Chennai.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "geo_kerala_urban",
+   "dimension": "geography",
+   "claim": "Kerala urbanisation",
+   "value": "47.7",
+   "unit": "%",
+   "year": 2011,
+   "source_ids": [
+    "census2011"
+   ],
+   "tags": [
+    "kerala",
+    "south",
+    "urban"
+   ],
+   "detail": "Census 2011. Dispersed urbanisation; high human development and remittance exposure.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "geo_mh_urban",
+   "dimension": "geography",
+   "claim": "Maharashtra urbanisation",
+   "value": "45.2",
+   "unit": "%",
+   "year": 2011,
+   "source_ids": [
+    "census2011"
+   ],
+   "tags": [
+    "maharashtra",
+    "west",
+    "urban"
+   ],
+   "detail": "Census 2011. Mumbai dominates, but Pune, Nashik and Nagpur carry distinct consumption cultures.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "geo_up_urban",
+   "dimension": "geography",
+   "claim": "Uttar Pradesh urbanisation",
+   "value": "22.3",
+   "unit": "%",
+   "year": 2011,
+   "source_ids": [
+    "census2011"
+   ],
+   "tags": [
+    "uttar pradesh",
+    "north",
+    "urban"
+   ],
+   "detail": "Census 2011. Large rural base; tier-2 towns like Lucknow, Kanpur, Varanasi and Gorakhpur matter.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "geo_bihar_urban",
+   "dimension": "geography",
+   "claim": "Bihar urbanisation",
+   "value": "11.3",
+   "unit": "%",
+   "year": 2011,
+   "source_ids": [
+    "census2011"
+   ],
+   "tags": [
+    "bihar",
+    "east",
+    "rural"
+   ],
+   "detail": "Census 2011. India's least urbanised large state; migration is a core household strategy.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "geo_delhi_pop",
+   "dimension": "geography",
+   "claim": "Delhi population",
+   "value": "16.8",
+   "unit": "million",
+   "year": 2011,
+   "source_ids": [
+    "census2011"
+   ],
+   "tags": [
+    "delhi",
+    "metro"
+   ],
+   "detail": "Census 2011. High income dispersion inside one city; 'Delhi' is not one market.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "geo_mumbai_pop",
+   "dimension": "geography",
+   "claim": "Mumbai population",
+   "value": "12.4",
+   "unit": "million",
+   "year": 2011,
+   "source_ids": [
+    "census2011"
+   ],
+   "tags": [
+    "mumbai",
+    "metro"
+   ],
+   "detail": "Census 2011. Extreme space constraint and a very large rental/commuter economy.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "geo_blr_pop",
+   "dimension": "geography",
+   "claim": "Bengaluru population",
+   "value": "8.4",
+   "unit": "million",
+   "year": 2011,
+   "source_ids": [
+    "census2011"
+   ],
+   "tags": [
+    "bengaluru",
+    "metro",
+    "south"
+   ],
+   "detail": "Census 2011. Tech-led migration, gated housing and a large young renter population.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "inc_mpce_rural",
+   "dimension": "income",
+   "claim": "Monthly per-capita consumption expenditure, rural",
+   "value": "3,773",
+   "unit": "₹ / month",
+   "year": 2023,
+   "source_ids": [
+    "hces2223"
+   ],
+   "tags": [
+    "mpce",
+    "rural",
+    "income"
+   ],
+   "detail": "HCES 2022-23, nominal. The median household has far less discretionary income than metro averages suggest.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "inc_mpce_urban",
+   "dimension": "income",
+   "claim": "Monthly per-capita consumption expenditure, urban",
+   "value": "6,459",
+   "unit": "₹ / month",
+   "year": 2023,
+   "source_ids": [
+    "hces2223"
+   ],
+   "tags": [
+    "mpce",
+    "urban",
+    "income"
+   ],
+   "detail": "HCES 2022-23, nominal. Urban average is roughly 1.7x rural.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "inc_food_rural",
+   "dimension": "consumption",
+   "claim": "Food share of rural consumption",
+   "value": "46.4",
+   "unit": "%",
+   "year": 2023,
+   "source_ids": [
+    "hces2223"
+   ],
+   "tags": [
+    "food",
+    "rural",
+    "budget"
+   ],
+   "detail": "HCES 2022-23. Food remains the largest single block; a price shock crowds out everything else.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "inc_food_urban",
+   "dimension": "consumption",
+   "claim": "Food share of urban consumption",
+   "value": "39.2",
+   "unit": "%",
+   "year": 2023,
+   "source_ids": [
+    "hces2223"
+   ],
+   "tags": [
+    "food",
+    "urban",
+    "budget"
+   ],
+   "detail": "HCES 2022-23. Still high by middle-income country standards.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "inc_mpi_headcount",
+   "dimension": "poverty",
+   "claim": "Multidimensional poverty headcount",
+   "value": "11.28",
+   "unit": "%",
+   "year": 2023,
+   "source_ids": [
+    "niti_mpi"
+   ],
+   "tags": [
+    "poverty",
+    "mpi",
+    "district"
+   ],
+   "detail": "NITI Aayog National MPI 2023. National average hides district-level concentration.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "inc_mpi_escape",
+   "dimension": "poverty",
+   "claim": "People escaping multidimensional poverty, 2013-14 to 2022-23",
+   "value": "24.82",
+   "unit": "crore",
+   "year": 2024,
+   "source_ids": [
+    "niti_mpi"
+   ],
+   "tags": [
+    "poverty",
+    "mobility"
+   ],
+   "detail": "NITI Aayog discussion paper, 2024. Improvement is real but uneven; newly non-poor households remain fragile.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "inc_hh_size",
+   "dimension": "demography",
+   "claim": "Average household size",
+   "value": "4.4",
+   "unit": "people",
+   "year": 2021,
+   "source_ids": [
+    "nfhs5"
+   ],
+   "tags": [
+    "household",
+    "family"
+   ],
+   "detail": "NFHS-5. Joint and multi-generational households still shape purchase permission.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "inc_premiumisation",
+   "dimension": "consumption",
+   "claim": "Premiumisation",
+   "value": "uneven",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "hul",
+    "nielseniq",
+    "gs_consumer"
+   ],
+   "tags": [
+    "premium",
+    "fmcg",
+    "class"
+   ],
+   "detail": "Premium packs grow faster in metros and affluent tier-2, while mass and sachet packs still dominate volume in tier-3/4.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "inc_income_volatility",
+   "dimension": "income",
+   "claim": "Income volatility",
+   "value": "high",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "cmie",
+    "plfs2324",
+    "worldbank"
+   ],
+   "tags": [
+    "income",
+    "informal",
+    "risk"
+   ],
+   "detail": "A large share of households earn from informal, seasonal or piece-rate work; monthly affordability is not stable.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "inc_credit_dependence",
+   "dimension": "finance",
+   "claim": "Household credit dependence",
+   "value": "rising",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "rbi_fi",
+    "crisil"
+   ],
+   "tags": [
+    "credit",
+    "emi",
+    "bnpl"
+   ],
+   "detail": "Consumer credit and EMI penetration are rising, but access is uneven and informal borrowing remains common.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "inc_class_definition",
+   "dimension": "class",
+   "claim": "Middle-class definition",
+   "value": "contested",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "price",
+    "cmie",
+    "worldbank"
+   ],
+   "tags": [
+    "class",
+    "middle class"
+   ],
+   "detail": "Estimates range from 100m to 500m+ depending on income thresholds. Treat 'middle class' as a spectrum, not a badge.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "id_hindu",
+   "dimension": "religion",
+   "claim": "Hindu share",
+   "value": "79.8",
+   "unit": "%",
+   "year": 2011,
+   "source_ids": [
+    "census_religion"
+   ],
+   "tags": [
+    "religion",
+    "hindu"
+   ],
+   "detail": "Census 2011. National average masks state-level variation.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "id_muslim",
+   "dimension": "religion",
+   "claim": "Muslim share",
+   "value": "14.2",
+   "unit": "%",
+   "year": 2011,
+   "source_ids": [
+    "census_religion"
+   ],
+   "tags": [
+    "religion",
+    "muslim"
+   ],
+   "detail": "Census 2011. Concentrated in specific states and districts; not a monolith.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "id_christian",
+   "dimension": "religion",
+   "claim": "Christian share",
+   "value": "2.3",
+   "unit": "%",
+   "year": 2011,
+   "source_ids": [
+    "census_religion"
+   ],
+   "tags": [
+    "religion",
+    "christian"
+   ],
+   "detail": "Census 2011. Significant in Kerala, Goa and much of the Northeast.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "id_sikh",
+   "dimension": "religion",
+   "claim": "Sikh share",
+   "value": "1.7",
+   "unit": "%",
+   "year": 2011,
+   "source_ids": [
+    "census_religion"
+   ],
+   "tags": [
+    "religion",
+    "sikh"
+   ],
+   "detail": "Census 2011. Punjab and adjoining states; strong diaspora and gurdwara networks.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "id_buddhist",
+   "dimension": "religion",
+   "claim": "Buddhist share",
+   "value": "0.7",
+   "unit": "%",
+   "year": 2011,
+   "source_ids": [
+    "census_religion"
+   ],
+   "tags": [
+    "religion",
+    "buddhist"
+   ],
+   "detail": "Census 2011. Maharashtra (Dalit Buddhist movement), Ladakh and the Northeast.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "id_jain",
+   "dimension": "religion",
+   "claim": "Jain share",
+   "value": "0.4",
+   "unit": "%",
+   "year": 2011,
+   "source_ids": [
+    "census_religion"
+   ],
+   "tags": [
+    "religion",
+    "jain"
+   ],
+   "detail": "Census 2011. Small share, disproportionate presence in trade and finance.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "id_sc",
+   "dimension": "caste",
+   "claim": "Scheduled Castes",
+   "value": "16.6",
+   "unit": "%",
+   "year": 2011,
+   "source_ids": [
+    "census2011",
+    "sec_census"
+   ],
+   "tags": [
+    "caste",
+    "sc",
+    "deprivation"
+   ],
+   "detail": "Census 2011. Caste remains a structural marker of access, network and consumption risk.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "id_st",
+   "dimension": "caste",
+   "claim": "Scheduled Tribes",
+   "value": "8.6",
+   "unit": "%",
+   "year": 2011,
+   "source_ids": [
+    "census2011",
+    "sec_census"
+   ],
+   "tags": [
+    "caste",
+    "st",
+    "tribal"
+   ],
+   "detail": "Census 2011. Concentrated in central, eastern and northeastern India; distinct land and forest rights.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "id_sex_ratio",
+   "dimension": "gender",
+   "claim": "Sex ratio",
+   "value": "1,020",
+   "unit": "females / 1,000 males",
+   "year": 2021,
+   "source_ids": [
+    "nfhs5"
+   ],
+   "tags": [
+    "gender",
+    "sex ratio"
+   ],
+   "detail": "NFHS-5 household population. Improves on Census 2011 but hides regional skew.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "id_women_internet",
+   "dimension": "gender",
+   "claim": "Women who have ever used the internet",
+   "value": "33.3",
+   "unit": "%",
+   "year": 2021,
+   "source_ids": [
+    "nfhs5"
+   ],
+   "tags": [
+    "gender",
+    "digital",
+    "internet"
+   ],
+   "detail": "NFHS-5. Men: roughly 57%. The gender digital gap is a direct constraint on reach.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "id_men_internet",
+   "dimension": "gender",
+   "claim": "Men who have ever used the internet",
+   "value": "57.1",
+   "unit": "%",
+   "year": 2021,
+   "source_ids": [
+    "nfhs5"
+   ],
+   "tags": [
+    "gender",
+    "digital",
+    "internet"
+   ],
+   "detail": "NFHS-5. Device sharing often hides women's actual access.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "id_female_lfpr",
+   "dimension": "gender",
+   "claim": "Female labour force participation",
+   "value": "41.7",
+   "unit": "%",
+   "year": 2024,
+   "source_ids": [
+    "plfs2324"
+   ],
+   "tags": [
+    "gender",
+    "work",
+    "lfpr"
+   ],
+   "detail": "PLFS 2023-24, usual status. Rising but still low; unpaid care work is a major constraint.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "id_child_marriage",
+   "dimension": "gender",
+   "claim": "Women aged 20-24 married before 18",
+   "value": "23.3",
+   "unit": "%",
+   "year": 2021,
+   "source_ids": [
+    "nfhs5"
+   ],
+   "tags": [
+    "gender",
+    "marriage",
+    "norms"
+   ],
+   "detail": "NFHS-5. Varies sharply by state; affects education, mobility and consumption agency.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "id_caste_gap",
+   "dimension": "caste",
+   "claim": "Caste consumption gap",
+   "value": "persistent",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "ihds",
+    "sec_census",
+    "oxfam"
+   ],
+   "tags": [
+    "caste",
+    "inequality",
+    "consumption"
+   ],
+   "detail": "SC/ST and OBC households remain over-represented in lower consumption deciles and informal work.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "id_religion_mixing",
+   "dimension": "religion",
+   "claim": "Inter-religious social mixing",
+   "value": "low",
+   "unit": "qualitative",
+   "year": 2021,
+   "source_ids": [
+    "pew"
+   ],
+   "tags": [
+    "religion",
+    "trust",
+    "community"
+   ],
+   "detail": "Pew 2021 finds high stated tolerance but low everyday mixing; trust is often community-bounded.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "id_gender_mobility",
+   "dimension": "gender",
+   "claim": "Women's mobility and purchase agency",
+   "value": "constrained",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "nfhs5",
+    "ihds"
+   ],
+   "tags": [
+    "gender",
+    "mobility",
+    "permission"
+   ],
+   "detail": "Many purchases require a father, husband or elder's permission; women-only channels and home delivery reduce friction.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "job_lfpr",
+   "dimension": "jobs",
+   "claim": "Labour force participation rate",
+   "value": "60.1",
+   "unit": "%",
+   "year": 2024,
+   "source_ids": [
+    "plfs2324"
+   ],
+   "tags": [
+    "jobs",
+    "lfpr",
+    "employment"
+   ],
+   "detail": "PLFS 2023-24, usual status (15+).",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "job_unemployment",
+   "dimension": "jobs",
+   "claim": "Unemployment rate",
+   "value": "3.2",
+   "unit": "%",
+   "year": 2024,
+   "source_ids": [
+    "plfs2324"
+   ],
+   "tags": [
+    "jobs",
+    "unemployment"
+   ],
+   "detail": "PLFS 2023-24. Low headline rate coexists with underemployment and low-quality work.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "job_informal",
+   "dimension": "jobs",
+   "claim": "Informal employment share",
+   "value": "~90",
+   "unit": "%",
+   "year": 2024,
+   "source_ids": [
+    "plfs2324",
+    "cmie"
+   ],
+   "tags": [
+    "jobs",
+    "informal",
+    "msme"
+   ],
+   "detail": "Most workers are self-employed, casual or in enterprises without formal contracts.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "job_gig",
+   "dimension": "jobs",
+   "claim": "Gig workers",
+   "value": "7.7",
+   "unit": "million",
+   "year": 2022,
+   "source_ids": [
+    "niti_adp",
+    "plfs2324"
+   ],
+   "tags": [
+    "gig",
+    "platform",
+    "jobs"
+   ],
+   "detail": "NITI Aayog 2022 estimate; projected 23.5 million by 2029-30. Definitional debates are large.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "job_msme_units",
+   "dimension": "jobs",
+   "claim": "MSME units",
+   "value": "63",
+   "unit": "million",
+   "year": 2024,
+   "source_ids": [
+    "ficci",
+    "worldbank"
+   ],
+   "tags": [
+    "msme",
+    "enterprise",
+    "jobs"
+   ],
+   "detail": "Broad estimate including micro-enterprises; most employ fewer than five people.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "job_agri_share",
+   "dimension": "jobs",
+   "claim": "Agriculture share of employment",
+   "value": "45.8",
+   "unit": "%",
+   "year": 2023,
+   "source_ids": [
+    "plfs2324"
+   ],
+   "tags": [
+    "agriculture",
+    "rural",
+    "jobs"
+   ],
+   "detail": "PLFS 2022-23. Falling slowly; still the largest rural employer.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "edu_college_enrolment",
+   "dimension": "education",
+   "claim": "Higher-education enrolment",
+   "value": "43.3",
+   "unit": "million",
+   "year": 2022,
+   "source_ids": [
+    "aishe"
+   ],
+   "tags": [
+    "college",
+    "education",
+    "youth"
+   ],
+   "detail": "AISHE 2021-22. Gross enrolment ratio around 28%; huge state variation.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "edu_ger",
+   "dimension": "education",
+   "claim": "Gross enrolment ratio, higher education",
+   "value": "28.4",
+   "unit": "%",
+   "year": 2022,
+   "source_ids": [
+    "aishe"
+   ],
+   "tags": [
+    "college",
+    "education"
+   ],
+   "detail": "AISHE 2021-22. Enrolment is concentrated in arts, science and commerce; employability is a separate problem.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "edu_neet",
+   "dimension": "education",
+   "claim": "NEET aspirants",
+   "value": "24",
+   "unit": "lakh",
+   "year": 2024,
+   "source_ids": [
+    "ministry_education"
+   ],
+   "tags": [
+    "coaching",
+    "college",
+    "exam"
+   ],
+   "detail": "Approximate candidate volume; coaching hubs like Kota and Hyderabad are their own micro-economies.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "edu_asER",
+   "dimension": "education",
+   "claim": "14-18 learning and digital access",
+   "value": "uneven",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "aser"
+   ],
+   "tags": [
+    "school",
+    "learning",
+    "digital"
+   ],
+   "detail": "ASER 2023 finds most 14-18-year-olds enrolled, but large gaps in reading, maths and access to a smartphone at home.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "edu_college_culture",
+   "dimension": "education",
+   "claim": "College culture",
+   "value": "status-defining",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "aser",
+    "aishe"
+   ],
+   "tags": [
+    "college",
+    "youth",
+    "status"
+   ],
+   "detail": "College is a status market: city, course, hostel, phone, clothes and 'exposure' all signal class.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "job_sarkari_status",
+   "dimension": "jobs",
+   "claim": "Government job prestige",
+   "value": "high",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "lokniti",
+    "cmie"
+   ],
+   "tags": [
+    "jobs",
+    "status",
+    "security"
+   ],
+   "detail": "A permanent government job remains a marriage-market and family-status asset, especially in the Hindi belt.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "dig_internet_subs",
+   "dimension": "digital",
+   "claim": "Internet subscribers",
+   "value": "950",
+   "unit": "million",
+   "year": 2025,
+   "source_ids": [
+    "trai"
+   ],
+   "tags": [
+    "internet",
+    "telecom"
+   ],
+   "detail": "TRAI subscriber data. Subscriptions overstate unique users because of multiple SIMs and shared devices.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "dig_active_users",
+   "dimension": "digital",
+   "claim": "Active internet users",
+   "value": "958",
+   "unit": "million",
+   "year": 2025,
+   "source_ids": [
+    "iamai"
+   ],
+   "tags": [
+    "internet",
+    "rural"
+   ],
+   "detail": "IAMAI-Kantar 2025. Rural users are now the majority of new additions.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "dig_rural_share",
+   "dimension": "digital",
+   "claim": "Rural share of internet users",
+   "value": "55",
+   "unit": "%",
+   "year": 2025,
+   "source_ids": [
+    "iamai"
+   ],
+   "tags": [
+    "rural",
+    "internet"
+   ],
+   "detail": "Rural internet growth is real, but usage is shallower: entertainment, messaging and payments dominate.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "dig_smartphone_hh",
+   "dimension": "digital",
+   "claim": "Households with a smartphone",
+   "value": "85.5",
+   "unit": "%",
+   "year": 2025,
+   "source_ids": [
+    "cms_telecom"
+   ],
+   "tags": [
+    "smartphone",
+    "device"
+   ],
+   "detail": "MoSPI CMS Telecom 2025. Rural 82.1%, urban 91.3%; device sharing is common.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "dig_telecom_subs",
+   "dimension": "digital",
+   "claim": "Telephone subscribers",
+   "value": "1.15",
+   "unit": "billion",
+   "year": 2025,
+   "source_ids": [
+    "trai"
+   ],
+   "tags": [
+    "telecom",
+    "mobile"
+   ],
+   "detail": "TRAI. India is a multi-SIM market; subscriber counts are not people counts.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "dig_data_cost",
+   "dimension": "digital",
+   "claim": "Mobile data affordability",
+   "value": "among the lowest",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "trai",
+    "iamai"
+   ],
+   "tags": [
+    "data",
+    "affordability"
+   ],
+   "detail": "Cheap data is the single biggest reason for video-first behaviour in tier-2/3/4.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "dig_upi",
+   "dimension": "payments",
+   "claim": "UPI transactions",
+   "value": "172",
+   "unit": "billion / year",
+   "year": 2025,
+   "source_ids": [
+    "npci_upi"
+   ],
+   "tags": [
+    "upi",
+    "payments",
+    "digital"
+   ],
+   "detail": "FY2024-25 scale. High volume does not mean high balances or credit access.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "dig_whatsapp",
+   "dimension": "media",
+   "claim": "WhatsApp users",
+   "value": "500+",
+   "unit": "million",
+   "year": 2024,
+   "source_ids": [
+    "iamai",
+    "meta_bcg"
+   ],
+   "tags": [
+    "whatsapp",
+    "messaging",
+    "trust"
+   ],
+   "detail": "WhatsApp is the de facto social graph, market and rumour network for much of India.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "dig_ott",
+   "dimension": "media",
+   "claim": "OTT viewers",
+   "value": "500+",
+   "unit": "million",
+   "year": 2024,
+   "source_ids": [
+    "mpa",
+    "iamai"
+   ],
+   "tags": [
+    "ott",
+    "video",
+    "netflix"
+   ],
+   "detail": "Reach is broad; paid subscriptions are much smaller and churn is high.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "dig_tv_hh",
+   "dimension": "media",
+   "claim": "TV households",
+   "value": "210",
+   "unit": "million",
+   "year": 2024,
+   "source_ids": [
+    "barc",
+    "prasar_bharati"
+   ],
+   "tags": [
+    "tv",
+    "media",
+    "rural"
+   ],
+   "detail": "TV remains the widest video reach, especially in rural and older segments; DD Free Dish matters in remote areas.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "dig_social_users",
+   "dimension": "media",
+   "claim": "Social media users",
+   "value": "500+",
+   "unit": "million",
+   "year": 2024,
+   "source_ids": [
+    "iamai"
+   ],
+   "tags": [
+    "social",
+    "media"
+   ],
+   "detail": "Platform mix shifts by tier: Instagram/YouTube in metros, ShareChat/Moj and WhatsApp status in smaller towns.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "dig_ecom_shoppers",
+   "dimension": "retail",
+   "claim": "Online shoppers",
+   "value": "270",
+   "unit": "million",
+   "year": 2024,
+   "source_ids": [
+    "bain_flipkart"
+   ],
+   "tags": [
+    "ecommerce",
+    "online",
+    "retail"
+   ],
+   "detail": "Bain-Flipkart estimate. Most growth is now from tier-2/3, but basket sizes are smaller.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "dig_language",
+   "dimension": "language",
+   "claim": "Preference for Indic languages online",
+   "value": "~90",
+   "unit": "%",
+   "year": 2024,
+   "source_ids": [
+    "iamai"
+   ],
+   "tags": [
+    "language",
+    "internet",
+    "content"
+   ],
+   "detail": "Most new internet users prefer content in their own language; English signals status but limits reach.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "dig_broadband_gap",
+   "dimension": "digital",
+   "claim": "Rural broadband gap",
+   "value": "persistent",
+   "unit": "qualitative",
+   "year": 2025,
+   "source_ids": [
+    "trai",
+    "jjm"
+   ],
+   "tags": [
+    "broadband",
+    "rural",
+    "supply"
+   ],
+   "detail": "Mobile coverage is broad; reliable fixed broadband and device quality are not. Shared phones constrain commerce.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "cat_ev2w",
+   "dimension": "category",
+   "claim": "Electric two-wheeler share of new sales",
+   "value": "5.4",
+   "unit": "%",
+   "year": 2024,
+   "source_ids": [
+    "siam",
+    "bnef"
+   ],
+   "tags": [
+    "ev",
+    "two-wheeler",
+    "mobility"
+   ],
+   "detail": "FY2023-24 approximate. Highly concentrated in a few states and urban pockets.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cat_ev3w",
+   "dimension": "category",
+   "claim": "Electric three-wheeler share of new sales",
+   "value": "55",
+   "unit": "%",
+   "year": 2024,
+   "source_ids": [
+    "siam",
+    "bnef"
+   ],
+   "tags": [
+    "ev",
+    "three-wheeler",
+    "mobility"
+   ],
+   "detail": "Commercial three-wheelers electrify faster because total cost of ownership is visible daily.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cat_evcar",
+   "dimension": "category",
+   "claim": "Electric car share of new car sales",
+   "value": "2.4",
+   "unit": "%",
+   "year": 2024,
+   "source_ids": [
+    "siam",
+    "bnef"
+   ],
+   "tags": [
+    "ev",
+    "car",
+    "premium"
+   ],
+   "detail": "Small but growing; charging and resale anxiety remain the binding constraints outside metros.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cat_chargers",
+   "dimension": "category",
+   "claim": "Public EV charging points",
+   "value": "~30,000",
+   "unit": "points",
+   "year": 2024,
+   "source_ids": [
+    "bnef",
+    "mnre"
+   ],
+   "tags": [
+    "ev",
+    "charging",
+    "supply"
+   ],
+   "detail": "Heavily concentrated in Maharashtra, Delhi, Karnataka, Tamil Nadu and Gujarat.",
+   "confidence": "low",
+   "geo": "India"
+  },
+  {
+   "id": "cat_qcom",
+   "dimension": "category",
+   "claim": "Quick commerce GMV",
+   "value": "$6-7",
+   "unit": "billion",
+   "year": 2024,
+   "source_ids": [
+    "redseer",
+    "bain_flipkart"
+   ],
+   "tags": [
+    "quick commerce",
+    "retail",
+    "city"
+   ],
+   "detail": "Concentrated in the top 10-12 cities; unit economics depend on order density.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cat_darkstores",
+   "dimension": "category",
+   "claim": "Dark stores",
+   "value": "5,000+",
+   "unit": "stores",
+   "year": 2024,
+   "source_ids": [
+    "redseer"
+   ],
+   "tags": [
+    "quick commerce",
+    "supply"
+   ],
+   "detail": "Store density, not app downloads, is the real moat.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cat_kirana",
+   "dimension": "category",
+   "claim": "Kirana stores",
+   "value": "12",
+   "unit": "million",
+   "year": 2024,
+   "source_ids": [
+    "kantar",
+    "hul"
+   ],
+   "tags": [
+    "kirana",
+    "retail",
+    "distribution"
+   ],
+   "detail": "Kiranas still handle the majority of FMCG volume; they are also credit providers and community nodes.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "cat_modern_trade",
+   "dimension": "category",
+   "claim": "Modern trade share of retail",
+   "value": "~12",
+   "unit": "%",
+   "year": 2024,
+   "source_ids": [
+    "nielseniq",
+    "hul"
+   ],
+   "tags": [
+    "modern trade",
+    "retail"
+   ],
+   "detail": "Modern trade is metro-skewed; general trade remains the default in smaller towns.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cat_fmcg_rural",
+   "dimension": "category",
+   "claim": "Rural share of FMCG demand",
+   "value": "~37",
+   "unit": "%",
+   "year": 2024,
+   "source_ids": [
+    "hul",
+    "nielseniq"
+   ],
+   "tags": [
+    "fmcg",
+    "rural"
+   ],
+   "detail": "Rural demand is volume-led and monsoon-sensitive; premium packs travel less well.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cat_beauty",
+   "dimension": "category",
+   "claim": "Beauty and personal care market",
+   "value": "~$20",
+   "unit": "billion",
+   "year": 2023,
+   "source_ids": [
+    "hul",
+    "nielseniq",
+    "bcg"
+   ],
+   "tags": [
+    "beauty",
+    "personal care",
+    "premium"
+   ],
+   "detail": "Mass skincare and hair oil dominate volume; premium beauty grows from a small base in metros.",
+   "confidence": "low",
+   "geo": "India"
+  },
+  {
+   "id": "cat_protein",
+   "dimension": "category",
+   "claim": "Protein supplement market",
+   "value": "small but growing",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "icmr",
+    "nielseniq"
+   ],
+   "tags": [
+    "protein",
+    "health",
+    "premium"
+   ],
+   "detail": "Protein deficiency is widespread; supplements are an urban, gym-linked category with trust and adulteration concerns.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cat_ott_paid",
+   "dimension": "category",
+   "claim": "Paid OTT subscriptions",
+   "value": "~100",
+   "unit": "million",
+   "year": 2024,
+   "source_ids": [
+    "mpa"
+   ],
+   "tags": [
+    "ott",
+    "netflix",
+    "subscription"
+   ],
+   "detail": "Paid base is far smaller than reach; telecom bundles and mobile-only plans drive conversion.",
+   "confidence": "low",
+   "geo": "India"
+  },
+  {
+   "id": "cat_netflix",
+   "dimension": "category",
+   "claim": "Netflix India strategy",
+   "value": "mobile-first",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "mpa"
+   ],
+   "tags": [
+    "netflix",
+    "ott",
+    "pricing"
+   ],
+   "detail": "Netflix India relies on mobile-only plans, telecom bundles and local originals; household sharing is common.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cat_telecom_arpu",
+   "dimension": "category",
+   "claim": "Telecom ARPU",
+   "value": "~₹200",
+   "unit": "₹ / month",
+   "year": 2024,
+   "source_ids": [
+    "trai"
+   ],
+   "tags": [
+    "telecom",
+    "arpu",
+    "price"
+   ],
+   "detail": "Low ARPU limits operator investment; price hikes are politically and competitively constrained.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cat_lpg",
+   "dimension": "category",
+   "claim": "LPG coverage",
+   "value": "99.8",
+   "unit": "%",
+   "year": 2024,
+   "source_ids": [
+    "ppac"
+   ],
+   "tags": [
+    "lpg",
+    "energy",
+    "household"
+   ],
+   "detail": "Coverage is near-universal, but refill affordability and last-mile reliability vary.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "cat_crude_import",
+   "dimension": "category",
+   "claim": "Crude oil import dependence",
+   "value": "~88",
+   "unit": "%",
+   "year": 2024,
+   "source_ids": [
+    "ppac"
+   ],
+   "tags": [
+    "oil",
+    "energy",
+    "macro"
+   ],
+   "detail": "India imports most of its crude; global prices transmit quickly to household budgets.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "cat_health_insurance",
+   "dimension": "category",
+   "claim": "Population covered by health insurance",
+   "value": "~30",
+   "unit": "%",
+   "year": 2022,
+   "source_ids": [
+    "nha",
+    "irdai"
+   ],
+   "tags": [
+    "health",
+    "insurance",
+    "protection"
+   ],
+   "detail": "Public schemes cover a large share; depth and hospital access are uneven. Out-of-pocket spending remains high.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cat_solar",
+   "dimension": "category",
+   "claim": "Rooftop solar",
+   "value": "small base",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "mnre",
+    "bnef"
+   ],
+   "tags": [
+    "solar",
+    "energy",
+    "premium"
+   ],
+   "detail": "Rooftop solar is growing from a small base; financing, roof rights and installer trust are barriers.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cat_bnpl",
+   "dimension": "category",
+   "claim": "Buy-now-pay-later",
+   "value": "regulated growth",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "rbi_payments",
+    "crisil"
+   ],
+   "tags": [
+    "bnpl",
+    "credit",
+    "youth"
+   ],
+   "detail": "Young, urban and thin-file consumers adopt BNPL; RBI has tightened unsecured credit and default norms.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cat_coaching",
+   "dimension": "category",
+   "claim": "Coaching economy",
+   "value": "large",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "ministry_education",
+    "aser"
+   ],
+   "tags": [
+    "coaching",
+    "education",
+    "youth"
+   ],
+   "detail": "Exam coaching is a household expense with high social pressure and weak consumer protection.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "sup_cold_chain",
+   "dimension": "supply",
+   "claim": "Cold-chain coverage",
+   "value": "fragmented",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "ficci",
+    "worldbank"
+   ],
+   "tags": [
+    "cold chain",
+    "agri",
+    "supply"
+   ],
+   "detail": "A large share of perishables still moves without reliable cold chain; wastage is concentrated at the farm-gate.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "sup_ev_charging",
+   "dimension": "supply",
+   "claim": "EV charging concentration",
+   "value": "metro-skewed",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "bnef",
+    "mnre"
+   ],
+   "tags": [
+    "ev",
+    "charging",
+    "tier 2"
+   ],
+   "detail": "Public chargers cluster in a few states and cities; highway and small-town coverage is thin.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "sup_qcom_cities",
+   "dimension": "supply",
+   "claim": "Quick commerce city concentration",
+   "value": "top 10-12 cities",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "redseer"
+   ],
+   "tags": [
+    "quick commerce",
+    "tier 2",
+    "supply"
+   ],
+   "detail": "Expansion beyond the top cities depends on density, rider supply and store economics.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "sup_phc",
+   "dimension": "supply",
+   "claim": "Primary health centre gaps",
+   "value": "persistent",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "nha",
+    "niti_adp"
+   ],
+   "tags": [
+    "health",
+    "rural",
+    "supply"
+   ],
+   "detail": "Staffing, diagnostics and drug availability vary widely; private providers fill the gap at a cost.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "sup_specialists",
+   "dimension": "supply",
+   "claim": "Specialist doctor shortage",
+   "value": "concentrated in metros",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "nha"
+   ],
+   "tags": [
+    "health",
+    "doctors",
+    "supply"
+   ],
+   "detail": "Specialists cluster in cities; district hospitals depend on visiting consultants and referral networks.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "sup_jjm",
+   "dimension": "infrastructure",
+   "claim": "Rural households with tap water",
+   "value": "~80",
+   "unit": "%",
+   "year": 2025,
+   "source_ids": [
+    "jjm"
+   ],
+   "tags": [
+    "water",
+    "rural",
+    "infrastructure"
+   ],
+   "detail": "Jal Jeevan Mission coverage has risen fast; quality and reliability lag connection numbers.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "sup_sanitation",
+   "dimension": "infrastructure",
+   "claim": "Improved sanitation coverage",
+   "value": "70.2",
+   "unit": "%",
+   "year": 2021,
+   "source_ids": [
+    "nfhs5"
+   ],
+   "tags": [
+    "sanitation",
+    "rural",
+    "infrastructure"
+   ],
+   "detail": "NFHS-5. Usage gaps and water availability matter more than toilet construction alone.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "sup_roads",
+   "dimension": "infrastructure",
+   "claim": "Road connectivity",
+   "value": "improving",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "worldbank",
+    "mohua"
+   ],
+   "tags": [
+    "roads",
+    "logistics",
+    "rural"
+   ],
+   "detail": "Road access has improved, but last-mile quality and transport costs still shape market access.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "sup_northeast",
+   "dimension": "supply",
+   "claim": "Northeast logistics",
+   "value": "high-cost",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "niti_adp",
+    "worldbank"
+   ],
+   "tags": [
+    "northeast",
+    "logistics",
+    "supply"
+   ],
+   "detail": "Distance, terrain, inner-line permits and small markets raise landed costs and delay service.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "sup_power",
+   "dimension": "infrastructure",
+   "claim": "Power reliability",
+   "value": "uneven",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "mnre",
+    "worldbank"
+   ],
+   "tags": [
+    "power",
+    "rural",
+    "infrastructure"
+   ],
+   "detail": "Grid reliability varies by state and season; inverter/battery ownership is a coping strategy.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "sup_insurance_density",
+   "dimension": "finance",
+   "claim": "Insurance penetration",
+   "value": "4.0",
+   "unit": "% of GDP",
+   "year": 2024,
+   "source_ids": [
+    "irdai"
+   ],
+   "tags": [
+    "insurance",
+    "penetration",
+    "finance"
+   ],
+   "detail": "Life and non-life combined; protection gap is much larger than the headline.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "sup_banking",
+   "dimension": "finance",
+   "claim": "Bank branch access",
+   "value": "uneven",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "rbi_fi"
+   ],
+   "tags": [
+    "banking",
+    "rural",
+    "access"
+   ],
+   "detail": "Branch density is metro-heavy; business correspondents and UPI fill some gaps but not credit.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "sup_last_mile",
+   "dimension": "supply",
+   "claim": "Last-mile delivery cost",
+   "value": "high outside metros",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "bain_flipkart",
+    "redseer"
+   ],
+   "tags": [
+    "logistics",
+    "tier 3",
+    "supply"
+   ],
+   "detail": "Address density and returns make tier-3/4 unit economics harder than metro averages.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cul_festive_share",
+   "dimension": "festival",
+   "claim": "Festive quarter share of annual sales",
+   "value": "40-50",
+   "unit": "%",
+   "year": 2024,
+   "source_ids": [
+    "nielseniq",
+    "hul",
+    "bcg"
+   ],
+   "tags": [
+    "festival",
+    "diwali",
+    "demand"
+   ],
+   "detail": "For many discretionary categories, Sep-Dec carries a disproportionate share of annual demand.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cul_weddings",
+   "dimension": "festival",
+   "claim": "Weddings per year",
+   "value": "~10",
+   "unit": "million",
+   "year": 2024,
+   "source_ids": [
+    "ficci",
+    "nrai"
+   ],
+   "tags": [
+    "wedding",
+    "status",
+    "consumption"
+   ],
+   "detail": "Weddings are a major status and gifting market; spending is often socially benchmarked.",
+   "confidence": "low",
+   "geo": "India"
+  },
+  {
+   "id": "cul_gold",
+   "dimension": "status",
+   "claim": "Gold as household asset",
+   "value": "core",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "rbi_payments",
+    "worldbank"
+   ],
+   "tags": [
+    "gold",
+    "status",
+    "savings"
+   ],
+   "detail": "Gold is savings, status and marriage security at once; price sensitivity is different from other categories.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cul_car_status",
+   "dimension": "status",
+   "claim": "Car as status good",
+   "value": "high",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "siam",
+    "mckinsey"
+   ],
+   "tags": [
+    "car",
+    "status",
+    "class"
+   ],
+   "detail": "In smaller towns a car signals family arrival; the neighbour's car is a reference price.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cul_phone_status",
+   "dimension": "status",
+   "claim": "Phone as status good",
+   "value": "high",
+   "unit": "qualitative",
+   "year": 2025,
+   "source_ids": [
+    "counterpoint",
+    "iamai"
+   ],
+   "tags": [
+    "phone",
+    "status",
+    "youth"
+   ],
+   "detail": "The phone is the most visible everyday status marker; model, camera and brand matter more than specs.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cul_house_status",
+   "dimension": "status",
+   "claim": "House as status good",
+   "value": "high",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "pmayg",
+    "worldbank"
+   ],
+   "tags": [
+    "house",
+    "status",
+    "family"
+   ],
+   "detail": "A pucca house, a separate gate and a 'good address' are long-horizon status projects.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cul_saree",
+   "dimension": "status",
+   "claim": "Clothing and saree signalling",
+   "value": "high",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "nielseniq",
+    "bcg"
+   ],
+   "tags": [
+    "clothing",
+    "status",
+    "gender"
+   ],
+   "detail": "Clothing signals occasion, community and respectability; premium is read through fabric and brand, not just price.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cul_log_kya",
+   "dimension": "norms",
+   "claim": "Social surveillance ('log kya kahenge')",
+   "value": "strong",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "pew",
+    "ihds",
+    "lokniti"
+   ],
+   "tags": [
+    "norms",
+    "status",
+    "community"
+   ],
+   "detail": "Purchase decisions are often family and community decisions; visible consumption invites judgement.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cul_vastu",
+   "dimension": "norms",
+   "claim": "Vastu, muhurat and auspicious timing",
+   "value": "persistent",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "lokniti",
+    "ihds"
+   ],
+   "tags": [
+    "norms",
+    "festival",
+    "house"
+   ],
+   "detail": "House, gold and vehicle purchases may be timed to auspicious dates; rational to the household even when it looks inefficient.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cul_caste_network",
+   "dimension": "norms",
+   "claim": "Caste and community trade networks",
+   "value": "persistent",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "ihds",
+    "sec_census"
+   ],
+   "tags": [
+    "caste",
+    "trade",
+    "trust"
+   ],
+   "detail": "Occupation and credit networks are still community-linked in many towns; trust travels through known networks.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cul_jugaad",
+   "dimension": "norms",
+   "claim": "Jugaad and repair culture",
+   "value": "strong",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "worldbank",
+    "cmie"
+   ],
+   "tags": [
+    "jugaad",
+    "repair",
+    "informal"
+   ],
+   "detail": "Households optimise for repairability, local spare parts and informal service, not just warranty terms.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cul_neighbour_proof",
+   "dimension": "norms",
+   "claim": "Neighbour proof",
+   "value": "decisive",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "meta_bcg",
+    "kantar"
+   ],
+   "tags": [
+    "social proof",
+    "trust",
+    "word of mouth"
+   ],
+   "detail": "One visible owner in the same street or apartment block outweighs a national ad for high-involvement purchases.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cul_local_dealer",
+   "dimension": "norms",
+   "claim": "Local dealer trust",
+   "value": "decisive",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "siam",
+    "hul"
+   ],
+   "tags": [
+    "dealer",
+    "trust",
+    "service"
+   ],
+   "detail": "The dealer is the product's face; service access and resale value are judged through them.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cul_education_mobility",
+   "dimension": "norms",
+   "claim": "Education as mobility",
+   "value": "strong",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "aser",
+    "aishe"
+   ],
+   "tags": [
+    "education",
+    "aspiration",
+    "class"
+   ],
+   "detail": "Families sacrifice current consumption for children's English-medium education and exam coaching.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cul_regional_pride",
+   "dimension": "norms",
+   "claim": "Regional and language pride",
+   "value": "strong",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "lokniti",
+    "iamai"
+   ],
+   "tags": [
+    "language",
+    "region",
+    "identity"
+   ],
+   "detail": "Campaigns that use the local language and local references travel further than translated metro creative.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cul_colourism",
+   "dimension": "norms",
+   "claim": "Colour and fairness bias",
+   "value": "persistent",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "ihds",
+    "nielseniq"
+   ],
+   "tags": [
+    "colour",
+    "beauty",
+    "status"
+   ],
+   "detail": "Fairness products and matrimonial preferences show colourism is still a market force; treat it as a bias to model, not endorse.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cul_posh_area",
+   "dimension": "status",
+   "claim": "Posh-area signalling",
+   "value": "strong",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "mckinsey",
+    "bcg"
+   ],
+   "tags": [
+    "posh",
+    "address",
+    "class"
+   ],
+   "detail": "Addresses like South Delhi, South Mumbai, Jubilee Hills, Koramangala or Alipore carry social meaning beyond amenities.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cul_college_hubs",
+   "dimension": "culture",
+   "claim": "College hubs",
+   "value": "distinct markets",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "aishe",
+    "aser"
+   ],
+   "tags": [
+    "college",
+    "youth",
+    "city"
+   ],
+   "detail": "Kota, Hyderabad, Pune, Bengaluru, Delhi North Campus and Chennai have their own student economies and status codes.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cul_migration_remittance",
+   "dimension": "culture",
+   "claim": "Migration and remittance obligations",
+   "value": "core",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "census_migration",
+    "worldbank"
+   ],
+   "tags": [
+    "migration",
+    "remittance",
+    "family"
+   ],
+   "detail": "Migrants often support a village household; spending is negotiated across two locations.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cul_service_trust",
+   "dimension": "norms",
+   "claim": "Service network as trust",
+   "value": "decisive",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "siam",
+    "bnef"
+   ],
+   "tags": [
+    "service",
+    "trust",
+    "after-sales"
+   ],
+   "detail": "The perceived distance to a service centre is a direct price on risk, especially for vehicles and durables.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cul_whatsapp_rumour",
+   "dimension": "norms",
+   "claim": "WhatsApp forward authority",
+   "value": "high",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "iamai",
+    "pew"
+   ],
+   "tags": [
+    "whatsapp",
+    "misinformation",
+    "trust"
+   ],
+   "detail": "Forwards from a trusted contact can outweigh official corrections; fact-checking must travel through the same network.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "cul_status_avoidance",
+   "dimension": "norms",
+   "claim": "Avoiding visible show-off",
+   "value": "contextual",
+   "unit": "qualitative",
+   "year": 2024,
+   "source_ids": [
+    "lokniti",
+    "ihds"
+   ],
+   "tags": [
+    "status",
+    "small town",
+    "norms"
+   ],
+   "detail": "In small communities, visible excess can invite envy or suspicion; understatement is sometimes the safer signal.",
+   "confidence": "medium",
+   "geo": "India"
+  }
+ ],
+ "regions": [
+  {
+   "id": "north",
+   "name": "North",
+   "states": [
+    "Delhi",
+    "Haryana",
+    "Punjab",
+    "Uttar Pradesh",
+    "Uttarakhand",
+    "Rajasthan",
+    "Himachal Pradesh",
+    "Jammu & Kashmir",
+    "Ladakh",
+    "Chandigarh"
+   ],
+   "summary": "Agrarian hinterland, dense towns, strong status competition and family-mediated purchases.",
+   "consumption": "Festival and wedding spending are highly visible; gold, vehicles and electronics carry family prestige. Sachets and EMI bridge irregular cash flows.",
+   "gender": "Women's mobility and paid work vary sharply by community and state; purdah, safety and family permission still shape access.",
+   "status": "Address, vehicle, phone and children's English-medium schooling are the core status markers.",
+   "constraints": "Seasonal income, groundwater stress, air pollution, weak last-mile service in small towns.",
+   "culture": "Hindi belt sociality, caste networks, temple towns, migration to Delhi/NCR and Punjab-to-abroad links.",
+   "source_ids": [
+    "census2011",
+    "nfhs5",
+    "hces2223",
+    "plfs2324",
+    "pew",
+    "ihds"
+   ]
+  },
+  {
+   "id": "south",
+   "name": "South",
+   "states": [
+    "Tamil Nadu",
+    "Kerala",
+    "Karnataka",
+    "Telangana",
+    "Andhra Pradesh",
+    "Puducherry",
+    "Lakshadweep",
+    "Andaman & Nicobar Island"
+   ],
+   "summary": "Higher urbanisation, stronger human development, language pride and a dense tier-2 town network.",
+   "consumption": "Education, healthcare and durable goods are prioritised; filter coffee, rice, gold and silk carry cultural weight. Premium adoption travels through tier-2 towns faster than in the north.",
+   "gender": "Kerala and Tamil Nadu show comparatively better female literacy and mobility, but paid work and safety still vary.",
+   "status": "Education, house, car and children's professional careers; 'good family' matters more than display in some communities.",
+   "constraints": "Water stress, congestion, high land prices, dependence on inter-state migrant labour.",
+   "culture": "Temple festivals, classical arts, film and language politics; Bengaluru and Hyderabad are tech-migration cities.",
+   "source_ids": [
+    "census2011",
+    "nfhs5",
+    "hces2223",
+    "plfs2324",
+    "aishe",
+    "iamai"
+   ]
+  },
+  {
+   "id": "west",
+   "name": "West",
+   "states": [
+    "Maharashtra",
+    "Gujarat",
+    "Goa",
+    "Dadara & Nagar Havelli"
+   ],
+   "summary": "Trade-led, entrepreneurial, highly urban and deeply connected to global commodity and migration flows.",
+   "consumption": "Gujarat's business networks and Maharashtra's metro aspiration create a wide spread: from diamond workers to luxury South Mumbai. Credit and dealer relationships are central.",
+   "gender": "Female work participation varies; Goa and urban Maharashtra are more liberal, while conservative pockets persist.",
+   "status": "Business scale, property, gold and vehicles; community reputation is a credit asset.",
+   "constraints": "Housing cost, water, congestion, migrant labour dependence, cyclical commodity exposure.",
+   "culture": "Garba, Ganesh Chaturthi, Diwali, business-family networks, Bollywood and a strong cooperative tradition.",
+   "source_ids": [
+    "census2011",
+    "nfhs5",
+    "hces2223",
+    "plfs2324",
+    "rbi_fi",
+    "bcg"
+   ]
+  },
+  {
+   "id": "east",
+   "name": "East",
+   "states": [
+    "West Bengal",
+    "Bihar",
+    "Jharkhand",
+    "Odisha",
+    "Assam",
+    "Sikkim"
+   ],
+   "summary": "Young, rural-heavy and migration-linked, with strong cultural identity and uneven industrialisation.",
+   "consumption": "Price sensitivity is high; sachets, second-hand goods and local repair markets matter. Festivals like Durga Puja and Chhath drive concentrated spending.",
+   "gender": "Women's work is rising in some pockets but mobility remains constrained; migration of men reshapes households.",
+   "status": "Education, government jobs, land and house; Kolkata's cultural capital carries regional prestige.",
+   "constraints": "Floods, weak industrial base, transport costs, limited formal credit, out-migration.",
+   "culture": "Bengali, Odia, Assamese and tribal identities; tea, fish, rice and strong literary/film traditions.",
+   "source_ids": [
+    "census2011",
+    "nfhs5",
+    "hces2223",
+    "plfs2324",
+    "census_migration",
+    "niti_mpi"
+   ]
+  },
+  {
+   "id": "central",
+   "name": "Central",
+   "states": [
+    "Madhya Pradesh",
+    "Chhattisgarh"
+   ],
+   "summary": "Agrarian and forest-dependent, with large tribal populations and significant poverty concentration.",
+   "consumption": "Food and fuel dominate budgets; durable purchases are deferred and often financed through informal credit or gold.",
+   "gender": "Early marriage and low female mobility persist in many districts; SHG networks are a countervailing force.",
+   "status": "Land, house, motorcycle and children's education; display is moderated by community norms.",
+   "constraints": "Rainfed agriculture, forest rights, poor connectivity, health and education gaps.",
+   "culture": "Tribal festivals, folk music, pilgrimage towns and Hindi-language media.",
+   "source_ids": [
+    "census2011",
+    "nfhs5",
+    "hces2223",
+    "niti_mpi",
+    "sec_census",
+    "jjm"
+   ]
+  },
+  {
+   "id": "northeast",
+   "name": "Northeast",
+   "states": [
+    "Arunachal Pradesh",
+    "Manipur",
+    "Meghalaya",
+    "Mizoram",
+    "Nagaland",
+    "Tripura"
+   ],
+   "summary": "Distinct ethnic and linguistic identities, high literacy in places, and severe logistics constraints.",
+   "consumption": "Small markets, high landed costs and strong community networks. Christianity, tribal customs and local languages shape trust.",
+   "gender": "Matrilineal pockets (Khasi, Garo) contrast with patrilineal communities; women's market presence is visible.",
+   "status": "Community standing, education and government employment; outside brands must earn local legitimacy.",
+   "constraints": "Terrain, inner-line permits, small market size, poor road/air connectivity, limited service networks.",
+   "culture": "Hornbill, Bihu, Sangai and tribal festivals; music, football and local fashion are strong identity markers.",
+   "source_ids": [
+    "census2011",
+    "nfhs5",
+    "census_religion",
+    "niti_adp",
+    "worldbank",
+    "iamai"
+   ]
+  }
+ ],
+ "norms": [
+  {
+   "id": "norm_family_permission",
+   "claim": "Family permission for large purchases",
+   "detail": "Big-ticket decisions are negotiated with parents, spouses and sometimes elders; a lone 'consumer' is the exception.",
+   "tiers": [
+    "1",
+    "2",
+    "3",
+    "4"
+   ],
+   "regions": [
+    "north",
+    "east",
+    "central"
+   ],
+   "effect": "Raises the bar for high-involvement categories; family demos and guarantor-friendly finance help.",
+   "source_ids": [
+    "nfhs5",
+    "ihds"
+   ]
+  },
+  {
+   "id": "norm_neighbour_proof",
+   "claim": "Neighbour proof",
+   "detail": "One visible owner in the same street, block or WhatsApp group is stronger evidence than a national ad.",
+   "tiers": [
+    "2",
+    "3",
+    "4"
+   ],
+   "regions": [
+    "north",
+    "west",
+    "east",
+    "central"
+   ],
+   "effect": "Accelerates adoption after first local owner; also accelerates rejection after a visible failure.",
+   "source_ids": [
+    "meta_bcg",
+    "kantar"
+   ]
+  },
+  {
+   "id": "norm_dealer_trust",
+   "claim": "Dealer as guarantor",
+   "detail": "The local dealer is judged on service, resale and whether they will still be there next year.",
+   "tiers": [
+    "2",
+    "3",
+    "4"
+   ],
+   "regions": [
+    "north",
+    "east",
+    "central",
+    "northeast"
+   ],
+   "effect": "Service density and dealer reputation are adoption infrastructure.",
+   "source_ids": [
+    "siam",
+    "hul"
+   ]
+  },
+  {
+   "id": "norm_log_kya",
+   "claim": "Log kya kahenge",
+   "detail": "Visible consumption is read as character; families avoid shame and envy as much as they seek prestige.",
+   "tiers": [
+    "2",
+    "3",
+    "4"
+   ],
+   "regions": [
+    "north",
+    "central",
+    "east"
+   ],
+   "effect": "Can suppress show-off categories and boost 'safe' premium signals (education, gold, house).",
+   "source_ids": [
+    "pew",
+    "lokniti"
+   ]
+  },
+  {
+   "id": "norm_jugaad",
+   "claim": "Jugaad and repair",
+   "detail": "Households optimise for repairability, local spare parts and informal service over official warranty.",
+   "tiers": [
+    "2",
+    "3",
+    "4"
+   ],
+   "regions": [
+    "north",
+    "east",
+    "central",
+    "west"
+   ],
+   "effect": "Favours modular, repairable products; punishes sealed, service-dependent designs.",
+   "source_ids": [
+    "worldbank",
+    "cmie"
+   ]
+  },
+  {
+   "id": "norm_scheme_legitimacy",
+   "claim": "Government scheme legitimacy",
+   "detail": "A scheme or subsidy can legitimise a category, but paperwork and last-mile delivery decide take-up.",
+   "tiers": [
+    "2",
+    "3",
+    "4"
+   ],
+   "regions": [
+    "north",
+    "east",
+    "central"
+   ],
+   "effect": "Policy scenarios should model friction, not just price cuts.",
+   "source_ids": [
+    "jjm",
+    "pmayg",
+    "niti_adp"
+   ]
+  },
+  {
+   "id": "norm_festival_timing",
+   "claim": "Auspicious timing",
+   "detail": "Purchases may be timed to festivals, muhurat or harvest cash; demand is lumpy and socially coordinated.",
+   "tiers": [
+    "1",
+    "2",
+    "3",
+    "4"
+   ],
+   "regions": [
+    "north",
+    "south",
+    "west",
+    "east",
+    "central"
+   ],
+   "effect": "Festival scenarios should lift both demand and price tolerance, then decay.",
+   "source_ids": [
+    "nielseniq",
+    "lokniti"
+   ]
+  },
+  {
+   "id": "norm_gold_security",
+   "claim": "Gold as security",
+   "detail": "Gold is savings, marriage insurance and status; it competes with financial products for the same rupee.",
+   "tiers": [
+    "1",
+    "2",
+    "3",
+    "4"
+   ],
+   "regions": [
+    "north",
+    "south",
+    "west",
+    "east"
+   ],
+   "effect": "Financial products must beat gold on trust and liquidity, not only returns.",
+   "source_ids": [
+    "rbi_payments",
+    "worldbank"
+   ]
+  },
+  {
+   "id": "norm_education_sacrifice",
+   "claim": "Education as sacrifice",
+   "detail": "Families cut current consumption for English-medium schooling, coaching and college.",
+   "tiers": [
+    "1",
+    "2",
+    "3"
+   ],
+   "regions": [
+    "north",
+    "south",
+    "west",
+    "east",
+    "central"
+   ],
+   "effect": "Education categories have unusual price tolerance and long decision cycles.",
+   "source_ids": [
+    "aser",
+    "aishe"
+   ]
+  },
+  {
+   "id": "norm_language_identity",
+   "claim": "Language as identity",
+   "detail": "Local-language creative signals respect; English-only creative signals distance.",
+   "tiers": [
+    "1",
+    "2",
+    "3",
+    "4"
+   ],
+   "regions": [
+    "north",
+    "south",
+    "west",
+    "east",
+    "central",
+    "northeast"
+   ],
+   "effect": "Localisation is not translation; idiom and reference matter.",
+   "source_ids": [
+    "iamai",
+    "lokniti"
+   ]
+  },
+  {
+   "id": "norm_colourism",
+   "claim": "Colourism",
+   "detail": "Fairness and colour bias shape beauty, matrimony and self-presentation.",
+   "tiers": [
+    "1",
+    "2",
+    "3",
+    "4"
+   ],
+   "regions": [
+    "north",
+    "south",
+    "west",
+    "east",
+    "central"
+   ],
+   "effect": "Model as a bias with ethical caveats; do not present it as a recommendation.",
+   "source_ids": [
+    "ihds",
+    "nielseniq"
+   ]
+  },
+  {
+   "id": "norm_womens_safety",
+   "claim": "Women's safety and reputation",
+   "detail": "Mobility, evening use and solo travel are negotiated against family honour and safety.",
+   "tiers": [
+    "1",
+    "2",
+    "3",
+    "4"
+   ],
+   "regions": [
+    "north",
+    "central",
+    "east"
+   ],
+   "effect": "Products that reduce safety friction (home delivery, verified drivers, women-only services) travel faster.",
+   "source_ids": [
+    "nfhs5",
+    "ihds"
+   ]
+  },
+  {
+   "id": "norm_whatsapp_authority",
+   "claim": "WhatsApp forward authority",
+   "detail": "A forward from a trusted contact can outweigh an official correction.",
+   "tiers": [
+    "2",
+    "3",
+    "4"
+   ],
+   "regions": [
+    "north",
+    "south",
+    "west",
+    "east",
+    "central",
+    "northeast"
+   ],
+   "effect": "Fact-checking must travel through the same network; mass media alone does not correct it.",
+   "source_ids": [
+    "iamai",
+    "pew"
+   ]
+  },
+  {
+   "id": "norm_status_understatement",
+   "claim": "Status understatement",
+   "detail": "In small communities, visible excess can invite envy; understatement is sometimes safer.",
+   "tiers": [
+    "3",
+    "4"
+   ],
+   "regions": [
+    "north",
+    "central",
+    "east"
+   ],
+   "effect": "Premium brands need a 'quiet' variant and a local legitimacy story.",
+   "source_ids": [
+    "lokniti",
+    "ihds"
+   ]
+  },
+  {
+   "id": "norm_service_distance",
+   "claim": "Service distance as risk",
+   "detail": "The distance to a service centre is priced into the purchase, especially for vehicles and durables.",
+   "tiers": [
+    "2",
+    "3",
+    "4"
+   ],
+   "regions": [
+    "north",
+    "east",
+    "central",
+    "northeast"
+   ],
+   "effect": "Service guarantees matter more than feature lists outside metros.",
+   "source_ids": [
+    "siam",
+    "bnef"
+   ]
+  },
+  {
+   "id": "norm_migration_obligation",
+   "claim": "Migration obligation",
+   "detail": "Migrant earnings support a village household; spending is negotiated across two locations.",
+   "tiers": [
+    "2",
+    "3",
+    "4"
+   ],
+   "regions": [
+    "east",
+    "central",
+    "north"
+   ],
+   "effect": "Remittance cycles create seasonal demand and conservative risk appetite.",
+   "source_ids": [
+    "census_migration",
+    "worldbank"
+   ]
+  }
+ ],
+ "category_priors": [
+  {
+   "topic_id": "ev-car",
+   "price_sensitivity": 0.72,
+   "status_signal": 0.82,
+   "supply_constraint": 0.78,
+   "trust_barrier": 0.74,
+   "peer_effect": 0.62,
+   "penetration_note": "2.4% of new car sales; charging and resale anxiety dominate outside metros.",
+   "source_ids": [
+    "siam",
+    "bnef"
+   ]
+  },
+  {
+   "topic_id": "ev-scooter",
+   "price_sensitivity": 0.68,
+   "status_signal": 0.58,
+   "supply_constraint": 0.66,
+   "trust_barrier": 0.62,
+   "peer_effect": 0.7,
+   "penetration_note": "5.4% of new two-wheeler sales; service density is the real constraint.",
+   "source_ids": [
+    "siam",
+    "bnef"
+   ]
+  },
+  {
+   "topic_id": "quick-commerce",
+   "price_sensitivity": 0.42,
+   "status_signal": 0.38,
+   "supply_constraint": 0.74,
+   "trust_barrier": 0.46,
+   "peer_effect": 0.66,
+   "penetration_note": "Top-10-city phenomenon; density and rider supply decide economics.",
+   "source_ids": [
+    "redseer",
+    "bain_flipkart"
+   ]
+  },
+  {
+   "topic_id": "upi-rural",
+   "price_sensitivity": 0.18,
+   "status_signal": 0.12,
+   "supply_constraint": 0.52,
+   "trust_barrier": 0.38,
+   "peer_effect": 0.72,
+   "penetration_note": "High transaction volume; rural usage is shallower and cash still dominates small purchases.",
+   "source_ids": [
+    "npci_upi",
+    "rbi_payments"
+   ]
+  },
+  {
+   "topic_id": "ai-jobs",
+   "price_sensitivity": 0.48,
+   "status_signal": 0.66,
+   "supply_constraint": 0.58,
+   "trust_barrier": 0.52,
+   "peer_effect": 0.48,
+   "penetration_note": "Urban, educated adoption; anxiety about replacement is as strong as aspiration.",
+   "source_ids": [
+    "iamai",
+    "plfs2324"
+   ]
+  },
+  {
+   "topic_id": "edtech",
+   "price_sensitivity": 0.62,
+   "status_signal": 0.72,
+   "supply_constraint": 0.44,
+   "trust_barrier": 0.58,
+   "peer_effect": 0.54,
+   "penetration_note": "Exam-driven demand; trust collapses after outcome failures.",
+   "source_ids": [
+    "aser",
+    "aishe"
+   ]
+  },
+  {
+   "topic_id": "health-insurance",
+   "price_sensitivity": 0.64,
+   "status_signal": 0.48,
+   "supply_constraint": 0.62,
+   "trust_barrier": 0.78,
+   "peer_effect": 0.4,
+   "penetration_note": "~30% covered; hospital networks and claim rejection drive distrust.",
+   "source_ids": [
+    "nha",
+    "irdai"
+   ]
+  },
+  {
+   "topic_id": "rural-credit",
+   "price_sensitivity": 0.58,
+   "status_signal": 0.34,
+   "supply_constraint": 0.68,
+   "trust_barrier": 0.64,
+   "peer_effect": 0.52,
+   "penetration_note": "Informal credit persists; formal loans are constrained by documentation and cash flow.",
+   "source_ids": [
+    "rbi_fi",
+    "mgnrega"
+   ]
+  },
+  {
+   "topic_id": "premium-fmcg",
+   "price_sensitivity": 0.46,
+   "status_signal": 0.62,
+   "supply_constraint": 0.38,
+   "trust_barrier": 0.44,
+   "peer_effect": 0.58,
+   "penetration_note": "Premium packs grow in metros and affluent tier-2; sachets still dominate volume.",
+   "source_ids": [
+    "hul",
+    "nielseniq"
+   ]
+  },
+  {
+   "topic_id": "ott",
+   "price_sensitivity": 0.38,
+   "status_signal": 0.42,
+   "supply_constraint": 0.3,
+   "trust_barrier": 0.34,
+   "peer_effect": 0.48,
+   "penetration_note": "500m+ reach, ~100m paid; telecom bundles and sharing blur conversion.",
+   "source_ids": [
+    "mpa",
+    "iamai"
+   ]
+  },
+  {
+   "topic_id": "solar-rooftop",
+   "price_sensitivity": 0.76,
+   "status_signal": 0.54,
+   "supply_constraint": 0.72,
+   "trust_barrier": 0.7,
+   "peer_effect": 0.44,
+   "penetration_note": "Small base; financing, roof rights and installer trust are barriers.",
+   "source_ids": [
+    "mnre",
+    "bnef"
+   ]
+  },
+  {
+   "topic_id": "gig-work",
+   "price_sensitivity": 0.44,
+   "status_signal": 0.38,
+   "supply_constraint": 0.56,
+   "trust_barrier": 0.52,
+   "peer_effect": 0.46,
+   "penetration_note": "7.7m+ gig workers; earnings volatility and safety are core objections.",
+   "source_ids": [
+    "niti_adp",
+    "plfs2324"
+   ]
+  },
+  {
+   "topic_id": "women-work",
+   "price_sensitivity": 0.52,
+   "status_signal": 0.58,
+   "supply_constraint": 0.64,
+   "trust_barrier": 0.6,
+   "peer_effect": 0.56,
+   "penetration_note": "Female LFPR 41.7%; safety, care work and family permission bind.",
+   "source_ids": [
+    "plfs2324",
+    "nfhs5"
+   ]
+  },
+  {
+   "topic_id": "misinformation",
+   "price_sensitivity": 0.16,
+   "status_signal": 0.24,
+   "supply_constraint": 0.22,
+   "trust_barrier": 0.72,
+   "peer_effect": 0.78,
+   "penetration_note": "WhatsApp-forward ecosystem; correction must travel through trusted networks.",
+   "source_ids": [
+    "iamai",
+    "pew"
+   ]
+  },
+  {
+   "topic_id": "agri-tech",
+   "price_sensitivity": 0.66,
+   "status_signal": 0.36,
+   "supply_constraint": 0.76,
+   "trust_barrier": 0.62,
+   "peer_effect": 0.48,
+   "penetration_note": "Fragmented holdings, cold chain and credit access limit adoption.",
+   "source_ids": [
+    "worldbank",
+    "ficci"
+   ]
+  },
+  {
+   "topic_id": "bnpl",
+   "price_sensitivity": 0.52,
+   "status_signal": 0.48,
+   "supply_constraint": 0.36,
+   "trust_barrier": 0.56,
+   "peer_effect": 0.5,
+   "penetration_note": "Young urban adoption; RBI tightening and default risk reshape the category.",
+   "source_ids": [
+    "rbi_payments",
+    "crisil"
+   ]
+  },
+  {
+   "topic_id": "language-ai",
+   "price_sensitivity": 0.34,
+   "status_signal": 0.46,
+   "supply_constraint": 0.44,
+   "trust_barrier": 0.52,
+   "peer_effect": 0.52,
+   "penetration_note": "Most new users prefer Indic languages; trust and accuracy are unresolved.",
+   "source_ids": [
+    "iamai",
+    "aishe"
+   ]
+  },
+  {
+   "topic_id": "coaching",
+   "price_sensitivity": 0.7,
+   "status_signal": 0.78,
+   "supply_constraint": 0.38,
+   "trust_barrier": 0.56,
+   "peer_effect": 0.62,
+   "penetration_note": "Exam coaching is a status and anxiety market with weak consumer protection.",
+   "source_ids": [
+    "ministry_education",
+    "aser"
+   ]
+  },
+  {
+   "topic_id": "generic",
+   "price_sensitivity": 0.55,
+   "status_signal": 0.5,
+   "supply_constraint": 0.5,
+   "trust_barrier": 0.55,
+   "peer_effect": 0.5,
+   "penetration_note": "Generic category prior; use only when no topic pack matches.",
+   "source_ids": [
+    "worldbank",
+    "hces2223"
+   ]
+  }
+ ],
+ "anchors": [
+  {
+   "topic_id": "ev-car",
+   "conversion": 0.55,
+   "low": 0.4,
+   "high": 0.68,
+   "basis": "Early-adopter conversion among affluent car buyers; 2.4% of new car sales with charging anxiety.",
+   "source_ids": [
+    "siam",
+    "bnef"
+   ]
+  },
+  {
+   "topic_id": "ev-scooter",
+   "conversion": 0.45,
+   "low": 0.32,
+   "high": 0.58,
+   "basis": "5.4% of new two-wheeler sales; service density and resale concerns.",
+   "source_ids": [
+    "siam",
+    "bnef"
+   ]
+  },
+  {
+   "topic_id": "quick-commerce",
+   "conversion": 0.62,
+   "low": 0.48,
+   "high": 0.74,
+   "basis": "High conversion among urban internet households in served pin codes.",
+   "source_ids": [
+    "redseer",
+    "bain_flipkart"
+   ]
+  },
+  {
+   "topic_id": "upi-rural",
+   "conversion": 0.78,
+   "low": 0.68,
+   "high": 0.86,
+   "basis": "High conversion once a bank account and smartphone exist; usage intensity is lower.",
+   "source_ids": [
+    "npci_upi",
+    "rbi_fi"
+   ]
+  },
+  {
+   "topic_id": "ai-jobs",
+   "conversion": 0.4,
+   "low": 0.28,
+   "high": 0.54,
+   "basis": "Urban educated adoption; anxiety and skill gaps limit conversion.",
+   "source_ids": [
+    "iamai",
+    "plfs2324"
+   ]
+  },
+  {
+   "topic_id": "edtech",
+   "conversion": 0.35,
+   "low": 0.24,
+   "high": 0.48,
+   "basis": "Exam-driven trial is high; paid conversion and retention are lower.",
+   "source_ids": [
+    "aser",
+    "aishe"
+   ]
+  },
+  {
+   "topic_id": "health-insurance",
+   "conversion": 0.3,
+   "low": 0.2,
+   "high": 0.42,
+   "basis": "~30% population covered; trust and claim experience bind.",
+   "source_ids": [
+    "nha",
+    "irdai"
+   ]
+  },
+  {
+   "topic_id": "rural-credit",
+   "conversion": 0.42,
+   "low": 0.3,
+   "high": 0.55,
+   "basis": "Formal credit conversion among banked rural households; informal credit remains substitutive.",
+   "source_ids": [
+    "rbi_fi",
+    "mgnrega"
+   ]
+  },
+  {
+   "topic_id": "premium-fmcg",
+   "conversion": 0.38,
+   "low": 0.28,
+   "high": 0.5,
+   "basis": "Premium pack conversion among affluent urban households; mass volume stays in sachets.",
+   "source_ids": [
+    "hul",
+    "nielseniq"
+   ]
+  },
+  {
+   "topic_id": "ott",
+   "conversion": 0.55,
+   "low": 0.42,
+   "high": 0.68,
+   "basis": "Paid conversion among reachable OTT viewers; bundles and sharing inflate reach.",
+   "source_ids": [
+    "mpa",
+    "iamai"
+   ]
+  },
+  {
+   "topic_id": "solar-rooftop",
+   "conversion": 0.22,
+   "low": 0.14,
+   "high": 0.32,
+   "basis": "Small base; financing and roof rights are hard constraints.",
+   "source_ids": [
+    "mnre",
+    "bnef"
+   ]
+  },
+  {
+   "topic_id": "gig-work",
+   "conversion": 0.48,
+   "low": 0.36,
+   "high": 0.6,
+   "basis": "Platform work conversion among urban youth; earnings volatility is the objection.",
+   "source_ids": [
+    "niti_adp",
+    "plfs2324"
+   ]
+  },
+  {
+   "topic_id": "women-work",
+   "conversion": 0.28,
+   "low": 0.18,
+   "high": 0.4,
+   "basis": "Female LFPR 41.7%; safety, care and permission constrain formal work.",
+   "source_ids": [
+    "plfs2324",
+    "nfhs5"
+   ]
+  },
+  {
+   "topic_id": "misinformation",
+   "conversion": 0.65,
+   "low": 0.52,
+   "high": 0.78,
+   "basis": "Forwarding conversion is high; belief and correction are separate.",
+   "source_ids": [
+    "iamai",
+    "pew"
+   ]
+  },
+  {
+   "topic_id": "agri-tech",
+   "conversion": 0.3,
+   "low": 0.2,
+   "high": 0.42,
+   "basis": "Fragmented holdings and cold-chain gaps limit paid adoption.",
+   "source_ids": [
+    "worldbank",
+    "ficci"
+   ]
+  },
+  {
+   "topic_id": "bnpl",
+   "conversion": 0.35,
+   "low": 0.24,
+   "high": 0.48,
+   "basis": "Young urban thin-file adoption; regulatory tightening is a headwind.",
+   "source_ids": [
+    "rbi_payments",
+    "crisil"
+   ]
+  },
+  {
+   "topic_id": "language-ai",
+   "conversion": 0.45,
+   "low": 0.32,
+   "high": 0.58,
+   "basis": "Indic-language preference is high; trust and accuracy limit paid use.",
+   "source_ids": [
+    "iamai",
+    "aishe"
+   ]
+  },
+  {
+   "topic_id": "coaching",
+   "conversion": 0.5,
+   "low": 0.38,
+   "high": 0.64,
+   "basis": "Exam anxiety drives paid conversion; outcomes and refunds are contested.",
+   "source_ids": [
+    "ministry_education",
+    "aser"
+   ]
+  },
+  {
+   "topic_id": "generic",
+   "conversion": 0.4,
+   "low": 0.3,
+   "high": 0.52,
+   "basis": "Generic anchor; use only when no topic pack matches.",
+   "source_ids": [
+    "worldbank",
+    "hces2223"
+   ]
+  }
+ ]
+}

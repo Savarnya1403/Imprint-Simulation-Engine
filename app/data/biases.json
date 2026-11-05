@@ -1,0 +1,265 @@
+[
+ {
+  "id": "loss_aversion",
+  "label": "Loss aversion",
+  "short": "Losses loom larger than gains",
+  "description": "A ₹5,000 loss feels roughly twice as large as an equivalent gain. Manifests as fear of a bad purchase, resale anxiety and status loss.",
+  "tiers": {
+   "1": 0.55,
+   "2": 0.62,
+   "3": 0.7,
+   "4": 0.78
+  },
+  "traits": {
+   "risk": -0.5,
+   "price": 0.3
+  },
+  "color": "#4ADE80"
+ },
+ {
+  "id": "anchoring",
+  "label": "Price anchoring",
+  "short": "First number sets the frame",
+  "description": "The sticker price, the neighbour's purchase price and the EMI per month become anchors. '₹999 per month' can feel cheaper than '₹24,000'.",
+  "tiers": {
+   "1": 0.52,
+   "2": 0.68,
+   "3": 0.76,
+   "4": 0.72
+  },
+  "traits": {
+   "price": 0.5
+  },
+  "color": "#8BE9A8"
+ },
+ {
+  "id": "bandwagon",
+  "label": "Bandwagon effect",
+  "short": "If everyone is doing it...",
+  "description": "Adoption rises when it becomes visible in the reference group. Viral WhatsApp forwards and wedding-season displays are strong cues.",
+  "tiers": {
+   "1": 0.42,
+   "2": 0.58,
+   "3": 0.68,
+   "4": 0.74
+  },
+  "traits": {
+   "conformity": 0.6,
+   "social_radius": 0.3
+  },
+  "color": "#4ADE80"
+ },
+ {
+  "id": "authority",
+  "label": "Authority bias",
+  "short": "Doctor, teacher, sarpanch, IAS",
+  "description": "Trust flows to titled people and uniforms more than to anonymous reviews, especially outside metros.",
+  "tiers": {
+   "1": 0.34,
+   "2": 0.5,
+   "3": 0.62,
+   "4": 0.72
+  },
+  "traits": {
+   "trust_gov": 0.5
+  },
+  "color": "#C8F7D4"
+ },
+ {
+  "id": "in_group",
+  "label": "In-group trust",
+  "short": "Apna vs paraya",
+  "description": "Language, caste, religion, region and occupation shape who is believed. This is a structural advantage, not a personal failing.",
+  "tiers": {
+   "1": 0.45,
+   "2": 0.55,
+   "3": 0.65,
+   "4": 0.78
+  },
+  "traits": {
+   "conformity": 0.4,
+   "social_radius": 0.3
+  },
+  "color": "#9FE8B4"
+ },
+ {
+  "id": "availability",
+  "label": "Availability heuristic",
+  "short": "Vivid beats base rate",
+  "description": "One fire, one fraud, one accident on the news outweighs ten thousand quiet successes. Local WhatsApp video is the strongest form.",
+  "tiers": {
+   "1": 0.46,
+   "2": 0.58,
+   "3": 0.68,
+   "4": 0.76
+  },
+  "traits": {
+   "trust_media": 0.4
+  },
+  "color": "#4ADE80"
+ },
+ {
+  "id": "optimism",
+  "label": "Optimism bias",
+  "short": "It won't happen to me",
+  "description": "Young, aspirational buyers underestimate maintenance, loan and health shocks. 'Mera number kab aayega' is a plan.",
+  "tiers": {
+   "1": 0.62,
+   "2": 0.58,
+   "3": 0.48,
+   "4": 0.4
+  },
+  "traits": {
+   "optimism": 0.6,
+   "risk": 0.3
+  },
+  "color": "#D7FBE1"
+ },
+ {
+  "id": "zero_sum",
+  "label": "Zero-sum thinking",
+  "short": "Your gain is my loss",
+  "description": "Markets, jobs and opportunities are read as fixed pies: the app is stealing the kirana's customer; the migrant is taking the job.",
+  "tiers": {
+   "1": 0.3,
+   "2": 0.46,
+   "3": 0.58,
+   "4": 0.66
+  },
+  "traits": {
+   "fatalism": 0.3,
+   "conformity": 0.3
+  },
+  "color": "#7ADF97"
+ },
+ {
+  "id": "fatalism",
+  "label": "Fatalism / chalta hai",
+  "short": "What can one person do?",
+  "description": "A coping grammar that absorbs dysfunction as normal. It reduces complaint and adoption of fixes, but also cushions disappointment.",
+  "tiers": {
+   "1": 0.22,
+   "2": 0.36,
+   "3": 0.48,
+   "4": 0.6
+  },
+  "traits": {
+   "fatalism": 0.7
+  },
+  "color": "#A9C9B3"
+ },
+ {
+  "id": "status",
+  "label": "Status signalling",
+  "short": "Log kya kahenge",
+  "description": "Visible consumption is social communication: the car in the driveway, the phone at the wedding, the English-medium school.",
+  "tiers": {
+   "1": 0.76,
+   "2": 0.78,
+   "3": 0.62,
+   "4": 0.46
+  },
+  "traits": {
+   "status": 0.8
+  },
+  "color": "#5CE08A"
+ },
+ {
+  "id": "scarcity",
+  "label": "Scarcity mindset",
+  "short": "Cash-flow, not net worth",
+  "description": "Decisions are made from the current wallet, not the annual balance sheet. A ₹2,000 EMI can be unaffordable even at a ₹1 lakh salary.",
+  "tiers": {
+   "1": 0.34,
+   "2": 0.55,
+   "3": 0.72,
+   "4": 0.86
+  },
+  "traits": {
+   "price": 0.8
+  },
+  "color": "#8FE3A6"
+ },
+ {
+  "id": "ambiguity",
+  "label": "Ambiguity aversion",
+  "short": "I don't understand it, so no",
+  "description": "New categories with unclear ownership, warranty or resale are penalised. The dealer and the local repairman reduce ambiguity.",
+  "tiers": {
+   "1": 0.36,
+   "2": 0.5,
+   "3": 0.64,
+   "4": 0.72
+  },
+  "traits": {
+   "education": -0.4,
+   "risk": -0.4
+  },
+  "color": "#6FD98C"
+ },
+ {
+  "id": "confirmation",
+  "label": "Confirmation bias",
+  "short": "I already knew that",
+  "description": "People seek evidence that fits existing beliefs. Once a brand is labelled 'Chinese' or 'anti-Hindu' or 'elite', facts rarely move it.",
+  "tiers": {
+   "1": 0.48,
+   "2": 0.56,
+   "3": 0.62,
+   "4": 0.66
+  },
+  "traits": {
+   "conformity": 0.4
+  },
+  "color": "#98E8AF"
+ },
+ {
+  "id": "recency",
+  "label": "Recency bias",
+  "short": "The last thing I saw",
+  "description": "The latest video, price cut or scam headline dominates a longer track record. Social feeds are built to exploit this.",
+  "tiers": {
+   "1": 0.55,
+   "2": 0.6,
+   "3": 0.64,
+   "4": 0.6
+  },
+  "traits": {
+   "trust_media": 0.5
+  },
+  "color": "#4ADE80"
+ },
+ {
+  "id": "just_world",
+  "label": "Just-world belief",
+  "short": "People get what they deserve",
+  "description": "Success is attributed to merit, failure to character. It makes structural problems invisible and victim-blaming easy.",
+  "tiers": {
+   "1": 0.42,
+   "2": 0.5,
+   "3": 0.46,
+   "4": 0.38
+  },
+  "traits": {
+   "status": 0.4
+  },
+  "color": "#B9EEC7"
+ },
+ {
+  "id": "tall_poppy",
+  "label": "Tall poppy / envy",
+  "short": "Why is he showing off?",
+  "description": "Visible success invites suspicion and schadenfreude. It punishes early adopters who display new status symbols.",
+  "tiers": {
+   "1": 0.34,
+   "2": 0.48,
+   "3": 0.56,
+   "4": 0.6
+  },
+  "traits": {
+   "status": 0.4,
+   "conformity": 0.3
+  },
+  "color": "#7FCF94"
+ }
+]

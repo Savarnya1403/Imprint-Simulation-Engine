@@ -1,0 +1,14 @@
+fastapi>=0.115
+uvicorn[standard]>=0.30
+numpy>=1.26
+pydantic>=2.7
+
+# Optional: PDF corpus ingestion. Without pypdf, PDF ingestion fails with a clear message.
+pypdf>=4.0
+
+# Optional: local open-source LLM for dev (TinyLlama etc). For hosted sites, use IMPRINT_LLM_BASE_URL instead.
+# llama-cpp-python>=0.3 ; platform_system == "Darwin" and platform_machine == "arm64"
+
+# Optional: local TimesFM 3.0 on Apple silicon. Non-commercial checkpoint licence.
+# timesfm>=3.0.2 ; platform_system == "Darwin" and platform_machine == "arm64"
+# mlx>=0.22 ; platform_system == "Darwin" and platform_machine == "arm64"

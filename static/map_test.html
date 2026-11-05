@@ -1,0 +1,3 @@
+<!doctype html><html><body style="background:#0a0a0c"><svg viewBox="0 0 720 820" width="720" height="820" id="m"></svg><script>
+fetch('/static/data/india_map.json').then(r=>r.json()).then(d=>{const s=document.getElementById('m');d.states.forEach(st=>{const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d',st.path);p.setAttribute('fill','#191c20');p.setAttribute('stroke','#4ade8055');p.setAttribute('stroke-width','.6');s.appendChild(p);});});
+</script></body></html>

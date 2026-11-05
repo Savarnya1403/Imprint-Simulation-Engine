@@ -1,0 +1,1510 @@
+[
+ {
+  "name": "Andhra Pradesh",
+  "population_m": 53.2,
+  "urban_pct": 33.4,
+  "literacy_pct": 67.0,
+  "internet_pct": 58,
+  "nsdp_pc": 219000,
+  "tfr": 1.7,
+  "sex_ratio": 993,
+  "region": "south",
+  "lat": 15.9129,
+  "lon": 79.74,
+  "capital": "Amaravati",
+  "cities": [
+   {
+    "name": "Visakhapatnam",
+    "tier": 2
+   },
+   {
+    "name": "Vijayawada",
+    "tier": 2
+   },
+   {
+    "name": "Guntur",
+    "tier": 2
+   },
+   {
+    "name": "Tirupati",
+    "tier": 3
+   },
+   {
+    "name": "Rajahmundry",
+    "tier": 3
+   },
+   {
+    "name": "Kurnool",
+    "tier": 3
+   },
+   {
+    "name": "Nellore",
+    "tier": 3
+   },
+   {
+    "name": "Anantapur",
+    "tier": 4
+   }
+  ],
+  "map_name": "Andhra Pradesh"
+ },
+ {
+  "name": "Arunachal Pradesh",
+  "population_m": 1.6,
+  "urban_pct": 22.9,
+  "literacy_pct": 65.4,
+  "internet_pct": 52,
+  "nsdp_pc": 210000,
+  "tfr": 2.1,
+  "sex_ratio": 938,
+  "region": "northeast",
+  "lat": 28.218,
+  "lon": 94.7278,
+  "capital": "Itanagar",
+  "cities": [
+   {
+    "name": "Itanagar",
+    "tier": 2
+   },
+   {
+    "name": "Naharlagun",
+    "tier": 3
+   },
+   {
+    "name": "Pasighat",
+    "tier": 4
+   }
+  ],
+  "map_name": "Arunachal Pradesh"
+ },
+ {
+  "name": "Assam",
+  "population_m": 35.7,
+  "urban_pct": 14.1,
+  "literacy_pct": 72.2,
+  "internet_pct": 48,
+  "nsdp_pc": 120000,
+  "tfr": 1.9,
+  "sex_ratio": 958,
+  "region": "northeast",
+  "lat": 26.2006,
+  "lon": 92.9376,
+  "capital": "Dispur",
+  "cities": [
+   {
+    "name": "Guwahati",
+    "tier": 2
+   },
+   {
+    "name": "Dibrugarh",
+    "tier": 3
+   },
+   {
+    "name": "Silchar",
+    "tier": 3
+   },
+   {
+    "name": "Jorhat",
+    "tier": 3
+   },
+   {
+    "name": "Tezpur",
+    "tier": 3
+   },
+   {
+    "name": "Nagaon",
+    "tier": 4
+   },
+   {
+    "name": "Barpeta",
+    "tier": 4
+   }
+  ],
+  "map_name": "Assam"
+ },
+ {
+  "name": "Bihar",
+  "population_m": 128.5,
+  "urban_pct": 11.3,
+  "literacy_pct": 61.8,
+  "internet_pct": 38,
+  "nsdp_pc": 62000,
+  "tfr": 3.0,
+  "sex_ratio": 918,
+  "region": "east",
+  "lat": 25.0961,
+  "lon": 85.3131,
+  "capital": "Patna",
+  "cities": [
+   {
+    "name": "Patna",
+    "tier": 2
+   },
+   {
+    "name": "Gaya",
+    "tier": 3
+   },
+   {
+    "name": "Bhagalpur",
+    "tier": 3
+   },
+   {
+    "name": "Muzaffarpur",
+    "tier": 3
+   },
+   {
+    "name": "Darbhanga",
+    "tier": 3
+   },
+   {
+    "name": "Purnia",
+    "tier": 4
+   },
+   {
+    "name": "Chapra",
+    "tier": 4
+   },
+   {
+    "name": "Saharsa",
+    "tier": 4
+   },
+   {
+    "name": "Bettiah",
+    "tier": 4
+   }
+  ],
+  "map_name": "Bihar"
+ },
+ {
+  "name": "Chhattisgarh",
+  "population_m": 30.0,
+  "urban_pct": 23.2,
+  "literacy_pct": 70.3,
+  "internet_pct": 45,
+  "nsdp_pc": 130000,
+  "tfr": 2.0,
+  "sex_ratio": 991,
+  "region": "central",
+  "lat": 21.2787,
+  "lon": 81.8661,
+  "capital": "Raipur",
+  "cities": [
+   {
+    "name": "Raipur",
+    "tier": 2
+   },
+   {
+    "name": "Bhilai",
+    "tier": 2
+   },
+   {
+    "name": "Bilaspur",
+    "tier": 3
+   },
+   {
+    "name": "Korba",
+    "tier": 3
+   },
+   {
+    "name": "Durg",
+    "tier": 3
+   },
+   {
+    "name": "Jagdalpur",
+    "tier": 4
+   },
+   {
+    "name": "Ambikapur",
+    "tier": 4
+   }
+  ],
+  "map_name": "Chhattisgarh"
+ },
+ {
+  "name": "Delhi",
+  "population_m": 21.5,
+  "urban_pct": 97.5,
+  "literacy_pct": 86.2,
+  "internet_pct": 78,
+  "nsdp_pc": 460000,
+  "tfr": 1.4,
+  "sex_ratio": 868,
+  "region": "north",
+  "lat": 28.6139,
+  "lon": 77.209,
+  "capital": "New Delhi",
+  "cities": [
+   {
+    "name": "Delhi",
+    "tier": 1
+   },
+   {
+    "name": "New Delhi",
+    "tier": 1
+   },
+   {
+    "name": "Dwarka",
+    "tier": 1
+   },
+   {
+    "name": "Rohini",
+    "tier": 1
+   }
+  ],
+  "map_name": "Delhi"
+ },
+ {
+  "name": "Goa",
+  "population_m": 1.6,
+  "urban_pct": 62.2,
+  "literacy_pct": 88.7,
+  "internet_pct": 76,
+  "nsdp_pc": 480000,
+  "tfr": 1.3,
+  "sex_ratio": 973,
+  "region": "west",
+  "lat": 15.2993,
+  "lon": 74.124,
+  "capital": "Panaji",
+  "cities": [
+   {
+    "name": "Panaji",
+    "tier": 1
+   },
+   {
+    "name": "Margao",
+    "tier": 3
+   },
+   {
+    "name": "Vasco",
+    "tier": 3
+   },
+   {
+    "name": "Mapusa",
+    "tier": 3
+   },
+   {
+    "name": "Ponda",
+    "tier": 4
+   }
+  ],
+  "map_name": "Goa"
+ },
+ {
+  "name": "Gujarat",
+  "population_m": 71.5,
+  "urban_pct": 42.6,
+  "literacy_pct": 78.0,
+  "internet_pct": 62,
+  "nsdp_pc": 250000,
+  "tfr": 1.9,
+  "sex_ratio": 919,
+  "region": "west",
+  "lat": 22.2587,
+  "lon": 71.1924,
+  "capital": "Gandhinagar",
+  "cities": [
+   {
+    "name": "Ahmedabad",
+    "tier": 1
+   },
+   {
+    "name": "Surat",
+    "tier": 1
+   },
+   {
+    "name": "Vadodara",
+    "tier": 2
+   },
+   {
+    "name": "Rajkot",
+    "tier": 2
+   },
+   {
+    "name": "Bhavnagar",
+    "tier": 3
+   },
+   {
+    "name": "Jamnagar",
+    "tier": 3
+   },
+   {
+    "name": "Junagadh",
+    "tier": 3
+   },
+   {
+    "name": "Anand",
+    "tier": 3
+   },
+   {
+    "name": "Bhuj",
+    "tier": 4
+   },
+   {
+    "name": "Mehsana",
+    "tier": 4
+   }
+  ],
+  "map_name": "Gujarat"
+ },
+ {
+  "name": "Haryana",
+  "population_m": 30.0,
+  "urban_pct": 34.9,
+  "literacy_pct": 75.6,
+  "internet_pct": 63,
+  "nsdp_pc": 290000,
+  "tfr": 2.0,
+  "sex_ratio": 879,
+  "region": "north",
+  "lat": 29.0588,
+  "lon": 76.0856,
+  "capital": "Chandigarh",
+  "cities": [
+   {
+    "name": "Gurugram",
+    "tier": 1
+   },
+   {
+    "name": "Faridabad",
+    "tier": 1
+   },
+   {
+    "name": "Panipat",
+    "tier": 2
+   },
+   {
+    "name": "Ambala",
+    "tier": 3
+   },
+   {
+    "name": "Karnal",
+    "tier": 3
+   },
+   {
+    "name": "Hisar",
+    "tier": 3
+   },
+   {
+    "name": "Rohtak",
+    "tier": 3
+   },
+   {
+    "name": "Bhiwani",
+    "tier": 4
+   }
+  ],
+  "map_name": "Haryana"
+ },
+ {
+  "name": "Himachal Pradesh",
+  "population_m": 7.5,
+  "urban_pct": 10.0,
+  "literacy_pct": 82.8,
+  "internet_pct": 65,
+  "nsdp_pc": 240000,
+  "tfr": 1.4,
+  "sex_ratio": 972,
+  "region": "north",
+  "lat": 31.1048,
+  "lon": 77.1734,
+  "capital": "Shimla",
+  "cities": [
+   {
+    "name": "Shimla",
+    "tier": 2
+   },
+   {
+    "name": "Dharamshala",
+    "tier": 3
+   },
+   {
+    "name": "Solan",
+    "tier": 3
+   },
+   {
+    "name": "Mandi",
+    "tier": 3
+   },
+   {
+    "name": "Kullu",
+    "tier": 3
+   },
+   {
+    "name": "Kinnaur",
+    "tier": 4
+   }
+  ],
+  "map_name": "Himachal Pradesh"
+ },
+ {
+  "name": "Jammu & Kashmir",
+  "population_m": 13.9,
+  "urban_pct": 28.5,
+  "literacy_pct": 67.2,
+  "internet_pct": 50,
+  "nsdp_pc": 150000,
+  "tfr": 1.4,
+  "sex_ratio": 889,
+  "region": "north",
+  "lat": 33.7782,
+  "lon": 76.5762,
+  "capital": "Srinagar",
+  "cities": [
+   {
+    "name": "Srinagar",
+    "tier": 2
+   },
+   {
+    "name": "Jammu",
+    "tier": 2
+   },
+   {
+    "name": "Anantnag",
+    "tier": 3
+   },
+   {
+    "name": "Baramulla",
+    "tier": 3
+   },
+   {
+    "name": "Udhampur",
+    "tier": 3
+   },
+   {
+    "name": "Leh",
+    "tier": 4
+   },
+   {
+    "name": "Kargil",
+    "tier": 4
+   }
+  ],
+  "map_name": "Jammu & Kashmir"
+ },
+ {
+  "name": "Jharkhand",
+  "population_m": 38.5,
+  "urban_pct": 24.1,
+  "literacy_pct": 66.4,
+  "internet_pct": 42,
+  "nsdp_pc": 105000,
+  "tfr": 2.3,
+  "sex_ratio": 948,
+  "region": "east",
+  "lat": 23.6102,
+  "lon": 85.2799,
+  "capital": "Ranchi",
+  "cities": [
+   {
+    "name": "Ranchi",
+    "tier": 2
+   },
+   {
+    "name": "Jamshedpur",
+    "tier": 2
+   },
+   {
+    "name": "Dhanbad",
+    "tier": 2
+   },
+   {
+    "name": "Bokaro",
+    "tier": 3
+   },
+   {
+    "name": "Hazaribagh",
+    "tier": 3
+   },
+   {
+    "name": "Deoghar",
+    "tier": 3
+   },
+   {
+    "name": "Dumka",
+    "tier": 4
+   },
+   {
+    "name": "Chaibasa",
+    "tier": 4
+   }
+  ],
+  "map_name": "Jharkhand"
+ },
+ {
+  "name": "Karnataka",
+  "population_m": 68.5,
+  "urban_pct": 38.7,
+  "literacy_pct": 75.4,
+  "internet_pct": 64,
+  "nsdp_pc": 330000,
+  "tfr": 1.6,
+  "sex_ratio": 973,
+  "region": "south",
+  "lat": 15.3173,
+  "lon": 75.7139,
+  "capital": "Bengaluru",
+  "cities": [
+   {
+    "name": "Bengaluru",
+    "tier": 1
+   },
+   {
+    "name": "Mysuru",
+    "tier": 2
+   },
+   {
+    "name": "Hubballi",
+    "tier": 2
+   },
+   {
+    "name": "Mangaluru",
+    "tier": 2
+   },
+   {
+    "name": "Belagavi",
+    "tier": 3
+   },
+   {
+    "name": "Kalaburagi",
+    "tier": 3
+   },
+   {
+    "name": "Davanagere",
+    "tier": 3
+   },
+   {
+    "name": "Shivamogga",
+    "tier": 3
+   },
+   {
+    "name": "Ballari",
+    "tier": 4
+   },
+   {
+    "name": "Bidar",
+    "tier": 4
+   }
+  ],
+  "map_name": "Karnataka"
+ },
+ {
+  "name": "Kerala",
+  "population_m": 35.8,
+  "urban_pct": 47.7,
+  "literacy_pct": 94.0,
+  "internet_pct": 82,
+  "nsdp_pc": 280000,
+  "tfr": 1.5,
+  "sex_ratio": 1084,
+  "region": "south",
+  "lat": 10.8505,
+  "lon": 76.2711,
+  "capital": "Thiruvananthapuram",
+  "cities": [
+   {
+    "name": "Kochi",
+    "tier": 1
+   },
+   {
+    "name": "Thiruvananthapuram",
+    "tier": 1
+   },
+   {
+    "name": "Kozhikode",
+    "tier": 2
+   },
+   {
+    "name": "Thrissur",
+    "tier": 2
+   },
+   {
+    "name": "Kollam",
+    "tier": 3
+   },
+   {
+    "name": "Kannur",
+    "tier": 3
+   },
+   {
+    "name": "Alappuzha",
+    "tier": 3
+   },
+   {
+    "name": "Palakkad",
+    "tier": 3
+   },
+   {
+    "name": "Idukki",
+    "tier": 4
+   },
+   {
+    "name": "Wayanad",
+    "tier": 4
+   }
+  ],
+  "map_name": "Kerala"
+ },
+ {
+  "name": "Madhya Pradesh",
+  "population_m": 87.0,
+  "urban_pct": 27.6,
+  "literacy_pct": 69.3,
+  "internet_pct": 47,
+  "nsdp_pc": 140000,
+  "tfr": 2.0,
+  "sex_ratio": 931,
+  "region": "central",
+  "lat": 22.9734,
+  "lon": 78.6569,
+  "capital": "Bhopal",
+  "cities": [
+   {
+    "name": "Indore",
+    "tier": 1
+   },
+   {
+    "name": "Bhopal",
+    "tier": 1
+   },
+   {
+    "name": "Jabalpur",
+    "tier": 2
+   },
+   {
+    "name": "Gwalior",
+    "tier": 2
+   },
+   {
+    "name": "Ujjain",
+    "tier": 3
+   },
+   {
+    "name": "Sagar",
+    "tier": 3
+   },
+   {
+    "name": "Rewa",
+    "tier": 3
+   },
+   {
+    "name": "Satna",
+    "tier": 3
+   },
+   {
+    "name": "Chhindwara",
+    "tier": 4
+   },
+   {
+    "name": "Dhar",
+    "tier": 4
+   }
+  ],
+  "map_name": "Madhya Pradesh"
+ },
+ {
+  "name": "Maharashtra",
+  "population_m": 128.0,
+  "urban_pct": 45.2,
+  "literacy_pct": 82.3,
+  "internet_pct": 68,
+  "nsdp_pc": 290000,
+  "tfr": 1.7,
+  "sex_ratio": 929,
+  "region": "west",
+  "lat": 19.7515,
+  "lon": 75.7139,
+  "capital": "Mumbai",
+  "cities": [
+   {
+    "name": "Mumbai",
+    "tier": 1
+   },
+   {
+    "name": "Pune",
+    "tier": 1
+   },
+   {
+    "name": "Thane",
+    "tier": 1
+   },
+   {
+    "name": "Nagpur",
+    "tier": 2
+   },
+   {
+    "name": "Nashik",
+    "tier": 2
+   },
+   {
+    "name": "Chhatrapati Sambhajinagar",
+    "tier": 3
+   },
+   {
+    "name": "Solapur",
+    "tier": 3
+   },
+   {
+    "name": "Kolhapur",
+    "tier": 3
+   },
+   {
+    "name": "Nanded",
+    "tier": 3
+   },
+   {
+    "name": "Yavatmal",
+    "tier": 4
+   },
+   {
+    "name": "Satara",
+    "tier": 4
+   },
+   {
+    "name": "Ratnagiri",
+    "tier": 4
+   }
+  ],
+  "map_name": "Maharashtra"
+ },
+ {
+  "name": "Manipur",
+  "population_m": 3.2,
+  "urban_pct": 30.2,
+  "literacy_pct": 79.2,
+  "internet_pct": 55,
+  "nsdp_pc": 120000,
+  "tfr": 2.2,
+  "sex_ratio": 992,
+  "region": "northeast",
+  "lat": 24.6637,
+  "lon": 93.9063,
+  "capital": "Imphal",
+  "cities": [
+   {
+    "name": "Imphal",
+    "tier": 2
+   },
+   {
+    "name": "Thoubal",
+    "tier": 3
+   },
+   {
+    "name": "Churachandpur",
+    "tier": 4
+   }
+  ],
+  "map_name": "Manipur"
+ },
+ {
+  "name": "Meghalaya",
+  "population_m": 3.3,
+  "urban_pct": 20.1,
+  "literacy_pct": 74.4,
+  "internet_pct": 48,
+  "nsdp_pc": 130000,
+  "tfr": 2.9,
+  "sex_ratio": 989,
+  "region": "northeast",
+  "lat": 25.467,
+  "lon": 91.3662,
+  "capital": "Shillong",
+  "cities": [
+   {
+    "name": "Shillong",
+    "tier": 2
+   },
+   {
+    "name": "Tura",
+    "tier": 3
+   },
+   {
+    "name": "Jowai",
+    "tier": 3
+   },
+   {
+    "name": "Cherrapunji",
+    "tier": 4
+   }
+  ],
+  "map_name": "Meghalaya"
+ },
+ {
+  "name": "Mizoram",
+  "population_m": 1.2,
+  "urban_pct": 52.1,
+  "literacy_pct": 91.3,
+  "internet_pct": 70,
+  "nsdp_pc": 200000,
+  "tfr": 1.9,
+  "sex_ratio": 976,
+  "region": "northeast",
+  "lat": 23.1645,
+  "lon": 92.9376,
+  "capital": "Aizawl",
+  "cities": [
+   {
+    "name": "Aizawl",
+    "tier": 2
+   },
+   {
+    "name": "Lunglei",
+    "tier": 3
+   },
+   {
+    "name": "Champhai",
+    "tier": 4
+   }
+  ],
+  "map_name": "Mizoram"
+ },
+ {
+  "name": "Nagaland",
+  "population_m": 2.2,
+  "urban_pct": 28.9,
+  "literacy_pct": 79.6,
+  "internet_pct": 52,
+  "nsdp_pc": 150000,
+  "tfr": 2.7,
+  "sex_ratio": 931,
+  "region": "northeast",
+  "lat": 26.1584,
+  "lon": 94.5624,
+  "capital": "Kohima",
+  "cities": [
+   {
+    "name": "Kohima",
+    "tier": 2
+   },
+   {
+    "name": "Dimapur",
+    "tier": 3
+   },
+   {
+    "name": "Mokokchung",
+    "tier": 4
+   }
+  ],
+  "map_name": "Nagaland"
+ },
+ {
+  "name": "Odisha",
+  "population_m": 46.5,
+  "urban_pct": 16.7,
+  "literacy_pct": 72.9,
+  "internet_pct": 48,
+  "nsdp_pc": 130000,
+  "tfr": 1.8,
+  "sex_ratio": 979,
+  "region": "east",
+  "lat": 20.9517,
+  "lon": 85.0985,
+  "capital": "Bhubaneswar",
+  "cities": [
+   {
+    "name": "Bhubaneswar",
+    "tier": 2
+   },
+   {
+    "name": "Cuttack",
+    "tier": 2
+   },
+   {
+    "name": "Rourkela",
+    "tier": 3
+   },
+   {
+    "name": "Berhampur",
+    "tier": 3
+   },
+   {
+    "name": "Sambalpur",
+    "tier": 3
+   },
+   {
+    "name": "Puri",
+    "tier": 3
+   },
+   {
+    "name": "Koraput",
+    "tier": 4
+   },
+   {
+    "name": "Kalahandi",
+    "tier": 4
+   }
+  ],
+  "map_name": "Odisha"
+ },
+ {
+  "name": "Punjab",
+  "population_m": 30.5,
+  "urban_pct": 37.5,
+  "literacy_pct": 75.8,
+  "internet_pct": 68,
+  "nsdp_pc": 210000,
+  "tfr": 1.6,
+  "sex_ratio": 895,
+  "region": "north",
+  "lat": 31.1471,
+  "lon": 75.3412,
+  "capital": "Chandigarh",
+  "cities": [
+   {
+    "name": "Ludhiana",
+    "tier": 2
+   },
+   {
+    "name": "Amritsar",
+    "tier": 2
+   },
+   {
+    "name": "Jalandhar",
+    "tier": 2
+   },
+   {
+    "name": "Mohali",
+    "tier": 2
+   },
+   {
+    "name": "Patiala",
+    "tier": 3
+   },
+   {
+    "name": "Bathinda",
+    "tier": 3
+   },
+   {
+    "name": "Sangrur",
+    "tier": 4
+   }
+  ],
+  "map_name": "Punjab"
+ },
+ {
+  "name": "Rajasthan",
+  "population_m": 81.0,
+  "urban_pct": 24.9,
+  "literacy_pct": 66.1,
+  "internet_pct": 50,
+  "nsdp_pc": 150000,
+  "tfr": 2.0,
+  "sex_ratio": 928,
+  "region": "north",
+  "lat": 27.0238,
+  "lon": 74.2179,
+  "capital": "Jaipur",
+  "cities": [
+   {
+    "name": "Jaipur",
+    "tier": 1
+   },
+   {
+    "name": "Jodhpur",
+    "tier": 2
+   },
+   {
+    "name": "Udaipur",
+    "tier": 2
+   },
+   {
+    "name": "Kota",
+    "tier": 2
+   },
+   {
+    "name": "Ajmer",
+    "tier": 3
+   },
+   {
+    "name": "Bikaner",
+    "tier": 3
+   },
+   {
+    "name": "Alwar",
+    "tier": 3
+   },
+   {
+    "name": "Bhilwara",
+    "tier": 3
+   },
+   {
+    "name": "Barmer",
+    "tier": 4
+   },
+   {
+    "name": "Churu",
+    "tier": 4
+   }
+  ],
+  "map_name": "Rajasthan"
+ },
+ {
+  "name": "Sikkim",
+  "population_m": 0.68,
+  "urban_pct": 25.0,
+  "literacy_pct": 81.4,
+  "internet_pct": 68,
+  "nsdp_pc": 350000,
+  "tfr": 1.1,
+  "sex_ratio": 890,
+  "region": "northeast",
+  "lat": 27.533,
+  "lon": 88.5122,
+  "capital": "Gangtok",
+  "cities": [
+   {
+    "name": "Gangtok",
+    "tier": 2
+   },
+   {
+    "name": "Namchi",
+    "tier": 3
+   },
+   {
+    "name": "Mangan",
+    "tier": 4
+   }
+  ],
+  "map_name": "Sikkim"
+ },
+ {
+  "name": "Tamil Nadu",
+  "population_m": 77.5,
+  "urban_pct": 48.4,
+  "literacy_pct": 80.1,
+  "internet_pct": 72,
+  "nsdp_pc": 320000,
+  "tfr": 1.4,
+  "sex_ratio": 996,
+  "region": "south",
+  "lat": 11.1271,
+  "lon": 78.6569,
+  "capital": "Chennai",
+  "cities": [
+   {
+    "name": "Chennai",
+    "tier": 1
+   },
+   {
+    "name": "Coimbatore",
+    "tier": 2
+   },
+   {
+    "name": "Madurai",
+    "tier": 2
+   },
+   {
+    "name": "Tiruchirappalli",
+    "tier": 2
+   },
+   {
+    "name": "Salem",
+    "tier": 3
+   },
+   {
+    "name": "Tirunelveli",
+    "tier": 3
+   },
+   {
+    "name": "Vellore",
+    "tier": 3
+   },
+   {
+    "name": "Erode",
+    "tier": 3
+   },
+   {
+    "name": "Thanjavur",
+    "tier": 4
+   },
+   {
+    "name": "Dindigul",
+    "tier": 4
+   }
+  ],
+  "map_name": "Tamil Nadu"
+ },
+ {
+  "name": "Telangana",
+  "population_m": 38.5,
+  "urban_pct": 38.7,
+  "literacy_pct": 66.5,
+  "internet_pct": 64,
+  "nsdp_pc": 340000,
+  "tfr": 1.6,
+  "sex_ratio": 988,
+  "region": "south",
+  "lat": 18.1124,
+  "lon": 79.0193,
+  "capital": "Hyderabad",
+  "cities": [
+   {
+    "name": "Hyderabad",
+    "tier": 1
+   },
+   {
+    "name": "Warangal",
+    "tier": 2
+   },
+   {
+    "name": "Nizamabad",
+    "tier": 3
+   },
+   {
+    "name": "Karimnagar",
+    "tier": 3
+   },
+   {
+    "name": "Khammam",
+    "tier": 3
+   },
+   {
+    "name": "Mahbubnagar",
+    "tier": 4
+   },
+   {
+    "name": "Adilabad",
+    "tier": 4
+   }
+  ],
+  "map_name": "Telangana"
+ },
+ {
+  "name": "Tripura",
+  "population_m": 4.1,
+  "urban_pct": 26.2,
+  "literacy_pct": 87.2,
+  "internet_pct": 58,
+  "nsdp_pc": 150000,
+  "tfr": 1.7,
+  "sex_ratio": 960,
+  "region": "northeast",
+  "lat": 23.9408,
+  "lon": 91.9882,
+  "capital": "Agartala",
+  "cities": [
+   {
+    "name": "Agartala",
+    "tier": 2
+   },
+   {
+    "name": "Udaipur",
+    "tier": 3
+   },
+   {
+    "name": "Dharmanagar",
+    "tier": 4
+   }
+  ],
+  "map_name": "Tripura"
+ },
+ {
+  "name": "Uttar Pradesh",
+  "population_m": 240.0,
+  "urban_pct": 22.3,
+  "literacy_pct": 67.7,
+  "internet_pct": 45,
+  "nsdp_pc": 85000,
+  "tfr": 2.4,
+  "sex_ratio": 912,
+  "region": "north",
+  "lat": 26.8467,
+  "lon": 80.9462,
+  "capital": "Lucknow",
+  "cities": [
+   {
+    "name": "Lucknow",
+    "tier": 2
+   },
+   {
+    "name": "Kanpur",
+    "tier": 2
+   },
+   {
+    "name": "Varanasi",
+    "tier": 2
+   },
+   {
+    "name": "Agra",
+    "tier": 2
+   },
+   {
+    "name": "Prayagraj",
+    "tier": 2
+   },
+   {
+    "name": "Gorakhpur",
+    "tier": 3
+   },
+   {
+    "name": "Bareilly",
+    "tier": 3
+   },
+   {
+    "name": "Aligarh",
+    "tier": 3
+   },
+   {
+    "name": "Jhansi",
+    "tier": 3
+   },
+   {
+    "name": "Sitapur",
+    "tier": 4
+   },
+   {
+    "name": "Azamgarh",
+    "tier": 4
+   },
+   {
+    "name": "Bahraich",
+    "tier": 4
+   },
+   {
+    "name": "Pilibhit",
+    "tier": 4
+   }
+  ],
+  "map_name": "Uttar Pradesh"
+ },
+ {
+  "name": "Uttarakhand",
+  "population_m": 11.5,
+  "urban_pct": 30.2,
+  "literacy_pct": 78.8,
+  "internet_pct": 62,
+  "nsdp_pc": 230000,
+  "tfr": 1.7,
+  "sex_ratio": 963,
+  "region": "north",
+  "lat": 30.0668,
+  "lon": 79.0193,
+  "capital": "Dehradun",
+  "cities": [
+   {
+    "name": "Dehradun",
+    "tier": 2
+   },
+   {
+    "name": "Haridwar",
+    "tier": 2
+   },
+   {
+    "name": "Rishikesh",
+    "tier": 3
+   },
+   {
+    "name": "Haldwani",
+    "tier": 3
+   },
+   {
+    "name": "Roorkee",
+    "tier": 3
+   },
+   {
+    "name": "Almora",
+    "tier": 4
+   },
+   {
+    "name": "Pithoragarh",
+    "tier": 4
+   }
+  ],
+  "map_name": "Uttarakhand"
+ },
+ {
+  "name": "West Bengal",
+  "population_m": 100.5,
+  "urban_pct": 31.9,
+  "literacy_pct": 76.3,
+  "internet_pct": 55,
+  "nsdp_pc": 160000,
+  "tfr": 1.6,
+  "sex_ratio": 950,
+  "region": "east",
+  "lat": 22.9868,
+  "lon": 87.855,
+  "capital": "Kolkata",
+  "cities": [
+   {
+    "name": "Kolkata",
+    "tier": 1
+   },
+   {
+    "name": "Howrah",
+    "tier": 1
+   },
+   {
+    "name": "Siliguri",
+    "tier": 2
+   },
+   {
+    "name": "Durgapur",
+    "tier": 2
+   },
+   {
+    "name": "Asansol",
+    "tier": 3
+   },
+   {
+    "name": "Kharagpur",
+    "tier": 3
+   },
+   {
+    "name": "Malda",
+    "tier": 3
+   },
+   {
+    "name": "Purulia",
+    "tier": 4
+   },
+   {
+    "name": "Murshidabad",
+    "tier": 4
+   }
+  ],
+  "map_name": "West Bengal"
+ },
+ {
+  "name": "Chandigarh",
+  "population_m": 1.2,
+  "urban_pct": 97.0,
+  "literacy_pct": 86.4,
+  "internet_pct": 80,
+  "nsdp_pc": 400000,
+  "tfr": 1.4,
+  "sex_ratio": 818,
+  "region": "north",
+  "lat": 30.7333,
+  "lon": 76.7794,
+  "capital": "Chandigarh",
+  "cities": [
+   {
+    "name": "Chandigarh",
+    "tier": 2
+   }
+  ],
+  "map_name": "Chandigarh"
+ },
+ {
+  "name": "Puducherry",
+  "population_m": 1.6,
+  "urban_pct": 68.0,
+  "literacy_pct": 86.0,
+  "internet_pct": 75,
+  "nsdp_pc": 300000,
+  "tfr": 1.3,
+  "sex_ratio": 1037,
+  "region": "south",
+  "lat": 11.9416,
+  "lon": 79.8083,
+  "capital": "Puducherry",
+  "cities": [
+   {
+    "name": "Puducherry",
+    "tier": 2
+   },
+   {
+    "name": "Karaikal",
+    "tier": 3
+   }
+  ],
+  "map_name": "Puducherry"
+ },
+ {
+  "name": "Andaman & Nicobar Island",
+  "population_m": 0.4,
+  "urban_pct": 37.7,
+  "literacy_pct": 86.3,
+  "internet_pct": 65,
+  "nsdp_pc": 250000,
+  "tfr": 1.5,
+  "sex_ratio": 876,
+  "region": "east",
+  "lat": 11.7401,
+  "lon": 92.6586,
+  "capital": "Port Blair",
+  "cities": [
+   {
+    "name": "Port Blair",
+    "tier": 2
+   },
+   {
+    "name": "Havelock",
+    "tier": 4
+   }
+  ],
+  "map_name": "Andaman & Nicobar Island"
+ },
+ {
+  "name": "Ladakh",
+  "population_m": 0.3,
+  "urban_pct": 16.0,
+  "literacy_pct": 80.0,
+  "internet_pct": 45,
+  "nsdp_pc": 180000,
+  "tfr": 1.3,
+  "sex_ratio": 800,
+  "region": "north",
+  "lat": 34.1526,
+  "lon": 77.5771,
+  "capital": "Leh",
+  "cities": [
+   {
+    "name": "Leh",
+    "tier": 2
+   },
+   {
+    "name": "Kargil",
+    "tier": 3
+   }
+  ],
+  "map_name": "Ladakh"
+ },
+ {
+  "name": "Dadara & Nagar Havelli",
+  "population_m": 0.6,
+  "urban_pct": 58.0,
+  "literacy_pct": 87.0,
+  "internet_pct": 65,
+  "nsdp_pc": 350000,
+  "tfr": 1.4,
+  "sex_ratio": 930,
+  "region": "west",
+  "lat": 20.1809,
+  "lon": 73.0169,
+  "capital": "Silvassa",
+  "cities": [
+   {
+    "name": "Silvassa",
+    "tier": 3
+   },
+   {
+    "name": "Daman",
+    "tier": 3
+   }
+  ],
+  "map_name": "Dadara & Nagar Havelli"
+ },
+ {
+  "name": "Lakshadweep",
+  "population_m": 0.07,
+  "urban_pct": 78.0,
+  "literacy_pct": 91.8,
+  "internet_pct": 70,
+  "nsdp_pc": 250000,
+  "tfr": 1.4,
+  "sex_ratio": 946,
+  "region": "south",
+  "lat": 10.5669,
+  "lon": 72.6417,
+  "capital": "Kavaratti",
+  "cities": [
+   {
+    "name": "Kavaratti",
+    "tier": 3
+   }
+  ],
+  "map_name": "Lakshadweep"
+ }
+]

@@ -1,0 +1,1889 @@
+{
+ "version": "2026.11-seed",
+ "built": "2026-11-05",
+ "provenance_note": "Reconstructed perception arcs from public reporting and regulator/company records. They are illustrative, not a measured panel, not a representative survey, and not a causal estimate. Use them for analogy and calibration priors, not as ground truth.",
+ "days": [
+  -14,
+  -7,
+  0,
+  7,
+  14,
+  30,
+  45,
+  60
+ ],
+ "cases": [
+  {
+   "id": "jio-2016",
+   "brand": "Reliance Jio",
+   "decision": "Free 4G data and voice launch",
+   "year": 2016,
+   "month": 9,
+   "category": "telecom",
+   "tags": [
+    "price shock",
+    "telecom",
+    "data",
+    "incumbent response",
+    "mass market"
+   ],
+   "summary": "Jio entered with free voice and cheap data, forcing incumbents to cut prices and collapsing data tariffs.",
+   "context": "Incumbents earned rents on voice and data; smartphone penetration was rising but data was expensive. Jio needed scale before rivals could copy.",
+   "announcement": "Free services until 31 December 2016, then aggressive tariff packs.",
+   "treatment_type": "price shock",
+   "geography": "national",
+   "sources": [
+    {
+     "org": "TRAI",
+     "title": "Telecom subscription and tariff data",
+     "year": 2017,
+     "url": "https://www.trai.gov.in/"
+    },
+    {
+     "org": "Reliance Industries",
+     "title": "Annual Report 2016-17",
+     "year": 2017,
+     "url": "https://www.ril.com/investors"
+    }
+   ],
+   "perception": [
+    {
+     "day": -14,
+     "support": 0.3,
+     "neutral": 0.45,
+     "oppose": 0.25
+    },
+    {
+     "day": -7,
+     "support": 0.34,
+     "neutral": 0.44,
+     "oppose": 0.22
+    },
+    {
+     "day": 0,
+     "support": 0.62,
+     "neutral": 0.27,
+     "oppose": 0.11
+    },
+    {
+     "day": 7,
+     "support": 0.7,
+     "neutral": 0.21,
+     "oppose": 0.09
+    },
+    {
+     "day": 14,
+     "support": 0.67,
+     "neutral": 0.24,
+     "oppose": 0.09
+    },
+    {
+     "day": 30,
+     "support": 0.6,
+     "neutral": 0.29,
+     "oppose": 0.11
+    },
+    {
+     "day": 45,
+     "support": 0.56,
+     "neutral": 0.31,
+     "oppose": 0.13
+    },
+    {
+     "day": 60,
+     "support": 0.54,
+     "neutral": 0.33,
+     "oppose": 0.13
+    }
+   ],
+   "peak_oppose_day": 7,
+   "peak_support_day": 7,
+   "half_life_days": 28,
+   "outcome": {
+    "kpi": "mobile data price",
+    "direction": "down",
+    "magnitude_pct": -90,
+    "low": -95,
+    "high": -80,
+    "confidence": "high",
+    "note": "Tariffs fell sharply; the exact basket depends on plan and circle."
+   },
+   "mechanisms": [
+    "Price Shock",
+    "Incumbent Response",
+    "Network Effect",
+    "Scale Bet"
+   ],
+   "segments": [
+    {
+     "segment": "Urban youth",
+     "reaction": "Immediate trial; data-heavy behaviour."
+    },
+    {
+     "segment": "Rural feature-phone users",
+     "reaction": "Slower; device and coverage bind."
+    },
+    {
+     "segment": "Incumbent shareholders",
+     "reaction": "Severe value destruction."
+    }
+   ],
+   "caveats": "Free service is not a sustainable price; the perception arc is reconstructed from public reporting."
+  },
+  {
+   "id": "demonetisation-2016",
+   "brand": "Government of India",
+   "decision": " ₹500/₹1000 note withdrawal",
+   "year": 2016,
+   "month": 11,
+   "category": "payments",
+   "tags": [
+    "policy shock",
+    "cash",
+    "digital payments",
+    "trust",
+    "informal economy"
+   ],
+   "summary": "A sudden currency withdrawal pushed households and merchants toward digital payments, then cash partially returned.",
+   "context": "Cash dominated small transactions; UPI was new and merchant acceptance was thin. The policy was announced as a fight against black money.",
+   "announcement": "Prime-time address; 86% of currency by value invalidated with a short exchange window.",
+   "treatment_type": "policy shock",
+   "geography": "national",
+   "sources": [
+    {
+     "org": "RBI",
+     "title": "Annual Report 2016-17",
+     "year": 2017,
+     "url": "https://www.rbi.org.in/"
+    },
+    {
+     "org": "NPCI",
+     "title": "UPI statistics",
+     "year": 2017,
+     "url": "https://www.npci.org.in/"
+    }
+   ],
+   "perception": [
+    {
+     "day": -14,
+     "support": 0.38,
+     "neutral": 0.3,
+     "oppose": 0.32
+    },
+    {
+     "day": -7,
+     "support": 0.42,
+     "neutral": 0.28,
+     "oppose": 0.3
+    },
+    {
+     "day": 0,
+     "support": 0.55,
+     "neutral": 0.22,
+     "oppose": 0.23
+    },
+    {
+     "day": 7,
+     "support": 0.48,
+     "neutral": 0.24,
+     "oppose": 0.28
+    },
+    {
+     "day": 14,
+     "support": 0.4,
+     "neutral": 0.26,
+     "oppose": 0.34
+    },
+    {
+     "day": 30,
+     "support": 0.34,
+     "neutral": 0.28,
+     "oppose": 0.38
+    },
+    {
+     "day": 45,
+     "support": 0.32,
+     "neutral": 0.29,
+     "oppose": 0.39
+    },
+    {
+     "day": 60,
+     "support": 0.31,
+     "neutral": 0.3,
+     "oppose": 0.39
+    }
+   ],
+   "peak_oppose_day": 14,
+   "peak_support_day": 0,
+   "half_life_days": 35,
+   "outcome": {
+    "kpi": "digital payment volume",
+    "direction": "up",
+    "magnitude_pct": 35,
+    "low": 20,
+    "high": 50,
+    "confidence": "medium",
+    "note": "Digital payments rose, but cash also returned; attribution to the policy alone is contested."
+   },
+   "mechanisms": [
+    "Forced Adoption",
+    "Cash Constraint",
+    "Merchant Acceptance",
+    "Trust Shock"
+   ],
+   "segments": [
+    {
+     "segment": "Urban salaried",
+     "reaction": "Quick digital shift."
+    },
+    {
+     "segment": "Informal daily-wage",
+     "reaction": "Severe short-term disruption."
+    },
+    {
+     "segment": "Small merchants",
+     "reaction": "Adopted QR codes, then reverted partly to cash."
+    }
+   ],
+   "caveats": "Perception and outcome are entangled with UPI, GST and bank recapitalisation. Not a clean natural experiment."
+  },
+  {
+   "id": "maggi-2015",
+   "brand": "Nestlé Maggi",
+   "decision": "Regulatory ban after lead tests",
+   "year": 2015,
+   "month": 6,
+   "category": "fmcg",
+   "tags": [
+    "trust shock",
+    "food safety",
+    "regulator",
+    "boycott",
+    "recovery"
+   ],
+   "summary": "A food-safety scare removed Maggi from shelves; trust collapsed, then recovered slowly after relaunch and testing.",
+   "context": "Maggi was a category-defining convenience food with deep household penetration and a nostalgic position among students.",
+   "announcement": "FSSAI order; widespread product withdrawal and negative TV coverage.",
+   "treatment_type": "trust shock",
+   "geography": "national",
+   "sources": [
+    {
+     "org": "FSSAI",
+     "title": "Order on Maggi noodles",
+     "year": 2015,
+     "url": "https://fssai.gov.in/"
+    },
+    {
+     "org": "Nestlé India",
+     "title": "Annual Report 2015",
+     "year": 2016,
+     "url": "https://www.nestle.in/investors"
+    }
+   ],
+   "perception": [
+    {
+     "day": -14,
+     "support": 0.4,
+     "neutral": 0.32,
+     "oppose": 0.28
+    },
+    {
+     "day": -7,
+     "support": 0.38,
+     "neutral": 0.3,
+     "oppose": 0.32
+    },
+    {
+     "day": 0,
+     "support": 0.18,
+     "neutral": 0.2,
+     "oppose": 0.62
+    },
+    {
+     "day": 7,
+     "support": 0.16,
+     "neutral": 0.18,
+     "oppose": 0.66
+    },
+    {
+     "day": 14,
+     "support": 0.2,
+     "neutral": 0.22,
+     "oppose": 0.58
+    },
+    {
+     "day": 30,
+     "support": 0.3,
+     "neutral": 0.28,
+     "oppose": 0.42
+    },
+    {
+     "day": 45,
+     "support": 0.38,
+     "neutral": 0.3,
+     "oppose": 0.32
+    },
+    {
+     "day": 60,
+     "support": 0.43,
+     "neutral": 0.31,
+     "oppose": 0.26
+    }
+   ],
+   "peak_oppose_day": 7,
+   "peak_support_day": -14,
+   "half_life_days": 40,
+   "outcome": {
+    "kpi": "brand sales",
+    "direction": "down",
+    "magnitude_pct": -55,
+    "low": -70,
+    "high": -35,
+    "confidence": "high",
+    "note": "Sales collapsed during the ban; recovery took multiple quarters."
+   },
+   "mechanisms": [
+    "Trust Shock",
+    "Regulatory Legitimacy",
+    "Nostalgia",
+    "Distribution Loss"
+   ],
+   "segments": [
+    {
+     "segment": "Parents",
+     "reaction": "Strong avoidance."
+    },
+    {
+     "segment": "Students",
+     "reaction": "Faster return after relaunch."
+    },
+    {
+     "segment": "Retailers",
+     "reaction": "Delisted, then restored after assurance."
+    }
+   ],
+   "caveats": "The ban was later contested in court; the perception arc is a reconstruction, not a measured panel."
+  },
+  {
+   "id": "whatsapp-2021",
+   "brand": "WhatsApp",
+   "decision": "Privacy policy update",
+   "year": 2021,
+   "month": 1,
+   "category": "digital",
+   "tags": [
+    "privacy",
+    "trust",
+    "network effect",
+    "migration",
+    "backlash"
+   ],
+   "summary": "A privacy-policy change triggered a loud backlash and a migration wave to Signal and Telegram, but WhatsApp's core network held.",
+   "context": "WhatsApp was the default social graph; switching costs were high because family and work groups lived there.",
+   "announcement": "In-app notice requiring acceptance; confusion about what would be shared with Facebook.",
+   "treatment_type": "trust shock",
+   "geography": "national",
+   "sources": [
+    {
+     "org": "WhatsApp",
+     "title": "Privacy policy update explainer",
+     "year": 2021,
+     "url": "https://blog.whatsapp.com/"
+    },
+    {
+     "org": "Reuters",
+     "title": "Signal and Telegram downloads surge",
+     "year": 2021,
+     "url": "https://www.reuters.com/"
+    }
+   ],
+   "perception": [
+    {
+     "day": -14,
+     "support": 0.38,
+     "neutral": 0.4,
+     "oppose": 0.22
+    },
+    {
+     "day": -7,
+     "support": 0.36,
+     "neutral": 0.4,
+     "oppose": 0.24
+    },
+    {
+     "day": 0,
+     "support": 0.26,
+     "neutral": 0.33,
+     "oppose": 0.41
+    },
+    {
+     "day": 7,
+     "support": 0.22,
+     "neutral": 0.27,
+     "oppose": 0.51
+    },
+    {
+     "day": 14,
+     "support": 0.24,
+     "neutral": 0.28,
+     "oppose": 0.48
+    },
+    {
+     "day": 30,
+     "support": 0.28,
+     "neutral": 0.31,
+     "oppose": 0.41
+    },
+    {
+     "day": 45,
+     "support": 0.3,
+     "neutral": 0.32,
+     "oppose": 0.38
+    },
+    {
+     "day": 60,
+     "support": 0.31,
+     "neutral": 0.33,
+     "oppose": 0.36
+    }
+   ],
+   "peak_oppose_day": 7,
+   "peak_support_day": -14,
+   "half_life_days": 30,
+   "outcome": {
+    "kpi": "migration to rivals",
+    "direction": "up",
+    "magnitude_pct": 4,
+    "low": 1,
+    "high": 9,
+    "confidence": "medium",
+    "note": "Downloads surged, but durable switching was limited by network effects."
+   },
+   "mechanisms": [
+    "Privacy Backlash",
+    "Network Lock-in",
+    "Media Amplification",
+    "Low Behavioural Elasticity"
+   ],
+   "segments": [
+    {
+     "segment": "Urban tech workers",
+     "reaction": "Visible migration."
+    },
+    {
+     "segment": "Family groups",
+     "reaction": "Stayed; switching cost too high."
+    },
+    {
+     "segment": "Small businesses",
+     "reaction": "Stayed for customer reach."
+    }
+   ],
+   "caveats": "A canonical case of loud online opposition not translating into proportional behaviour change."
+  },
+  {
+   "id": "netflix-mobile-2019",
+   "brand": "Netflix India",
+   "decision": "Mobile-only low-price plan",
+   "year": 2019,
+   "month": 7,
+   "category": "ott",
+   "tags": [
+    "price cut",
+    "ott",
+    "mobile",
+    "premium",
+    "india-first"
+   ],
+   "summary": "Netflix introduced a mobile-only plan at a fraction of the standard price to widen reach beyond affluent metros.",
+   "context": "Indian OTT price points were low, data was cheap, and most viewing was mobile. Netflix was seen as expensive and English-first.",
+   "announcement": "₹199/month mobile-only plan with local content push.",
+   "treatment_type": "price cut",
+   "geography": "national",
+   "sources": [
+    {
+     "org": "Netflix",
+     "title": "India mobile plan announcement",
+     "year": 2019,
+     "url": "https://about.netflix.com/"
+    },
+    {
+     "org": "Media Partners Asia",
+     "title": "India OTT outlook",
+     "year": 2020,
+     "url": "https://www.mediapartnersasia.com/"
+    }
+   ],
+   "perception": [
+    {
+     "day": -14,
+     "support": 0.34,
+     "neutral": 0.48,
+     "oppose": 0.18
+    },
+    {
+     "day": -7,
+     "support": 0.36,
+     "neutral": 0.47,
+     "oppose": 0.17
+    },
+    {
+     "day": 0,
+     "support": 0.48,
+     "neutral": 0.42,
+     "oppose": 0.1
+    },
+    {
+     "day": 7,
+     "support": 0.53,
+     "neutral": 0.37,
+     "oppose": 0.1
+    },
+    {
+     "day": 14,
+     "support": 0.5,
+     "neutral": 0.39,
+     "oppose": 0.11
+    },
+    {
+     "day": 30,
+     "support": 0.45,
+     "neutral": 0.43,
+     "oppose": 0.12
+    },
+    {
+     "day": 45,
+     "support": 0.43,
+     "neutral": 0.44,
+     "oppose": 0.13
+    },
+    {
+     "day": 60,
+     "support": 0.42,
+     "neutral": 0.45,
+     "oppose": 0.13
+    }
+   ],
+   "peak_oppose_day": 7,
+   "peak_support_day": 7,
+   "half_life_days": 30,
+   "outcome": {
+    "kpi": "paid subscriptions",
+    "direction": "up",
+    "magnitude_pct": 28,
+    "low": 15,
+    "high": 40,
+    "confidence": "medium",
+    "note": "The plan widened the funnel; ARPU fell and sharing remained common."
+   },
+   "mechanisms": [
+    "Price Architecture",
+    "Mobile First",
+    "Local Content",
+    "Status Democratisation"
+   ],
+   "segments": [
+    {
+     "segment": "Students",
+     "reaction": "High trial."
+    },
+    {
+     "segment": "Families",
+     "reaction": "Shared passwords."
+    },
+    {
+     "segment": "Affluent metro",
+     "reaction": "Stayed on premium plans."
+    }
+   ],
+   "caveats": "Subscriber estimates vary by source; the perception arc is reconstructed."
+  },
+  {
+   "id": "airtel-min-recharge-2018",
+   "brand": "Bharti Airtel",
+   "decision": "Minimum monthly recharge",
+   "year": 2018,
+   "month": 11,
+   "category": "telecom",
+   "tags": [
+    "price hike",
+    "telecom",
+    "churn",
+    "arpu",
+    "low-end users"
+   ],
+   "summary": "Airtel set a minimum recharge to clean up low-ARPU subscribers, lifting ARPU while churning marginal users.",
+   "context": "The market had collapsed into a price war; operators wanted to reduce inactive and ultra-low-ARPU subscribers.",
+   "announcement": "Minimum monthly recharge of ₹35 to retain incoming service.",
+   "treatment_type": "price hike",
+   "geography": "national",
+   "sources": [
+    {
+     "org": "TRAI",
+     "title": "Telecom subscription reports",
+     "year": 2019,
+     "url": "https://www.trai.gov.in/"
+    },
+    {
+     "org": "Bharti Airtel",
+     "title": "Annual Report 2018-19",
+     "year": 2019,
+     "url": "https://www.airtel.in/investors"
+    }
+   ],
+   "perception": [
+    {
+     "day": -14,
+     "support": 0.35,
+     "neutral": 0.45,
+     "oppose": 0.2
+    },
+    {
+     "day": -7,
+     "support": 0.33,
+     "neutral": 0.44,
+     "oppose": 0.23
+    },
+    {
+     "day": 0,
+     "support": 0.27,
+     "neutral": 0.38,
+     "oppose": 0.35
+    },
+    {
+     "day": 7,
+     "support": 0.25,
+     "neutral": 0.31,
+     "oppose": 0.44
+    },
+    {
+     "day": 14,
+     "support": 0.26,
+     "neutral": 0.31,
+     "oppose": 0.43
+    },
+    {
+     "day": 30,
+     "support": 0.3,
+     "neutral": 0.34,
+     "oppose": 0.36
+    },
+    {
+     "day": 45,
+     "support": 0.32,
+     "neutral": 0.35,
+     "oppose": 0.33
+    },
+    {
+     "day": 60,
+     "support": 0.33,
+     "neutral": 0.36,
+     "oppose": 0.31
+    }
+   ],
+   "peak_oppose_day": 7,
+   "peak_support_day": -14,
+   "half_life_days": 35,
+   "outcome": {
+    "kpi": "ARPU",
+    "direction": "up",
+    "magnitude_pct": 18,
+    "low": 10,
+    "high": 26,
+    "confidence": "high",
+    "note": "ARPU rose and the subscriber base shrank; the trade-off was deliberate."
+   },
+   "mechanisms": [
+    "Price Hike",
+    "Customer Cleaning",
+    "Churn",
+    "ARPU Trade-off"
+   ],
+   "segments": [
+    {
+     "segment": "Low-end prepaid",
+     "reaction": "Churn or multi-SIM."
+    },
+    {
+     "segment": "Urban postpaid",
+     "reaction": "Low impact."
+    },
+    {
+     "segment": "Rural shared phones",
+     "reaction": "Disproportionate disruption."
+    }
+   ],
+   "caveats": "ARPU and churn are reported at company level; perception is reconstructed."
+  },
+  {
+   "id": "patanjali-2015",
+   "brand": "Patanjali Ayurved",
+   "decision": "Ayurvedic FMCG scale-up",
+   "year": 2015,
+   "month": 1,
+   "category": "fmcg",
+   "tags": [
+    "trust",
+    "price",
+    "swadeshi",
+    "incumbent response",
+    "distribution"
+   ],
+   "summary": "Patanjali combined ayurvedic claims, low prices and swadeshi identity to take share from incumbents in oral care, hair oil and foods.",
+   "context": "Consumers were sceptical of chemical-heavy FMCG; Baba Ramdev's brand had mass trust and a yoga-media platform.",
+   "announcement": "Aggressive expansion through franchise stores and kirana distribution.",
+   "treatment_type": "new entrant",
+   "geography": "national",
+   "sources": [
+    {
+     "org": "NielsenIQ",
+     "title": "India FMCG market data",
+     "year": 2017,
+     "url": "https://nielseniq.com/"
+    },
+    {
+     "org": "Patanjali Ayurved",
+     "title": "Company information",
+     "year": 2016,
+     "url": "https://www.patanjaliayurved.net/"
+    }
+   ],
+   "perception": [
+    {
+     "day": -14,
+     "support": 0.44,
+     "neutral": 0.42,
+     "oppose": 0.14
+    },
+    {
+     "day": -7,
+     "support": 0.46,
+     "neutral": 0.41,
+     "oppose": 0.13
+    },
+    {
+     "day": 0,
+     "support": 0.54,
+     "neutral": 0.37,
+     "oppose": 0.09
+    },
+    {
+     "day": 7,
+     "support": 0.58,
+     "neutral": 0.34,
+     "oppose": 0.08
+    },
+    {
+     "day": 14,
+     "support": 0.56,
+     "neutral": 0.35,
+     "oppose": 0.09
+    },
+    {
+     "day": 30,
+     "support": 0.51,
+     "neutral": 0.39,
+     "oppose": 0.1
+    },
+    {
+     "day": 45,
+     "support": 0.48,
+     "neutral": 0.41,
+     "oppose": 0.11
+    },
+    {
+     "day": 60,
+     "support": 0.47,
+     "neutral": 0.42,
+     "oppose": 0.11
+    }
+   ],
+   "peak_oppose_day": -14,
+   "peak_support_day": 7,
+   "half_life_days": 45,
+   "outcome": {
+    "kpi": "category share",
+    "direction": "up",
+    "magnitude_pct": 6,
+    "low": 3,
+    "high": 10,
+    "confidence": "medium",
+    "note": "Share gains were real in some categories; quality and distribution varied."
+   },
+   "mechanisms": [
+    "Trust Transfer",
+    "Price Advantage",
+    "Cultural Identity",
+    "Incumbent Response"
+   ],
+   "segments": [
+    {
+     "segment": "Hindi-belt households",
+     "reaction": "Strong trial."
+    },
+    {
+     "segment": "Urban sceptics",
+     "reaction": "Quality concerns."
+    },
+    {
+     "segment": "Kirana",
+     "reaction": "Adopted where margins were better."
+    }
+   ],
+   "caveats": "Category shares are contested; treat as directional."
+  },
+  {
+   "id": "byjus-2023",
+   "brand": "BYJU'S",
+   "decision": "Aggressive edtech expansion and refund crisis",
+   "year": 2023,
+   "month": 5,
+   "category": "edtech",
+   "tags": [
+    "trust shock",
+    "edtech",
+    "refunds",
+    "sales pressure",
+    "collapse"
+   ],
+   "summary": "A high-pressure sales model and refund failures destroyed trust in India's most visible edtech brand.",
+   "context": "Pandemic-era demand inflated the category; parents were buying hope and exam outcomes, often financed by loans.",
+   "announcement": "Layoffs, delayed salaries, auditor resignation and regulatory scrutiny.",
+   "treatment_type": "trust shock",
+   "geography": "national",
+   "sources": [
+    {
+     "org": "Ministry of Corporate Affairs",
+     "title": "Company filings and inspections",
+     "year": 2023,
+     "url": "https://www.mca.gov.in/"
+    },
+    {
+     "org": "Reuters",
+     "title": "BYJU'S crisis coverage",
+     "year": 2023,
+     "url": "https://www.reuters.com/"
+    }
+   ],
+   "perception": [
+    {
+     "day": -14,
+     "support": 0.46,
+     "neutral": 0.36,
+     "oppose": 0.18
+    },
+    {
+     "day": -7,
+     "support": 0.43,
+     "neutral": 0.34,
+     "oppose": 0.23
+    },
+    {
+     "day": 0,
+     "support": 0.3,
+     "neutral": 0.28,
+     "oppose": 0.42
+    },
+    {
+     "day": 7,
+     "support": 0.22,
+     "neutral": 0.22,
+     "oppose": 0.56
+    },
+    {
+     "day": 14,
+     "support": 0.17,
+     "neutral": 0.18,
+     "oppose": 0.65
+    },
+    {
+     "day": 30,
+     "support": 0.12,
+     "neutral": 0.16,
+     "oppose": 0.72
+    },
+    {
+     "day": 45,
+     "support": 0.11,
+     "neutral": 0.16,
+     "oppose": 0.73
+    },
+    {
+     "day": 60,
+     "support": 0.1,
+     "neutral": 0.17,
+     "oppose": 0.73
+    }
+   ],
+   "peak_oppose_day": 30,
+   "peak_support_day": -14,
+   "half_life_days": 60,
+   "outcome": {
+    "kpi": "paid renewals",
+    "direction": "down",
+    "magnitude_pct": -60,
+    "low": -75,
+    "high": -40,
+    "confidence": "high",
+    "note": "Renewals and new sales collapsed; the brand became a cautionary tale."
+   },
+   "mechanisms": [
+    "Trust Shock",
+    "Refund Failure",
+    "Sales Pressure",
+    "Regulatory Scrutiny"
+   ],
+   "segments": [
+    {
+     "segment": "Parents",
+     "reaction": "Anger and refund demands."
+    },
+    {
+     "segment": "Students",
+     "reaction": "Disruption and distrust."
+    },
+    {
+     "segment": "Investors",
+     "reaction": "Write-downs."
+    }
+   ],
+   "caveats": "A company-level collapse, not a clean category experiment."
+  },
+  {
+   "id": "nano-2009",
+   "brand": "Tata Nano",
+   "decision": "₹1 lakh car launch",
+   "year": 2009,
+   "month": 3,
+   "category": "mobility",
+   "tags": [
+    "status",
+    "positioning",
+    "car",
+    "aspiration",
+    "failure"
+   ],
+   "summary": "The Nano was engineered as the world's cheapest car; the market read 'cheap' as a status insult, not a triumph.",
+   "context": "Two-wheeler families aspired to a car as a visible sign of arrival. Price was a barrier, but status was the reason to buy.",
+   "announcement": "Launch at ₹1 lakh, positioned as a safer alternative to a scooter.",
+   "treatment_type": "new product",
+   "geography": "national",
+   "sources": [
+    {
+     "org": "Tata Motors",
+     "title": "Annual Report 2009-10",
+     "year": 2010,
+     "url": "https://www.tatamotors.com/investors/"
+    },
+    {
+     "org": "SIAM",
+     "title": "Passenger vehicle statistics",
+     "year": 2010,
+     "url": "https://www.siam.in/statistics.aspx"
+    }
+   ],
+   "perception": [
+    {
+     "day": -14,
+     "support": 0.3,
+     "neutral": 0.48,
+     "oppose": 0.22
+    },
+    {
+     "day": -7,
+     "support": 0.28,
+     "neutral": 0.47,
+     "oppose": 0.25
+    },
+    {
+     "day": 0,
+     "support": 0.24,
+     "neutral": 0.44,
+     "oppose": 0.32
+    },
+    {
+     "day": 7,
+     "support": 0.22,
+     "neutral": 0.42,
+     "oppose": 0.36
+    },
+    {
+     "day": 14,
+     "support": 0.21,
+     "neutral": 0.41,
+     "oppose": 0.38
+    },
+    {
+     "day": 30,
+     "support": 0.22,
+     "neutral": 0.4,
+     "oppose": 0.38
+    },
+    {
+     "day": 45,
+     "support": 0.23,
+     "neutral": 0.4,
+     "oppose": 0.37
+    },
+    {
+     "day": 60,
+     "support": 0.24,
+     "neutral": 0.4,
+     "oppose": 0.36
+    }
+   ],
+   "peak_oppose_day": 14,
+   "peak_support_day": -14,
+   "half_life_days": 60,
+   "outcome": {
+    "kpi": "unit sales vs target",
+    "direction": "down",
+    "magnitude_pct": -70,
+    "low": -85,
+    "high": -50,
+    "confidence": "high",
+    "note": "The car missed volume targets badly; later variants did not repair the positioning."
+   },
+   "mechanisms": [
+    "Status Misread",
+    "Price Signal",
+    "Aspiration Gap",
+    "Distribution"
+   ],
+   "segments": [
+    {
+     "segment": "First-time car buyers",
+     "reaction": "Rejected the 'cheap' label."
+    },
+    {
+     "segment": "Two-wheeler owners",
+     "reaction": "Preferred a used car or entry hatch."
+    },
+    {
+     "segment": "Dealers",
+     "reaction": "Low pull."
+    }
+   ],
+   "caveats": "A product/positioning failure; the perception arc is reconstructed."
+  },
+  {
+   "id": "fair-lovely-2020",
+   "brand": "HUL",
+   "decision": "Fair & Lovely rebrand to Glow & Lovely",
+   "year": 2020,
+   "month": 6,
+   "category": "beauty",
+   "tags": [
+    "colourism",
+    "brand",
+    "symbolic change",
+    "beauty",
+    "status"
+   ],
+   "summary": "A name change responded to colourism criticism without changing the product or the underlying fairness promise.",
+   "context": "Fairness creams were a large, profitable category; colourism was increasingly contested online but still embedded in matrimony and media.",
+   "announcement": "Rebrand announced amid global Black Lives Matter scrutiny and a public petition.",
+   "treatment_type": "rebrand",
+   "geography": "national",
+   "sources": [
+    {
+     "org": "Hindustan Unilever",
+     "title": "Press release on brand change",
+     "year": 2020,
+     "url": "https://www.hul.co.in/"
+    },
+    {
+     "org": "NielsenIQ",
+     "title": "Beauty and personal care data",
+     "year": 2021,
+     "url": "https://nielseniq.com/"
+    }
+   ],
+   "perception": [
+    {
+     "day": -14,
+     "support": 0.28,
+     "neutral": 0.42,
+     "oppose": 0.3
+    },
+    {
+     "day": -7,
+     "support": 0.29,
+     "neutral": 0.41,
+     "oppose": 0.3
+    },
+    {
+     "day": 0,
+     "support": 0.36,
+     "neutral": 0.38,
+     "oppose": 0.26
+    },
+    {
+     "day": 7,
+     "support": 0.4,
+     "neutral": 0.35,
+     "oppose": 0.25
+    },
+    {
+     "day": 14,
+     "support": 0.38,
+     "neutral": 0.36,
+     "oppose": 0.26
+    },
+    {
+     "day": 30,
+     "support": 0.34,
+     "neutral": 0.38,
+     "oppose": 0.28
+    },
+    {
+     "day": 45,
+     "support": 0.32,
+     "neutral": 0.39,
+     "oppose": 0.29
+    },
+    {
+     "day": 60,
+     "support": 0.31,
+     "neutral": 0.4,
+     "oppose": 0.29
+    }
+   ],
+   "peak_oppose_day": -14,
+   "peak_support_day": 7,
+   "half_life_days": 30,
+   "outcome": {
+    "kpi": "brand share",
+    "direction": "flat",
+    "magnitude_pct": 0,
+    "low": -3,
+    "high": 3,
+    "confidence": "medium",
+    "note": "The name changed; the category logic did not. Sales were broadly stable."
+   },
+   "mechanisms": [
+    "Symbolic Response",
+    "Colourism",
+    "Brand Equity",
+    "Consumer Cynicism"
+   ],
+   "segments": [
+    {
+     "segment": "Urban young women",
+     "reaction": "Sceptical of cosmetic change."
+    },
+    {
+     "segment": "Mass market",
+     "reaction": "Continued purchase."
+    },
+    {
+     "segment": "Activists",
+     "reaction": "Called it superficial."
+    }
+   ],
+   "caveats": "Perception is reconstructed from public commentary, not a measured survey."
+  },
+  {
+   "id": "ondc-2022",
+   "brand": "ONDC",
+   "decision": "Open network for digital commerce launch",
+   "year": 2022,
+   "month": 4,
+   "category": "ecommerce",
+   "tags": [
+    "infrastructure",
+    "ecommerce",
+    "open network",
+    "slow adoption",
+    "policy"
+   ],
+   "summary": "An open protocol aimed to democratise e-commerce, but adoption was slow because buyer apps, seller onboarding and incentives were fragmented.",
+   "context": "Marketplace duopoly, high commissions and small-seller exclusion created policy demand for an open network.",
+   "announcement": "Beta launch with a handful of buyer and seller apps.",
+   "treatment_type": "infrastructure",
+   "geography": "national",
+   "sources": [
+    {
+     "org": "ONDC",
+     "title": "Network launch and statistics",
+     "year": 2024,
+     "url": "https://ondc.org/"
+    },
+    {
+     "org": "Bain & Company",
+     "title": "How India Shops Online",
+     "year": 2024,
+     "url": "https://www.bain.com/insights/how-india-shops-online/"
+    }
+   ],
+   "perception": [
+    {
+     "day": -14,
+     "support": 0.3,
+     "neutral": 0.58,
+     "oppose": 0.12
+    },
+    {
+     "day": -7,
+     "support": 0.31,
+     "neutral": 0.57,
+     "oppose": 0.12
+    },
+    {
+     "day": 0,
+     "support": 0.36,
+     "neutral": 0.53,
+     "oppose": 0.11
+    },
+    {
+     "day": 7,
+     "support": 0.38,
+     "neutral": 0.51,
+     "oppose": 0.11
+    },
+    {
+     "day": 14,
+     "support": 0.37,
+     "neutral": 0.51,
+     "oppose": 0.12
+    },
+    {
+     "day": 30,
+     "support": 0.34,
+     "neutral": 0.53,
+     "oppose": 0.13
+    },
+    {
+     "day": 45,
+     "support": 0.33,
+     "neutral": 0.53,
+     "oppose": 0.14
+    },
+    {
+     "day": 60,
+     "support": 0.32,
+     "neutral": 0.54,
+     "oppose": 0.14
+    }
+   ],
+   "peak_oppose_day": 45,
+   "peak_support_day": 7,
+   "half_life_days": 45,
+   "outcome": {
+    "kpi": "GMV share",
+    "direction": "up",
+    "magnitude_pct": 1,
+    "low": 0,
+    "high": 3,
+    "confidence": "medium",
+    "note": "Real but small share; the network's impact is longer-term and depends on incentives."
+   },
+   "mechanisms": [
+    "Infrastructure",
+    "Chicken-and-Egg",
+    "Seller Incentives",
+    "Buyer Habit"
+   ],
+   "segments": [
+    {
+     "segment": "Small sellers",
+     "reaction": "Curious but under-resourced."
+    },
+    {
+     "segment": "Buyers",
+     "reaction": "Low awareness."
+    },
+    {
+     "segment": "Incumbents",
+     "reaction": "Watchful."
+    }
+   ],
+   "caveats": "Too early for a stable outcome estimate; the case is included to model infrastructure-led adoption."
+  },
+  {
+   "id": "upi-2016",
+   "brand": "NPCI / UPI",
+   "decision": "Unified Payments Interface launch",
+   "year": 2016,
+   "month": 4,
+   "category": "payments",
+   "tags": [
+    "infrastructure",
+    "payments",
+    "network effect",
+    "slow then fast",
+    "policy"
+   ],
+   "summary": "UPI took years to reach escape velocity, then became the default retail payment rail.",
+   "context": "Cash dominated; bank apps were poor; merchant acceptance was thin. Demonetisation and cheap data accelerated adoption.",
+   "announcement": "API launch with a handful of banks; later incentives and QR codes.",
+   "treatment_type": "infrastructure",
+   "geography": "national",
+   "sources": [
+    {
+     "org": "NPCI",
+     "title": "UPI ecosystem statistics",
+     "year": 2025,
+     "url": "https://www.npci.org.in/"
+    },
+    {
+     "org": "RBI",
+     "title": "Payments system indicators",
+     "year": 2025,
+     "url": "https://www.rbi.org.in/"
+    }
+   ],
+   "perception": [
+    {
+     "day": -14,
+     "support": 0.36,
+     "neutral": 0.52,
+     "oppose": 0.12
+    },
+    {
+     "day": -7,
+     "support": 0.37,
+     "neutral": 0.51,
+     "oppose": 0.12
+    },
+    {
+     "day": 0,
+     "support": 0.44,
+     "neutral": 0.47,
+     "oppose": 0.09
+    },
+    {
+     "day": 7,
+     "support": 0.5,
+     "neutral": 0.42,
+     "oppose": 0.08
+    },
+    {
+     "day": 14,
+     "support": 0.54,
+     "neutral": 0.39,
+     "oppose": 0.07
+    },
+    {
+     "day": 30,
+     "support": 0.58,
+     "neutral": 0.36,
+     "oppose": 0.06
+    },
+    {
+     "day": 45,
+     "support": 0.6,
+     "neutral": 0.35,
+     "oppose": 0.05
+    },
+    {
+     "day": 60,
+     "support": 0.61,
+     "neutral": 0.34,
+     "oppose": 0.05
+    }
+   ],
+   "peak_oppose_day": -14,
+   "peak_support_day": 60,
+   "half_life_days": 60,
+   "outcome": {
+    "kpi": "transaction volume",
+    "direction": "up",
+    "magnitude_pct": 100,
+    "low": 50,
+    "high": 200,
+    "confidence": "high",
+    "note": "From a small base to hundreds of billions of annual transactions; exact growth depends on the base year."
+   },
+   "mechanisms": [
+    "Infrastructure",
+    "Network Effect",
+    "Policy Push",
+    "Merchant Acceptance"
+   ],
+   "segments": [
+    {
+     "segment": "Urban digitally native",
+     "reaction": "Rapid adoption."
+    },
+    {
+     "segment": "Rural feature-phone users",
+     "reaction": "Slower; assisted and feature-phone UPI emerging."
+    },
+    {
+     "segment": "Small merchants",
+     "reaction": "QR codes lowered acceptance cost."
+    }
+   ],
+   "caveats": "A multi-year adoption arc, not a 60-day event. Included as an infrastructure precedent."
+  },
+  {
+   "id": "gst-2017",
+   "brand": "Government of India",
+   "decision": "Goods and Services Tax rollout",
+   "year": 2017,
+   "month": 7,
+   "category": "policy",
+   "tags": [
+    "policy",
+    "tax",
+    "compliance",
+    "informal",
+    "confusion"
+   ],
+   "summary": "GST unified indirect taxes but created short-term compliance confusion, especially for small traders.",
+   "context": "State VAT regimes fragmented the market; informal traders were outside the tax net.",
+   "announcement": "Midnight launch; multiple rate slabs and frequent revisions.",
+   "treatment_type": "policy",
+   "geography": "national",
+   "sources": [
+    {
+     "org": "GST Council",
+     "title": "GST implementation records",
+     "year": 2018,
+     "url": "https://gstcouncil.gov.in/"
+    },
+    {
+     "org": "World Bank",
+     "title": "India Development Update",
+     "year": 2018,
+     "url": "https://www.worldbank.org/en/country/india"
+    }
+   ],
+   "perception": [
+    {
+     "day": -14,
+     "support": 0.32,
+     "neutral": 0.38,
+     "oppose": 0.3
+    },
+    {
+     "day": -7,
+     "support": 0.33,
+     "neutral": 0.37,
+     "oppose": 0.3
+    },
+    {
+     "day": 0,
+     "support": 0.4,
+     "neutral": 0.34,
+     "oppose": 0.26
+    },
+    {
+     "day": 7,
+     "support": 0.38,
+     "neutral": 0.32,
+     "oppose": 0.3
+    },
+    {
+     "day": 14,
+     "support": 0.36,
+     "neutral": 0.31,
+     "oppose": 0.33
+    },
+    {
+     "day": 30,
+     "support": 0.35,
+     "neutral": 0.31,
+     "oppose": 0.34
+    },
+    {
+     "day": 45,
+     "support": 0.36,
+     "neutral": 0.32,
+     "oppose": 0.32
+    },
+    {
+     "day": 60,
+     "support": 0.37,
+     "neutral": 0.33,
+     "oppose": 0.3
+    }
+   ],
+   "peak_oppose_day": 14,
+   "peak_support_day": 0,
+   "half_life_days": 40,
+   "outcome": {
+    "kpi": "formal compliance",
+    "direction": "up",
+    "magnitude_pct": 12,
+    "low": 5,
+    "high": 20,
+    "confidence": "medium",
+    "note": "Formalisation rose; short-term disruption and compliance costs were real."
+   },
+   "mechanisms": [
+    "Policy Shock",
+    "Compliance Cost",
+    "Formalisation",
+    "Rate Confusion"
+   ],
+   "segments": [
+    {
+     "segment": "Large firms",
+     "reaction": "Adapted."
+    },
+    {
+     "segment": "Small traders",
+     "reaction": "Confusion and cost."
+    },
+    {
+     "segment": "Consumers",
+     "reaction": "Mixed price effects."
+    }
+   ],
+   "caveats": "A structural policy, not a consumer brand decision."
+  },
+  {
+   "id": "farm-bills-2020",
+   "brand": "Government of India",
+   "decision": "Three farm laws",
+   "year": 2020,
+   "month": 9,
+   "category": "policy",
+   "tags": [
+    "policy",
+    "agriculture",
+    "protest",
+    "trust",
+    "regional"
+   ],
+   "summary": "Farm laws triggered sustained protests, especially in Punjab and Haryana, and were repealed after a trust breakdown.",
+   "context": "MSP and mandi systems were core to agrarian identity; farmers feared corporate capture of procurement.",
+   "announcement": "Passed amid pandemic restrictions; protests and negotiations followed.",
+   "treatment_type": "policy",
+   "geography": "national, concentrated in north",
+   "sources": [
+    {
+     "org": "PRS India",
+     "title": "Legislative tracking",
+     "year": 2021,
+     "url": "https://prsindia.org/"
+    },
+    {
+     "org": "Government of India",
+     "title": "Repeal announcement",
+     "year": 2021,
+     "url": "https://www.india.gov.in/"
+    }
+   ],
+   "perception": [
+    {
+     "day": -14,
+     "support": 0.42,
+     "neutral": 0.38,
+     "oppose": 0.2
+    },
+    {
+     "day": -7,
+     "support": 0.4,
+     "neutral": 0.36,
+     "oppose": 0.24
+    },
+    {
+     "day": 0,
+     "support": 0.3,
+     "neutral": 0.3,
+     "oppose": 0.4
+    },
+    {
+     "day": 7,
+     "support": 0.24,
+     "neutral": 0.24,
+     "oppose": 0.52
+    },
+    {
+     "day": 14,
+     "support": 0.21,
+     "neutral": 0.21,
+     "oppose": 0.58
+    },
+    {
+     "day": 30,
+     "support": 0.2,
+     "neutral": 0.2,
+     "oppose": 0.6
+    },
+    {
+     "day": 45,
+     "support": 0.19,
+     "neutral": 0.2,
+     "oppose": 0.61
+    },
+    {
+     "day": 60,
+     "support": 0.2,
+     "neutral": 0.21,
+     "oppose": 0.59
+    }
+   ],
+   "peak_oppose_day": 30,
+   "peak_support_day": -14,
+   "half_life_days": 60,
+   "outcome": {
+    "kpi": "government support",
+    "direction": "down",
+    "magnitude_pct": -18,
+    "low": -25,
+    "high": -10,
+    "confidence": "medium",
+    "note": "The laws were repealed; electoral effects varied by state."
+   },
+   "mechanisms": [
+    "Trust Shock",
+    "Identity Politics",
+    "Organised Protest",
+    "Policy Reversal"
+   ],
+   "segments": [
+    {
+     "segment": "Punjab farmers",
+     "reaction": "Sustained opposition."
+    },
+    {
+     "segment": "Urban consumers",
+     "reaction": "Mixed, low salience."
+    },
+    {
+     "segment": "Government",
+     "reaction": "Repeal."
+    }
+   ],
+   "caveats": "A politically salient case; perception is not a proxy for vote share."
+  },
+  {
+   "id": "ola-uber-2016",
+   "brand": "Ola / Uber",
+   "decision": "Surge pricing during demand spikes",
+   "year": 2016,
+   "month": 2,
+   "category": "mobility",
+   "tags": [
+    "price",
+    "surge",
+    "trust",
+    "regulation",
+    "platform"
+   ],
+   "summary": "Surge pricing was economically logical and socially toxic; users felt exploited during rain, strikes and emergencies.",
+   "context": "App-based ride-hailing was displacing autos and taxis; drivers and riders were both learning platform rules.",
+   "announcement": "Dynamic pricing expanded; regulators and users pushed back.",
+   "treatment_type": "price shock",
+   "geography": "metros",
+   "sources": [
+    {
+     "org": "Transport Department, Delhi",
+     "title": "Radio taxi regulation",
+     "year": 2016,
+     "url": "https://transport.delhi.gov.in/"
+    },
+    {
+     "org": "Reuters",
+     "title": "India ride-hailing coverage",
+     "year": 2016,
+     "url": "https://www.reuters.com/"
+    }
+   ],
+   "perception": [
+    {
+     "day": -14,
+     "support": 0.34,
+     "neutral": 0.42,
+     "oppose": 0.24
+    },
+    {
+     "day": -7,
+     "support": 0.33,
+     "neutral": 0.42,
+     "oppose": 0.25
+    },
+    {
+     "day": 0,
+     "support": 0.28,
+     "neutral": 0.36,
+     "oppose": 0.36
+    },
+    {
+     "day": 7,
+     "support": 0.26,
+     "neutral": 0.32,
+     "oppose": 0.42
+    },
+    {
+     "day": 14,
+     "support": 0.25,
+     "neutral": 0.31,
+     "oppose": 0.44
+    },
+    {
+     "day": 30,
+     "support": 0.28,
+     "neutral": 0.34,
+     "oppose": 0.38
+    },
+    {
+     "day": 45,
+     "support": 0.3,
+     "neutral": 0.35,
+     "oppose": 0.35
+    },
+    {
+     "day": 60,
+     "support": 0.31,
+     "neutral": 0.36,
+     "oppose": 0.33
+    }
+   ],
+   "peak_oppose_day": 14,
+   "peak_support_day": -14,
+   "half_life_days": 30,
+   "outcome": {
+    "kpi": "ride frequency",
+    "direction": "down",
+    "magnitude_pct": -6,
+    "low": -12,
+    "high": -2,
+    "confidence": "medium",
+    "note": "Short-term dips and regulatory scrutiny; the platform model survived."
+   },
+   "mechanisms": [
+    "Price Fairness",
+    "Trust Shock",
+    "Regulatory Response",
+    "Dependence"
+   ],
+   "segments": [
+    {
+     "segment": "Daily commuters",
+     "reaction": "Anger but continued use."
+    },
+    {
+     "segment": "Drivers",
+     "reaction": "Mixed; incentives mattered."
+    },
+    {
+     "segment": "Regulators",
+     "reaction": "Price caps and licensing."
+    }
+   ],
+   "caveats": "Perception is reconstructed; ride-hailing data is private."
+  },
+  {
+   "id": "platform-fee-2023",
+   "brand": "Swiggy / Zomato",
+   "decision": "Platform fee and surge fee expansion",
+   "year": 2023,
+   "month": 4,
+   "category": "food delivery",
+   "tags": [
+    "price",
+    "platform",
+    "fee",
+    "low elasticity",
+    "habit"
+   ],
+   "summary": "Food-delivery platforms raised fees; users complained but order frequency fell only modestly.",
+   "context": "Habit, discounts and convenience made demand less elastic than social media anger suggested.",
+   "announcement": "Per-order platform fee, rain fees and priority fees.",
+   "treatment_type": "price hike",
+   "geography": "metros and tier-2",
+   "sources": [
+    {
+     "org": "Swiggy",
+     "title": "Annual Report 2023-24",
+     "year": 2024,
+     "url": "https://www.swiggy.com/investors"
+    },
+    {
+     "org": "Zomato",
+     "title": "Annual Report 2023-24",
+     "year": 2024,
+     "url": "https://www.zomato.com/investor-relations"
+    }
+   ],
+   "perception": [
+    {
+     "day": -14,
+     "support": 0.36,
+     "neutral": 0.46,
+     "oppose": 0.18
+    },
+    {
+     "day": -7,
+     "support": 0.35,
+     "neutral": 0.45,
+     "oppose": 0.2
+    },
+    {
+     "day": 0,
+     "support": 0.3,
+     "neutral": 0.38,
+     "oppose": 0.32
+    },
+    {
+     "day": 7,
+     "support": 0.28,
+     "neutral": 0.34,
+     "oppose": 0.38
+    },
+    {
+     "day": 14,
+     "support": 0.29,
+     "neutral": 0.34,
+     "oppose": 0.37
+    },
+    {
+     "day": 30,
+     "support": 0.31,
+     "neutral": 0.36,
+     "oppose": 0.33
+    },
+    {
+     "day": 45,
+     "support": 0.32,
+     "neutral": 0.37,
+     "oppose": 0.31
+    },
+    {
+     "day": 60,
+     "support": 0.33,
+     "neutral": 0.37,
+     "oppose": 0.3
+    }
+   ],
+   "peak_oppose_day": 14,
+   "peak_support_day": -14,
+   "half_life_days": 25,
+   "outcome": {
+    "kpi": "order frequency",
+    "direction": "down",
+    "magnitude_pct": -3,
+    "low": -7,
+    "high": 0,
+    "confidence": "medium",
+    "note": "Small frequency impact; fee revenue rose. Habit and convenience dominate."
+   },
+   "mechanisms": [
+    "Low Price Elasticity",
+    "Habit",
+    "Fee Fatigue",
+    "Platform Power"
+   ],
+   "segments": [
+    {
+     "segment": "Young urban users",
+     "reaction": "Complain, keep ordering."
+    },
+    {
+     "segment": "Families",
+     "reaction": "More sensitive."
+    },
+    {
+     "segment": "Restaurants",
+     "reaction": "Margin pressure."
+    }
+   ],
+   "caveats": "Company-level data, not a measured consumer panel."
+  }
+ ]
+}

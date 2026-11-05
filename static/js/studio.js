@@ -736,6 +736,9 @@ function openAgent(id) {
   const chat = S.chats[a.id] || [];
   const topBiases = Object.entries(a.biases || {}).sort((x, y) => y[1] - x[1]).slice(0, 5);
   const traits = ['risk', 'optimism', 'price', 'trust_gov', 'conformity', 'fatalism'];
+  const mem = a.memory || {};
+  const memHtml = (mem.memories || []).slice(-6).map(m => `<div class="mem-row mem-row--${m.kind}"><span class="mem-kind">${m.kind}</span><span>${esc(m.text)}</span></div>`).join('');
+  const reflHtml = (mem.reflections || []).slice(0, 3).map(r => `<div class="mem-row mem-row--reflection"><span class="mem-kind">reflection</span><span>${esc(r)}</span></div>`).join('');
   $('#drawerBody').innerHTML = `
     <div class="drawer-profile"><span class="avatar">${avatar(a, 64)}</span><div><div class="drawer-name">${esc(a.name)}</div><div class="drawer-role">${esc(a.occupation)} · ${esc(a.city)}, ${esc(a.state)}<br>${esc(a.language)} · T${a.tier} · ${esc(a.gender)}, ${a.age}</div></div></div>
     <div class="drawer-chiprow"><span class="${tierClass(a.tier)}">Tier ${a.tier}</span><span class="chip">${esc(a.decision)}</span><span class="chip">${esc(a.caste_group)}</span><span class="chip">${esc(a.religion)}</span></div>
@@ -751,6 +754,7 @@ function openAgent(id) {
     <div class="drawer-section"><h4>Traits</h4>${traits.map(t => `<div class="trait-row"><span>${t.replace(/_/g, ' ')}</span><div class="bar"><i style="width:${(a.traits[t] || 0) * 100}%"></i></div><b>${Math.round((a.traits[t] || 0) * 100)}</b></div>`).join('')}</div>
     <div class="drawer-section"><h4>Biases</h4>${topBiases.map(([k, v]) => `<div class="trait-row"><span>${esc(k.replace(/_/g, ' '))}</span><div class="bar"><i style="width:${v * 100}%"></i></div><b>${Math.round(v * 100)}</b></div>`).join('')}</div>
     <div class="drawer-section"><h4>Life</h4><p class="small-copy">${esc(a.bio)}</p><p class="small-copy" style="margin-top:6px"><b style="color:rgba(255,255,255,.7)">Aspires:</b> ${esc(a.aspiration)}</p><p class="small-copy" style="margin-top:4px"><b style="color:rgba(255,255,255,.7)">Fears:</b> ${esc((a.fears || []).join(', '))}</p></div>
+    ${mem.count ? `<div class="drawer-section"><h4>Memory stream <span style="opacity:.4">(${mem.count})</span></h4>${memHtml}${reflHtml}</div>` : ''}
     ${(a.context || []).length ? `<div class="drawer-section"><h4>Context this citizen carries</h4><div class="context-list">${a.context.map(c => `<div class="ctx-item"><b>${esc(c.claim)}</b><span>${esc(truncate(c.detail || c.value || '', 170))}</span><em>${esc(c.why || 'retrieved context')} · ${esc((c.sources || []).map(x => x.org || x.title).join(', '))}</em></div>`).join('')}</div></div>` : ''}
     <div class="drawer-section"><h4>Ask ${esc(a.name.split(' ')[0])} anything</h4>
       <div class="dsuggest">${(chat.suggested || ['Would you buy this?', 'What would change your mind?', 'Who do you trust?']).map(q => `<button data-ask="${esc(q)}">${esc(q)}</button>`).join('')}</div>
@@ -1380,6 +1384,7 @@ function renderAll() {
   renderEvidence();
   renderResearch();
   renderReport();
+  renderEncounters();
 }
 
 /* ---------- playback ---------- */
@@ -1756,6 +1761,25 @@ async function applyParams() {
     toast('Parameters applied. Re-run to see effect.');
   } catch (e) { toast(e.message); }
   finally { btn.disabled = false; btn.innerHTML = label; }
+}
+
+/* ---------- generative encounters ---------- */
+function renderEncounters() {
+  const r = S.run;
+  const wrap = $('#worldEncounters');
+  if (!wrap) return;
+  const list = $('#encountersList');
+  const encs = (r && r.encounters) || [];
+  if (!encs.length) { wrap.hidden = true; return; }
+  wrap.hidden = false;
+  const mode = $('#encountersMode');
+  if (mode) mode.textContent = 'Concordia GM · ' + (encs[0].gm_mode === 'llm' ? 'LLM-adjudicated' : 'template');
+  list.innerHTML = encs.map(e => `
+    <div class="encounter-card">
+      <div class="encounter-head"><b>${esc(e.a.name)} × ${esc(e.b.name)}</b><span class="encounter-outcome ${esc(e.outcome)}">${esc(e.outcome)}</span></div>
+      <div class="encounter-dialogue">${esc((e.dialogue || e.reason || '').slice(0, 500))}</div>
+      <div class="encounter-foot">${esc(e.setting || '')} · stance ${e.stance_delta >= 0 ? '+' : ''}${Math.round((e.stance_delta || 0) * 100)}%</div>
+    </div>`).join('');
 }
 
 /* ---------- tabs ---------- */

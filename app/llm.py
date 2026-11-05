@@ -15,6 +15,7 @@ MODEL_DIR = Path(__file__).resolve().parent.parent / "models"
 DEFAULT_MODEL = os.environ.get("IMPRINT_LLM_MODEL", "tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf")
 BASE_URL = os.environ.get("IMPRINT_LLM_BASE_URL", "").strip()
 API_KEY = os.environ.get("IMPRINT_LLM_API_KEY", "ollama").strip()
+LOCAL_OPT_IN = os.environ.get("IMPRINT_LLM_LOCAL", "").strip().lower() in ("1", "true", "yes", "on")
 
 _llm = None
 _load_attempted = False
@@ -43,9 +44,12 @@ def load() -> bool:
     if BASE_URL:
         _llm = {"backend": "openai-compatible", "base_url": BASE_URL, "model": os.environ.get("IMPRINT_LLM_MODEL", "llama3.2")}
         return True
+    if not LOCAL_OPT_IN:
+        _load_error = "No model configured. Set IMPRINT_LLM_BASE_URL (hosted) or IMPRINT_LLM_LOCAL=1 (opt-in local GGUF)."
+        return False
     model_path = _find_model()
     if model_path is None:
-        _load_error = "No GGUF model found in ./models and no IMPRINT_LLM_BASE_URL set."
+        _load_error = "No GGUF model found in ./models and no IMPRINT_LLM_LOCAL opt-in."
         return False
     try:
         from llama_cpp import Llama

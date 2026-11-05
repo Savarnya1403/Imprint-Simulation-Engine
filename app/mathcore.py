@@ -197,10 +197,14 @@ def laplacian_diffusion(
 
     This is the heat equation on a graph: beliefs diffuse across social ties.
     High-degree nodes diffuse faster (influencers spread beliefs quicker).
+    Works with 1D (scalar per node) or 2D (multi-dim belief) arrays.
     """
     deg_safe = np.where(deg == 0, 1.0, deg)
     flow = -L @ beliefs
-    flow = flow / deg_safe.reshape(-1, 1)
+    if beliefs.ndim == 1:
+        flow = flow / deg_safe
+    else:
+        flow = flow / deg_safe.reshape(-1, 1)
     return beliefs + dt * diffusivity * flow
 
 

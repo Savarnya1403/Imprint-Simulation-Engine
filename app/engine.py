@@ -17,6 +17,8 @@ import numpy as np
 
 from . import content, personas, store
 from . import mathcore
+from . import memory, concordia
+from .nn import MLP, Value, sgd_update
 
 SCENARIOS = [
     dict(id="base", label="Base case", desc="No exogenous shock. The category competes on its own merits.", icon="◌"),
@@ -183,6 +185,69 @@ def _outlay(price: float) -> float:
     return price
 
 
+def _get_llm_generate():
+    """Return a prompt->text callable using the configured LLM (local or hosted), or None."""
+    try:
+        from . import llm
+        if not llm.status().get("available"):
+            return None
+        def gen(prompt, max_tokens: int = 120, temperature: float = 0.7):
+            return llm.generate(prompt, max_tokens=max_tokens, temperature=temperature)
+        return gen
+    except Exception:
+        return None
+
+
+def _llm_status():
+    try:
+        from . import llm
+        return llm.status()
+    except Exception:
+        return {"available": False}
+
+
+def _run_generative_layer(agents, adopted, topic, rounds, rng):
+    """Stanford memory stream + Concordia Game Master adjudication.
+
+    Caps LLM usage so the page stays responsive: hosted models get the full
+    generative treatment; local tiny models get a small budget (deterministic
+    templates fill the rest). Every layer has a deterministic fallback.
+    """
+    llm_generate = _get_llm_generate()
+    hosted = (_llm_status().get("backend") == "openai-compatible")
+    llm_budget = 4 if hosted else 1  # tiny local model: keep the page fast
+    topic_label = topic.get("label", "this")
+    streams = {}
+    for a in agents:
+        s = memory.MemoryStream(a["id"])
+        for text, kind, imp in memory.seed_memories(a, topic_label, day=1):
+            s.add(text, kind, imp, day=1)
+        streams[a["id"]] = s
+
+    encounters = []
+    pairs = concordia.sample_encounters(agents, adopted, rounds, topic, rng, n=3)
+    for a, b in pairs:
+        use_llm = llm_generate if llm_budget > 0 else None
+        if use_llm is not None:
+            llm_budget -= 1
+        out = concordia.resolve_encounter(a, b, topic, rounds, topic_label, use_llm, rng)
+        encounters.append(out)
+        streams[a["id"]].add(f"Talked to {b.get('name')} about {topic_label}. Outcome: {out['outcome']}.", "observation", 0.7, day=rounds)
+        streams[b["id"]].add(f"Talked to {a.get('name')} about {topic_label}. Outcome: {out['outcome']}.", "observation", 0.7, day=rounds)
+        a["stance"] = round(min(1.0, max(0.0, a["stance"] + out["stance_delta"])), 3)
+
+    reflect_llm = llm_generate if hosted else None  # reflections are deterministic on tiny local models
+    for a in agents:
+        if rng.random() < 0.35:  # reflection is expensive; sample a subset
+            try:
+                streams[a["id"]].reflect(a, topic_label, rounds, reflect_llm)
+            except Exception:
+                pass
+        a["memory"] = streams[a["id"]].to_dict()
+
+    return encounters
+
+
 def _calibration_params() -> dict:
     try:
         from .calibration import load_params
@@ -237,18 +302,13 @@ def _run_math_simulation(
 
     # --- Belief state: 6 dimensions per agent ---
     # [affordability, relative_advantage, social_proof, trust, risk, status]
-    beliefs = np.zeros((N, 6), dtype=np.float64)
-    beliefs[:, 0] = np.clip(np.array([a["awareness"] for a in agents]) + atlas_strength * 0.1, 0, 1)
-    beliefs[:, 1] = np.clip(.52 + tier_shift * 1.25 + occ_shift * 1.35 + region_shift * .85
-                            + (traits["optimism"] - .5) * .28, 0, 1)
-    beliefs[:, 2] = np.clip(0.2 + 0.3 * traits["conformity"], 0, 1)
-    beliefs[:, 3] = np.clip(traits["trust_gov"] * .26 + traits["trust_media"] * .14
-                            + (1 - bias["loss_aversion"]) * .26 + traits["education"] * .22 + .08, 0, 1)
-    beliefs[:, 4] = np.clip(.42 + (1 - traits["risk"]) * .30 + bias["loss_aversion"] * .20
-                            + bias["ambiguity"] * .16 - (traits["education"] - .5) * .10, 0, 1)
-    beliefs[:, 5] = np.clip(traits["status"], 0, 1)
+    # --- Nano-agents: each agent is a tiny MLP (micrograd-style autograd) ---
+    # 6 context inputs -> 1 adoption logit. Belief updating = backprop on
+    # cognitive-dissonance loss vs observed peer behavior.
+    mlps = [MLP(6, [4, 1]) for _ in range(N)]
+    mlp_lr = 0.05
 
-    # --- Graph Laplacian for social diffusion ---
+    # --- Graph Laplacian for social diffusion (Emergence World style) ---
     L, deg = mathcore.graph_laplacian(src, dst, N)
 
     # --- TimesFM demand signal ---
@@ -261,7 +321,6 @@ def _run_math_simulation(
     rejected = np.zeros(N, dtype=bool)
     rejection_reason: list[str | None] = [None] * N
     adopt_day = np.full(N, -1, dtype=np.int32)
-    momentum = np.zeros_like(beliefs)  # heavy-ball momentum for gradient descent
 
     timeline = []
     posts = []
@@ -274,6 +333,8 @@ def _run_math_simulation(
     panel = _pick_panel(agents, rng)
     panel_ids = {a["id"] for a in panel}
 
+    social_field_prev = np.zeros(N)  # initial social signal observed by agents
+
     for day in range(1, rounds + 1):
         # --- Annealed temperature (exploration early, commitment late) ---
         temp = mathcore.annealed_temperature(day, rounds, t_start=2.0, t_end=0.25)
@@ -281,11 +342,7 @@ def _run_math_simulation(
         # --- Market trend from TimesFM ---
         market_trend = demand_signal.market_trend_signal(day, rounds)
 
-        # --- Social field from graph Laplacian diffusion ---
-        social_field = mathcore.laplacian_diffusion(beliefs, L, deg, dt=0.1, diffusivity=0.15)
-        social_field = social_field * (1.0 + 0.5 * market_trend)  # trend amplifies social proof
-
-        # --- Utility computation ---
+        # --- Context features per agent (6 inputs to each nano-MLP) ---
         afford = _affordability(price, hh_income)
         relative = np.clip(.52 + tier_shift * 1.25 + occ_shift * 1.35 + region_shift * .85
                            + (traits["optimism"] - .5) * .28, 0, 1)
@@ -294,59 +351,35 @@ def _run_math_simulation(
         trust = np.clip(traits["trust_gov"] * .26 + traits["trust_media"] * .14
                         + (1 - bias["loss_aversion"]) * .26 + traits["education"] * .22 + .08, 0, 1)
         status = np.clip(traits["status"], 0, 1)
-        cultural = np.clip(.55 + (traits["conformity"] - .5) * .3 + (traits["social_radius"] - .5) * .2, 0, 1)
+        social = np.clip(.55 + (traits["conformity"] - .5) * .3, 0, 1)
 
-        # --- Attention weights (neurological concept) ---
-        attn = mathcore.attention_weights(traits, topic, day, rounds)
+        # --- Forward pass: each agent's nano-MLP maps context -> adoption probability ---
+        p_raw = np.zeros(N)
+        for i in range(N):
+            x = [Value(afford[i]), Value(relative[i]), Value(social_field_prev[i]),
+                 Value(trust[i]), Value(risk[i]), Value(status[i])]
+            p_raw[i] = float(mlps[i](x).data)
 
-        # --- Refractory period (recently decided agents resist change) ---
-        ref = mathcore.refractory_period(adopted, adopt_day, day, window=5)
+        # --- Social field: Laplacian diffusion of adoption probabilities ---
+        p_social = mathcore.laplacian_diffusion(p_raw, L, deg, dt=0.1, diffusivity=0.15)
+        p_social = p_social * (1.0 + 0.5 * market_trend)
 
-        # --- Build utility vector for ODE ---
-        utility = (0.55 * (2 * relative - 1) + 0.50 * (2 * afford - 1)
-                   + 0.85 * social_field[:, 2]  # social_proof dimension
-                   + 0.30 * trust_weight * (2 * trust - 1)
-                   - 0.62 * involvement * price_sens * (2 * risk - 1)
-                   + 0.18 * (2 * status - 1) + 0.12 * (2 * cultural - 1))
-        utility = np.clip(utility, -1, 1)
-
-        # --- RK4 belief ODE step ---
-        beliefs = mathcore.rk4_step(
-            t=day, beliefs=beliefs, dt=0.5,
-            utility=utility.reshape(-1, 1) * np.ones((N, 1)),
-            social_field=social_field,
-            temperature=temp,
-            params={
-                "utility_alpha": 0.6,
-                "social_beta": 0.35,
-                "dissonance_gamma": 0.25,
-                "refractory": ref,
-                "noise_sigma": 0.08,
-            },
-        )
-        beliefs = np.clip(beliefs, 0, 1)
-
-        # --- Gradient descent belief updating (cognitive dissonance minimization) ---
-        # Observed outcomes: what peers are actually doing
+        # --- Backprop: cognitive dissonance (my belief vs what peers actually do) ---
         peer_adopt_rate = peer_mean(adopted.astype(float), src, dst, N)
-        observed = np.tile(peer_adopt_rate.reshape(-1, 1), (1, 6))
-        loss, grad = mathcore.cognitive_dissonance_loss(beliefs, observed, attn)
-        beliefs, momentum = mathcore.gradient_descent_belief_update(
-            beliefs, grad, lr=0.05 * temp, momentum=momentum, beta=0.9
-        )
-        beliefs = np.clip(beliefs, 0, 1)
+        for i in range(N):
+            mlps[i].zero_grad()
+            x = [Value(afford[i]), Value(relative[i]), Value(p_social[i]),
+                 Value(trust[i]), Value(risk[i]), Value(status[i])]
+            out = mlps[i](x)
+            loss = (out - Value(float(peer_adopt_rate[i]))) ** 2
+            loss.backward()
+            sgd_update(mlps[i].parameters(), mlp_lr * temp)
 
-        # --- Temperature-scaled per-agent adoption decision (sigmoid, not cross-agent softmax) ---
-        # Each agent independently decides: P(adopt) = sigmoid((score - 0.5) / temperature)
-        adoption_score = (0.4 * beliefs[:, 0] + 0.25 * beliefs[:, 1]
-                          + 0.2 * beliefs[:, 2] + 0.1 * beliefs[:, 3]
-                          - 0.15 * beliefs[:, 4] + 0.1 * beliefs[:, 5])
-        adoption_score = np.clip(adoption_score, 0, 1)
-
-        # Logistic with temperature: low temp = sharp threshold, high temp = noisy
-        willing = 1 / (1 + np.exp(-(adoption_score - 0.5) / max(temp, 0.1)))
-        willing = willing * addressable  # only addressable agents can adopt
-        pressure = .62 + .55 * np.clip(social_field[:, 2], 0, 1.2)
+        # --- Adoption decision: temperature-scaled sigmoid on learned belief ---
+        media_lift = topic.get("ad_effect", .04) * mod["ad"] * (0.5 + 0.5 * market_trend)
+        p_effective = np.clip(p_raw + media_lift, 0, 1)
+        willing = p_effective * addressable  # media + learned belief
+        pressure = .62 + .55 * np.clip(p_social, 0, 1.2)
 
         # Scenario event
         event_mult = 1.0
@@ -356,28 +389,28 @@ def _run_math_simulation(
             events.append({"day": day, "type": scenario, "label": scenario, "text": shock_text, "impact": round(event_mult, 2)})
 
         event_scale = event_mult if day >= mod.get("event_day", 0) else 1.0
-        hazard = (0.095 * hazard_mult * willing * (.25 + .75 * beliefs[:, 0])
+        hazard = (0.095 * hazard_mult * willing * (.25 + .75 * p_effective)
                   * pressure * event_scale)
         hazard = np.clip(hazard, 0, .35)
 
         draw = np.array([rng.random() for _ in range(N)])
-        can = addressable & (~adopted) & (beliefs[:, 0] > .22) & (draw < hazard)
+        can = addressable & (~adopted) & (p_effective > 0.22) & (draw < hazard)
         adopted = adopted | can
         adopt_day[can] = day
         new_today = int(can.sum())
 
         # Active rejection
         rej_draw = np.array([rng.random() for _ in range(N)])
-        rej = (addressable & (beliefs[:, 0] > .45) & (~adopted) & (~rejected)
-               & (adoption_score < 0.3)
+        rej = (addressable & (p_effective > 0.45) & (~adopted) & (~rejected)
+               & (p_raw < 0.3)
                & (rej_draw < .05 + .07 * bias["loss_aversion"]))
         if rej.any():
             rejected = rejected | rej
             for i in np.where(rej)[0]:
                 rejection_reason[i] = content.objection(agents[i], topic, rng)
 
-        # Update stances from beliefs
-        a_stance = np.clip(.5 + .5 * (beliefs[:, 1] - beliefs[:, 4]), 0, 1)
+        # Stance = learned belief adjusted by risk
+        a_stance = np.clip(.5 + .5 * (p_raw - risk), 0, 1)
 
         adoption_rate = float(adopted.mean())
         conversion = float(adopted.sum() / n_addressable)
@@ -397,11 +430,13 @@ def _run_math_simulation(
         tier_adoption = {str(t): float(adopted[tier_arr == t].mean()) if (tier_arr == t).any() else 0.0 for t in (1, 2, 3, 4)}
         sentiment = float(a_stance.mean() * 2 - 1)
         polarization = float(a_stance.std() * 2)
+        social_field_prev = p_social
+
         top_state = _group_adoption(agents, adopted, "state", 3)
         top_occ = _group_adoption(agents, adopted, "occupation", 3)
         timeline.append({
             "day": day,
-            "awareness": round(float(beliefs[:, 0].mean()), 3),
+            "awareness": round(float(p_raw.mean()), 3),
             "adoption": round(adoption_rate, 4),
             "conversion": round(conversion, 4),
             "addressable": n_addressable,
@@ -409,7 +444,7 @@ def _run_math_simulation(
             "rejected": int(rejected.sum()),
             "sentiment": round(sentiment, 3),
             "polarization": round(min(1, polarization), 3),
-            "trust": round(float(beliefs[:, 3].mean()), 3),
+            "trust": round(float(trust.mean()), 3),
             "wom": round(len(posts) / max(1, day * N) * 1000, 2),
             "tier_adoption": {k: round(v, 4) for k, v in tier_adoption.items()},
             "state_adoption": _state_adoption(agents, adopted),
@@ -428,22 +463,22 @@ def _run_math_simulation(
         a["adopt_day"] = int(adopt_day[i]) if adopt_day[i] > 0 else None
         a["rejected"] = bool(rejected[i])
         a["rejection_reason"] = rejection_reason[i]
-        a["stance"] = round(float(np.clip(.5 + .5 * (beliefs[i, 1] - beliefs[i, 4]), 0, 1)), 3)
-        a["awareness"] = round(float(beliefs[i, 0]), 3)
-        a["intent"] = round(float(adoption_score[i]), 3)
+        a["stance"] = round(float(np.clip(.5 + .5 * (p_raw[i] - risk[i]), 0, 1)), 3)
+        a["awareness"] = round(float(p_raw[i]), 3)
+        a["intent"] = round(float(p_raw[i]), 3)
         a["addressable"] = bool(addressable[i])
         a["panel"] = a["id"] in panel_ids
         a["decision"] = "Adopted" if a["adopted"] else ("Rejected" if a["rejected"] else "Considering")
         a["decision_ledger"] = {
-            "affordability": round(float(beliefs[i, 0]), 3),
-            "relative_advantage": round(float(beliefs[i, 1]), 3),
-            "social_proof": round(float(beliefs[i, 2]), 3),
-            "trust": round(float(beliefs[i, 3]), 3),
-            "risk": round(float(beliefs[i, 4]), 3),
-            "status": round(float(beliefs[i, 5]), 3),
-            "intent": round(float(adoption_score[i]), 3),
+            "affordability": round(float(afford[i]), 3),
+            "relative_advantage": round(float(relative[i]), 3),
+            "social_proof": round(float(social[i]), 3),
+            "trust": round(float(trust[i]), 3),
+            "risk": round(float(risk[i]), 3),
+            "status": round(float(status[i]), 3),
+            "intent": round(float(p_raw[i]), 3),
             "bar": round(float(0.5), 3),
-            "utility": round(float(utility[i]), 3),
+            "utility": round(float(p_raw[i]), 3),
         }
         if not a["addressable"]:
             a["decision_note"] = "Not in the category's addressable pool (price, need or access)."
@@ -463,14 +498,15 @@ def _run_math_simulation(
         "adopt_day": adopt_day,
         "timeline": timeline,
         "n_addressable": n_addressable,
+        "addressable_mask": addressable,
         "ceiling": ceiling,
         "order_history": order_history,
         "tipping_day": tipping_day,
         "peak_growth": peak_growth,
         "peak_day": peak_day,
         "panel_ids": panel_ids,
-        "beliefs": beliefs,
-        "adoption_score": adoption_score,
+        "beliefs": p_raw,
+        "adoption_score": p_raw,
     }
 
 
@@ -622,6 +658,7 @@ def run_simulation(
     adopt_day = math_result["adopt_day"]
     timeline = math_result["timeline"]
     n_addressable = math_result["n_addressable"]
+    addressable_mask = math_result["addressable_mask"]
     ceiling = math_result["ceiling"]
     panel_ids = math_result["panel_ids"]
 
@@ -630,6 +667,7 @@ def run_simulation(
         posts = []
         debate = []
         focus = []
+        encounters = []
     else:
         # Rebuild stances for post generation
         a_stance = np.array([a["stance"] for a in agents])
@@ -644,11 +682,12 @@ def run_simulation(
             rng,
         )
         focus = _make_focus_group(agents, topic, question or "Would you adopt this? Why or why not?", rng, rounds)
+        encounters = _run_generative_layer(agents, adopted, topic, rounds, rng)
 
     # Summary
     summary = _summary(topic, timeline, agents, adopted, np.array([a["stance"] for a in agents]),
                        rejected, rejection_reason, [a for a in agents if a["id"] in panel_ids],
-                       scenario, brief, addressable=np.where(adopted | rejected, 1, 0), ceiling=ceiling)
+                       scenario, brief, addressable=addressable_mask, ceiling=ceiling)
 
     report = _report(topic, summary, timeline, agents, adopted,
                      np.array([a["stance"] for a in agents]), rejected, rejection_reason, rng)
@@ -684,6 +723,7 @@ def run_simulation(
         "posts": posts,
         "debate": debate,
         "panel": [a["id"] for a in agents if a["id"] in panel_ids],
+        "encounters": encounters,
         "focus_group": focus,
         "report": report,
         "evidence": evidence,

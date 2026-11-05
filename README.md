@@ -65,6 +65,10 @@ The context graph is a curated seed, not a 10,000× trained corpus. `app/data/at
 | `app/causal.py` | TimesFM counterfactual, conformal, placebo, synthetic control, Bayes, Monte Carlo, NPV |
 | `app/calibration.py` | Bounded coordinate search against public anchors, persisted history |
 | `app/reasoning.py` | Visible deliberation: replicate, stress, challenge, revise, verify |
+| `app/nn.py` | micrograd-style autograd + MLP; every agent is a small neural net |
+| `app/memory.py` | Generative-Agents memory stream: retrieval (recency × importance × relevance) + reflection |
+| `app/concordia.py` | Concordia-style Game Master: March & Olsen's three questions, GM-adjudicated Hinglish encounters |
+| `app/mathcore.py` | Belief ODE (Euler/RK4), graph-Laplacian diffusion, TimesFM demand signal |
 | `app/ingest.py` | PDF/HTML/CSV/JSON/TXT ingestion into the expandable corpus |
 | `app/forecast.py` | TimesFM 3.0 loader, topic and arbitrary-series forecasts |
 | `app/main.py` | FastAPI surface and static serving |
@@ -175,6 +179,15 @@ Each run then:
 
 The quality claim is inspectable behaviour: the system is allowed to lower its own confidence, disagree with its own causal check, and refuse to scale. The Reasoning tab shows every step, including the checks it failed. That is more useful than a multiplier you cannot audit, and it is the honest reading of "70× better" — many independent quality gates, not one magical factor.
 
+## Generative encounters: Stanford × Concordia
+
+Two research patterns are woven into the simulation (both Apache-2.0):
+
+- **Generative Agents (Stanford, Park et al. 2023)** — `app/memory.py`. Each agent accumulates a timestamped memory stream; retrieval scores memories by recency × importance × relevance; a reflection step derives firm beliefs by the agent. The agent drawer shows MEMORY STREAM and REFLECTION entries alongside traits and biases.
+- **Concordia Game Master (Google DeepMind)** — `app/concordia.py`. Agents don't just emit widgets; they meet (2–3 GM-adjudicated encounters per run). March & Olsen's three questions (*What kind of situation is this? What kind of person am I? What does a person such as I do here?*) frame each encounter; the GM resolves it in natural Hinglish with an outcome (convinced / sceptical / indifferent) that nudges stance. Encounters and reflections appear as **GENERATIVE ENCOUNTERS** cards in the World view and in each citizen file.
+
+LLM policy: local tiny models (llama.cpp, `IMPRINT_LLM_LOCAL=1`) are opt-in for development; hosted OpenAI-compatible endpoints (`IMPRINT_LLM_BASE_URL`) get the full pipeline. If neither is set, every generative step falls back to a deterministic, seed-reproducible template — the simulation is never LLM-dependent.
+
 ## Expand the corpus
 
 Files can be ingested from the CLI:
@@ -251,7 +264,9 @@ export IMPRINT_LLM_API_KEY="your-key"
 uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
-The key stays on the server; visitors just use the site. If unset, the app falls back to the built-in deterministic NLP (keyword + template replies) and the bundled TinyLlama is only used for local dev. Do not commit `models/` or API keys.
+The key stays on the server; visitors just use the site. If unset, the app falls back to the built-in deterministic NLP (keyword + template replies). Do not commit `models/` or API keys.
+
+> The local TinyLlama GGUF is **opt-in** (`IMPRINT_LLM_LOCAL=1`) for local development only. It is off by default because llama.cpp can be unstable on some machines; hosted endpoints (Groq, OpenRouter) are the supported production path.
 
 - `/api/health` confirms the forecast backend.
 - Every simulation run carries an `audit` object: adoption and conversion bounds, addressable accounting, sentiment bounds, tier coverage, context coverage, evidence attachment and seed replay.

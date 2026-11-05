@@ -288,13 +288,11 @@ function renderWorld() {
 
   renderFeed(row);
   updateMap(S.day - 1);
-  renderFeed(row);
-  updateMap(S.day - 1);
-  const dayPosts = r.posts.filter(p => p.day === S.day && p.platform !== 'Word of mouth');
-  if (dayPosts[0]) $('#bubbleA').textContent = truncate(dayPosts[0].text.replace(/[#*]/g, ''), 30);
-  if (dayPosts[1]) $('#bubbleB').textContent = truncate(dayPosts[1].text.replace(/[#*]/g, ''), 34);
   setupAgentField();
   renderVenn();
+  initTownAgents();
+  if (townState.raf) cancelAnimationFrame(townState.raf);
+  townState.raf = requestAnimationFrame(drawTown);
 }
 
 function truncate(s, n) { s = String(s || ''); return s.length > n ? s.slice(0, n - 1) + '…' : s; }
@@ -1418,6 +1416,7 @@ async function runSimulation() {
     S.chats = {};
     S.forecast = null; S.scenarios = null;
     S.reasoning = null; S.reasoningLoaded = false; S.reasoningKey = '';
+    townState.initialised = false;
     $('#crumbTopic').textContent = d.topic.label;
     $('#statusText').textContent = `Ready · ${d.population} agents`;
     $('#runDot').style.background = 'var(--green)';
@@ -1427,6 +1426,8 @@ async function runSimulation() {
     renderAll();
     setupAgentField();
     renderVenn();
+    townState.initialised = false; if (townState.raf) { cancelAnimationFrame(townState.raf); townState.raf = null; }
+    initTownAgents(); townState.raf = requestAnimationFrame(drawTown);
     if (S.tab === 'world') setTimeout(() => { if (!S.playing) togglePlay(); }, 700);
     if (S.tab === 'forecast') loadForecast();
     if (S.tab === 'reasoning') loadReasoning();
@@ -1478,6 +1479,310 @@ function togglePlay() {
     }
     setDay(S.day + 1);
   }, 850);
+}
+
+/* ---------- age-of-empires style Indian village & bazaar, rich top-down ---------- */
+const TOWN = {
+  W: 920, H: 540,
+  // Hand-placed buildings on a warm dusk village plan. kind drives flag logic.
+  buildings: [
+    // temple compound — north-east, red terracotta spire
+    { x: 690, y: 48, w: 120, h: 66, roof: '#a8432c', wall: '#c47a52', kind: 'temple', label: 'SHIV MANDIR' },
+    // school — south-west, blue-washed
+    { x: 52, y: 400, w: 124, h: 62, roof: '#2e4152', wall: '#5d7891', kind: 'school', label: 'VIDYALAYA' },
+    // EV charging point + Sharma Mobile — east side of bazaar
+    { x: 700, y: 250, w: 132, h: 68, roof: '#26332b', wall: '#4d6658', kind: 'ev', label: 'SHARMA MOBILE · EV' },
+    // chai + sabzi — along bazaar street
+    { x: 268, y: 252, w: 96, h: 52, roof: '#544229', wall: '#8a7050', kind: 'chai', label: 'CHAI-WALA' },
+    { x: 450, y: 248, w: 96, h: 50, roof: '#4e3e28', wall: '#8a7050', kind: 'sabzi', label: 'SABZI MANDI' },
+    // residential — north row (mixed adobe / blue-wash / green-wash / plinth)
+    { x: 56, y: 40, w: 88, h: 56, roof: '#5c402c', wall: '#a8836a', kind: 'house' },
+    { x: 168, y: 34, w: 74, h: 52, roof: '#36455a', wall: '#5d7891', kind: 'house' },
+    { x: 380, y: 40, w: 92, h: 54, roof: '#544229', wall: '#a8836a', kind: 'house' },
+    { x: 560, y: 34, w: 66, h: 50, roof: '#475747', wall: '#68806a', kind: 'house' },
+    // residential — south row
+    { x: 300, y: 420, w: 92, h: 54, roof: '#54423d', wall: '#8a6a5a', kind: 'house' },
+    { x: 440, y: 430, w: 84, h: 56, roof: '#655640', wall: '#a8836a', kind: 'house' },
+    { x: 576, y: 424, w: 70, h: 50, roof: '#3e4046', wall: '#666a73', kind: 'house' },
+    // smaller shops / homes along lane
+    { x: 172, y: 262, w: 60, h: 38, roof: '#514227', wall: '#8a7050', kind: 'house' },
+    { x: 600, y: 258, w: 56, h: 38, roof: '#514227', wall: '#8a7050', kind: 'house' },
+    // far-west and far-east edge houses
+    { x: 792, y: 420, w: 66, h: 52, roof: '#47443a', wall: '#7a7263', kind: 'house' },
+    { x: 12, y: 250, w: 56, h: 40, roof: '#514227', wall: '#8a7050', kind: 'house' },
+  ],
+  trees: [
+    { x: 120, y: 120, r: 26, kind: 'neem' }, { x: 224, y: 120, r: 18, kind: 'palm' },
+    { x: 340, y: 128, r: 22, kind: 'neem' }, { x: 452, y: 118, r: 24, kind: 'palm' },
+    { x: 250, y: 340, r: 20, kind: 'palm' }, { x: 380, y: 340, r: 18, kind: 'neem' },
+    { x: 540, y: 338, r: 22, kind: 'neem' }, { x: 800, y: 168, r: 24, kind: 'neem' },
+    { x: 60, y: 352, r: 16, kind: 'palm' }, { x: 860, y: 330, r: 18, kind: 'palm' },
+    { x: 640, y: 130, r: 16, kind: 'palm' },
+  ],
+  hotspots: [
+    { x: 0.08, y: 0.72, w: 0.13, h: 0.10, kind: 'school' },
+    { x: 0.07, y: 0.09, w: 0.10, h: 0.09, kind: 'north' },
+    { x: 0.29, y: 0.47, w: 0.10, h: 0.08, kind: 'bazaar' },
+    { x: 0.46, y: 0.46, w: 0.10, h: 0.08, kind: 'bazaar' },
+    { x: 0.72, y: 0.48, w: 0.13, h: 0.10, kind: 'ev' },
+    { x: 0.76, y: 0.10, w: 0.12, h: 0.10, kind: 'temple' },
+    { x: 0.28, y: 0.80, w: 0.13, h: 0.08, kind: 'south' },
+    { x: 0.88, y: 0.78, w: 0.08, h: 0.08, kind: 'east' },
+  ],
+  chatLines: [
+    'Service kaisa hai?', 'Price kitna hai?', 'Pehle charge point, phir baat.', 'Neighbour ne le liya…',
+    'EMI chalega kya?', 'Warranty kitne saal?', 'Mere gaon mein nahi hai.', 'Ek dost se sunna hai.',
+    'Thodi risky hai…', 'Dealer se baat karo, theek hai.', 'Festival pe discount?',
+    'Demo dekh pehle.', 'Kya beta, service ki?', 'Volvo toh hota hi hai.',
+  ],
+};
+
+let townState = { agents: [], raf: null, frame: 0, chatting: [], initialised: false };
+
+function drawRoad(ctx) {
+  // main bazaar — warm compacted earth with center stones
+  const g = ctx.createLinearGradient(0, 225, 0, 315);
+  g.addColorStop(0, '#544735'); g.addColorStop(0.5, '#6e5f47'); g.addColorStop(1, '#463b2d');
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.moveTo(0, 240); ctx.lineTo(920, 225); ctx.lineTo(920, 300); ctx.lineTo(0, 312); ctx.closePath(); ctx.fill();
+  // road edge stones
+  ctx.strokeStyle = 'rgba(230,205,150,.16)'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(0, 240); ctx.lineTo(920, 225); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0, 312); ctx.lineTo(920, 300); ctx.stroke();
+  // n-s lane
+  const g2 = ctx.createLinearGradient(390, 0, 500, 0);
+  g2.addColorStop(0, '#483d30'); g2.addColorStop(0.5, '#60513f'); g2.addColorStop(1, '#403427');
+  ctx.fillStyle = g2;
+  ctx.beginPath(); ctx.moveTo(400, 0); ctx.lineTo(495, 0); ctx.lineTo(530, 540); ctx.lineTo(425, 540); ctx.closePath(); ctx.fill();
+  // shadowed lane edges
+  ctx.strokeStyle = 'rgba(0,0,0,.35)'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(400, 0); ctx.lineTo(425, 540); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(495, 0); ctx.lineTo(530, 540); ctx.stroke();
+}
+
+function drawPond(ctx) {
+  // stepwell pond, top-left
+  ctx.fillStyle = '#101d26';
+  ctx.beginPath(); ctx.ellipse(105, 205, 72, 34, 0.15, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = 'rgba(110,175,215,.32)'; ctx.lineWidth = 1.4;
+  ctx.beginPath(); ctx.ellipse(105, 205, 52, 24, 0.15, 0, Math.PI * 2); ctx.stroke();
+  ctx.fillStyle = 'rgba(140,200,235,.18)';
+  ctx.beginPath(); ctx.ellipse(95, 200, 28, 12, 0.2, 0, Math.PI * 2); ctx.fill();
+}
+
+function drawGround(ctx) {
+  // dry grass base — warm dusk, NOT black
+  const g = ctx.createRadialGradient(460, 220, 80, 460, 260, 620);
+  g.addColorStop(0, '#332c21'); g.addColorStop(0.55, '#2b251d'); g.addColorStop(1, '#201c16');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, TOWN.W, TOWN.H);
+  // grass patches
+  for (let i = 0; i < 40; i++) {
+    const rx = (i * 733 + 91) % TOWN.W, ry = (i * 397 + 137) % (TOWN.H * 0.78) + 16;
+    ctx.fillStyle = i % 3 === 0 ? 'rgba(92,116,66,.42)' : 'rgba(72,82,52,.36)';
+    ctx.beginPath(); ctx.ellipse(rx, ry, 34 + (i % 7) * 12, 13 + (i % 5) * 6, 0, 0, Math.PI * 2); ctx.fill();
+  }
+  // packed earth
+  for (let i = 0; i < 24; i++) {
+    const rx = (i * 557 + 201) % TOWN.W, ry = (i * 289 + 311) % (TOWN.H * 0.8) + 24;
+    ctx.fillStyle = 'rgba(200,180,138,.11)';
+    ctx.beginPath(); ctx.ellipse(rx, ry, 52 + (i % 5) * 16, 17 + (i % 4) * 7, 0, 0, Math.PI * 2); ctx.fill();
+  }
+  drawRoad(ctx);
+  drawPond(ctx);
+  // string lights
+  for (let i = 0; i < 15; i++) {
+    const x = 22 + i * 63, y = 237 + Math.sin(i * 1.8) * 5;
+    ctx.fillStyle = i % 3 === 0 ? 'rgba(255,222,148,.95)' : 'rgba(255,196,148,.9)';
+    ctx.beginPath(); ctx.arc(x, y, 2.3, 0, Math.PI * 2); ctx.fill();
+  }
+}
+
+function drawTree(ctx, t, frame) {
+  ctx.fillStyle = 'rgba(0,0,0,.35)';
+  ctx.beginPath(); ctx.ellipse(t.x + 3, t.y + 2, t.r, t.r * 0.32, 0, 0, Math.PI * 2); ctx.fill();
+  if (t.kind === 'palm') {
+    ctx.strokeStyle = '#3e2e1e'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(t.x, t.y); ctx.quadraticCurveTo(t.x + 3, t.y - 16, t.x + 7, t.y - 30); ctx.stroke();
+    ctx.strokeStyle = '#2f4a2e'; ctx.lineWidth = 2.4;
+    const top = { x: t.x + 7, y: t.y - 30 };
+    for (let k = 0; k < 7; k++) {
+      const a = (k / 7) * Math.PI * 2 + 0.25;
+      ctx.beginPath(); ctx.moveTo(top.x, top.y);
+      ctx.quadraticCurveTo(top.x + Math.cos(a) * 12, top.y + Math.sin(a) * 7 - 4, top.x + Math.cos(a) * 21, top.y + Math.sin(a) * 12 - 8);
+      ctx.stroke();
+    }
+  } else {
+    ctx.fillStyle = '#2c3c2b'; ctx.beginPath(); ctx.arc(t.x, t.y - 14, t.r * 0.62, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#3a4f3a'; ctx.beginPath(); ctx.arc(t.x - 5, t.y - 19, t.r * 0.45, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#1e2a1e'; ctx.fillRect(t.x - 2, t.y - 9, 4, 10);
+  }
+}
+
+function drawBuilding(ctx, b, flagOn) {
+  // ground shadow
+  ctx.fillStyle = 'rgba(0,0,0,.4)';
+  ctx.beginPath(); ctx.ellipse(b.x + b.w / 2 + 6, b.y + b.h + 4, b.w * 0.62, 7, 0, 0, Math.PI * 2); ctx.fill();
+  // walls
+  ctx.fillStyle = b.wall;
+  ctx.fillRect(b.x, b.y, b.w, b.h);
+  // wall shading — left face darker
+  ctx.fillStyle = 'rgba(0,0,0,.22)';
+  ctx.fillRect(b.x, b.y, b.w * 0.32, b.h);
+  // roof slab
+  ctx.fillStyle = b.roof;
+  ctx.beginPath(); ctx.moveTo(b.x - 6, b.y); ctx.lineTo(b.x + b.w + 6, b.y); ctx.lineTo(b.x + b.w, b.y - 12); ctx.lineTo(b.x, b.y - 12); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,.12)';
+  ctx.fillRect(b.x, b.y - 12, b.w, 2.4);
+  // terracotta tile lines
+  ctx.strokeStyle = 'rgba(0,0,0,.28)'; ctx.lineWidth = 1;
+  for (let k = 1; k < 4; k++) {
+    ctx.beginPath(); ctx.moveTo(b.x + (b.w / 4) * k - 6, b.y); ctx.lineTo(b.x + (b.w / 4) * k, b.y - 12); ctx.stroke();
+  }
+  // door
+  ctx.fillStyle = 'rgba(22,14,9,.9)';
+  const dw = Math.min(14, b.w * 0.16), dh = Math.min(16, b.h * 0.4);
+  ctx.fillRect(b.x + b.w / 2 - dw / 2, b.y + b.h - dh, dw, dh);
+  // lit windows
+  ctx.fillStyle = 'rgba(255,222,140,.9)';
+  ctx.fillRect(b.x + 8, b.y + 8, 6, 7);
+  if (b.w > 70) ctx.fillRect(b.x + b.w - 14, b.y + 8, 6, 7);
+  // label
+  if (b.label) {
+    ctx.fillStyle = 'rgba(240,228,205,.92)'; ctx.font = '600 6.5px Inter, sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(b.label, b.x + b.w / 2, b.y + b.h / 2 + 2);
+    ctx.textAlign = 'left';
+  }
+  // adoption bunting flag
+  if (flagOn && (b.kind === 'ev' || b.kind === 'mobile' || b.kind === 'chai' || b.kind === 'sabzi')) {
+    const fx = b.x + b.w / 2, fy = b.y - 12;
+    ctx.strokeStyle = '#2c2c2c'; ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.moveTo(fx, fy); ctx.lineTo(fx, fy - 14); ctx.stroke();
+    ctx.fillStyle = '#57f2a4';
+    ctx.beginPath(); ctx.moveTo(fx, fy - 14); ctx.lineTo(fx + 11, fy - 10); ctx.lineTo(fx, fy - 6); ctx.closePath(); ctx.fill();
+  }
+}
+
+function drawFigure(ctx, x, y, col, bob) {
+  ctx.fillStyle = 'rgba(0,0,0,.45)';
+  ctx.beginPath(); ctx.ellipse(x, y + 1, 4.4, 1.7, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = '#141009'; ctx.lineWidth = 1.5; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(x, y - 4 + bob); ctx.lineTo(x - 2.2, y + 1); ctx.moveTo(x, y - 4 + bob); ctx.lineTo(x + 2.2, y + 1); ctx.stroke();
+  ctx.strokeStyle = col; ctx.lineWidth = 3.2;
+  ctx.beginPath(); ctx.moveTo(x, y - 10 + bob); ctx.lineTo(x, y - 4 + bob); ctx.stroke();
+  ctx.fillStyle = '#d6b07a';
+  ctx.beginPath(); ctx.arc(x, y - 13 + bob, 2.5, 0, Math.PI * 2); ctx.fill();
+}
+
+function initTownAgents() {
+  const r = S.run; if (!r) return;
+  const sample = r.agents.slice(0, 100);
+  townState.agents = sample.map((a, idx) => {
+    const hs = TOWN.hotspots[idx % TOWN.hotspots.length];
+    return {
+      a,
+      x: Math.random() * TOWN.W,
+      y: Math.random() * TOWN.H * 0.7 + 24,
+      tx: hs.x * TOWN.W + Math.random() * hs.w * TOWN.W,
+      ty: hs.y * TOWN.H + Math.random() * hs.h * TOWN.H,
+      speed: 15 + Math.random() * 22,
+      phase: Math.random() * Math.PI * 2,
+      pauseUntil: 0,
+      target: hs,
+    };
+  });
+  townState.initialised = true;
+  townState.frame = 0;
+  townState.chatting = [];
+}
+
+function updateTownAgents() {
+  if (!townState.agents.length) return;
+  const step = 1 / 60;
+  townState.agents.forEach((u, idx) => {
+    if (u.pauseUntil > townState.frame) { u.pauseUntil--; return; }
+    const dx = u.tx - u.x, dy = u.ty - u.y;
+    const dist = Math.hypot(dx, dy);
+    if (dist < 14) {
+      const hs = u.target;
+      u.tx = hs.x * TOWN.W + Math.random() * hs.w * TOWN.W;
+      u.ty = hs.y * TOWN.H + Math.random() * hs.h * TOWN.H;
+      u.pauseUntil = townState.frame + 40 + Math.floor(Math.random() * 110);
+      return;
+    }
+    const wob = Math.sin((townState.frame + idx * 11) * 0.05) * 0.4;
+    const nx = dx / dist, ny = dy / dist;
+    u.x += (nx * u.speed - ny * wob * u.speed * 0.35) * step * 2.2;
+    u.y += (ny * u.speed + nx * wob * u.speed * 0.35) * step * 2.2;
+  });
+  townState.chatting = [];
+  for (let i = 0; i < townState.agents.length && townState.chatting.length < 3; i += 2) {
+    for (let j = i + 1; j < townState.agents.length && townState.chatting.length < 3; j += 4) {
+      const a = townState.agents[i], b = townState.agents[j];
+      if (Math.hypot(a.x - b.x, a.y - b.y) < 32) townState.chatting.push({ a, b, phase: Math.random() * 1000 });
+    }
+  }
+}
+
+function drawTown() {
+  const canvas = $('#townCanvas'); if (!canvas || !S.run) return;
+  const ctx = canvas.getContext('2d');
+  const r = S.run, day = S.day;
+  const timeline = (r.timeline || [])[day - 1] || {};
+  townState.frame += 1;
+  if (!townState.initialised) initTownAgents();
+  updateTownAgents();
+
+  drawGround(ctx);
+  TOWN.trees.forEach(t => drawTree(ctx, t, townState.frame));
+  const flagOn = day >= 5;
+  const sortedB = TOWN.buildings.slice().sort((a, b) => a.y - b.y);
+  sortedB.forEach(b => drawBuilding(ctx, b, flagOn));
+
+  const agentDraw = townState.agents.slice().sort((a, b) => a.y - b.y);
+  agentDraw.forEach(u => {
+    const ad = u.a.adopt_day;
+    const aware = u.a.aware_day && u.a.aware_day <= day;
+    const col = ad && ad <= day ? '#4ADE80' : aware ? '#F2C14E' : '#CBB791';
+    const bob = Math.sin((townState.frame + u.phase * 90) * 0.09) * 1.4;
+    drawFigure(ctx, u.x, u.y, col, bob);
+    if (ad && ad <= day) {
+      const pulse = ((townState.frame + u.phase * 40) % 70) / 70;
+      ctx.strokeStyle = `rgba(74,222,128,${0.9 * (1 - pulse)})`;
+      ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.arc(u.x, u.y - 10 + bob, 5 + pulse * 12, 0, Math.PI * 2); ctx.stroke();
+    }
+  });
+
+  townState.chatting.forEach(c => {
+    const mx = (c.a.x + c.b.x) / 2, my = Math.min(c.a.y, c.b.y) - 22;
+    ctx.strokeStyle = 'rgba(255,255,255,.3)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(c.a.x, c.a.y - 14); ctx.lineTo(mx - 8, my + 7); ctx.moveTo(c.b.x, c.b.y - 14); ctx.lineTo(mx + 8, my + 7); ctx.stroke();
+    ctx.fillStyle = 'rgba(20,17,13,.94)';
+    ctx.strokeStyle = 'rgba(255,255,255,.25)';
+    const bw = 118, bh = 16;
+    ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(mx - bw / 2, my - bh / 2, bw, bh, 5); else ctx.rect(mx - bw / 2, my - bh / 2, bw, bh); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,.92)'; ctx.font = '8.5px Inter, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(TOWN.chatLines[Math.floor(c.phase + townState.frame / 45) % TOWN.chatLines.length], mx, my);
+    ctx.textAlign = 'left';
+  });
+
+  // soft dusk vignette
+  const vg = ctx.createRadialGradient(460, 210, 120, 460, 230, 560);
+  vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.22)');
+  ctx.fillStyle = vg; ctx.fillRect(0, 0, TOWN.W, TOWN.H);
+
+  const ticker = $('#townTickerText');
+  if (ticker && townState.frame % 150 === 0) {
+    const adopted = (r.agents || []).filter(a => a.adopt_day && a.adopt_day <= day);
+    if (adopted.length) {
+      const s = adopted[townState.frame % adopted.length];
+      ticker.textContent = `day ${day} — ${adopted.length} adopted · ${s.name} (${s.occupation}): “${(s.quote || '').slice(0, 66)}”`;
+    } else {
+      ticker.textContent = `day ${day} — bazaar is awake · awareness ${pct(timeline.awareness || 0)} · adoption ${pct(timeline.adoption || 0)}`;
+    }
+  }
+
+  townState.raf = requestAnimationFrame(drawTown);
 }
 
 /* ---------- live agent field + venn ---------- */
@@ -1870,8 +2175,8 @@ function switchTab(name) {
   if (name === 'causal') loadCausal();
   if (name === 'calibration') loadCalibration();
   if (name === 'reasoning') loadReasoning();
-  if (name === 'world' && S.run) setupAgentField();
-  if (name !== 'world' && S.agentField && S.agentField.raf) { cancelAnimationFrame(S.agentField.raf); S.agentField.raf = null; }
+  if (name === 'world' && S.run) { initTownAgents(); if (townState.raf) cancelAnimationFrame(townState.raf); townState.raf = requestAnimationFrame(drawTown); }
+  if (name !== 'world') { if (townState.raf) { cancelAnimationFrame(townState.raf); townState.raf = null; } if (S.agentField && S.agentField.raf) { cancelAnimationFrame(S.agentField.raf); S.agentField.raf = null; } }
   if (name === 'debate' && S.run) setTimeout(() => { if (!debatePlay) playDebate(); }, 400);
 }
 

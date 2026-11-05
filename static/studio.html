@@ -114,6 +114,7 @@
       <button class="tab" data-tab="debate">Debate</button>
       <button class="tab" data-tab="focus">Focus group</button>
       <button class="tab" data-tab="cognition">Cognition</button>
+      <button class="tab" data-tab="perception">Perception</button>
       <button class="tab" data-tab="forecast">Forecast</button>
       <button class="tab" data-tab="evidence">Evidence</button>
       <button class="tab" data-tab="research">Research</button>
@@ -588,6 +589,35 @@
           </div>
           <div class="agent-grid" id="agentGrid"></div>
           <button class="load-more" id="loadMoreAgents">Show more citizens</button>
+        </div>
+      </section>
+
+      <!-- PERCEPTION LAB -->
+      <section class="view" id="view-perception">
+        <div class="view-head">
+          <div><span class="panel__eyebrow">Cognition, quantified</span><h1 class="view-title">What the room <em>actually feels.</em></h1></div>
+          <span class="chip chip--muted">Rogers · Bass · Prospect Theory · Mere Exposure</span>
+        </div>
+        <div class="metrics" id="perceptionMetrics"></div>
+        <div class="perception-grid">
+          <div class="panel">
+            <div class="panel__head"><div><span class="panel__eyebrow">Rogers diffusion</span><h2 class="panel__title">Which wave adopted first</h2></div></div>
+            <div id="rogersChart" class="chart-box"></div>
+          </div>
+          <div class="panel">
+            <div class="panel__head"><div><span class="panel__eyebrow">Bass model</span><h2 class="panel__title">p, q, fit quality</h2></div></div>
+            <div id="bassView"></div>
+          </div>
+        </div>
+        <div class="perception-grid">
+          <div class="panel">
+            <div class="panel__head"><div><span class="panel__eyebrow">Prospect theory</span><h2 class="panel__title">S-curve: losses loom larger</h2></div></div>
+            <div id="prospectChart" class="chart-box"></div>
+          </div>
+          <div class="panel">
+            <div class="panel__head"><div><span class="panel__eyebrow">Neuroplasticity</span><h2 class="panel__title">Mere exposure reshapes preference</h2></div></div>
+            <div id="mereExposureChart" class="chart-box"></div>
+          </div>
         </div>
       </section>
 

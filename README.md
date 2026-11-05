@@ -66,6 +66,7 @@ The context graph is a curated seed, not a 10,000× trained corpus. `app/data/at
 | `app/calibration.py` | Bounded coordinate search against public anchors, persisted history |
 | `app/reasoning.py` | Visible deliberation: replicate, stress, challenge, revise, verify |
 | `app/nn.py` | micrograd-style autograd + MLP; every agent is a small neural net |
+| `app/cognition.py` | Prospect theory, mere exposure (neuroplasticity), Rogers diffusion, Bass p/q fit, bootstrap CIs, psychometrics |
 | `app/memory.py` | Generative-Agents memory stream: retrieval (recency × importance × relevance) + reflection |
 | `app/concordia.py` | Concordia-style Game Master: March & Olsen's three questions, GM-adjudicated Hinglish encounters |
 | `app/mathcore.py` | Belief ODE (Euler/RK4), graph-Laplacian diffusion, TimesFM demand signal |
@@ -187,6 +188,19 @@ Two research patterns are woven into the simulation (both Apache-2.0):
 - **Concordia Game Master (Google DeepMind)** — `app/concordia.py`. Agents don't just emit widgets; they meet (2–3 GM-adjudicated encounters per run). March & Olsen's three questions (*What kind of situation is this? What kind of person am I? What does a person such as I do here?*) frame each encounter; the GM resolves it in natural Hinglish with an outcome (convinced / sceptical / indifferent) that nudges stance. Encounters and reflections appear as **GENERATIVE ENCOUNTERS** cards in the World view and in each citizen file.
 
 LLM policy: local tiny models (llama.cpp, `IMPRINT_LLM_LOCAL=1`) are opt-in for development; hosted OpenAI-compatible endpoints (`IMPRINT_LLM_BASE_URL`) get the full pipeline. If neither is set, every generative step falls back to a deterministic, seed-reproducible template — the simulation is never LLM-dependent.
+
+## Cognitive science: what improved under the expert debate
+
+A research panel of one examines the engine; the winning changes landed in `app/cognition.py` and the decision loop:
+
+1. **Prospect Theory (Kahneman & Tversky)** — value is reference-dependent and S-shaped; λ = 2.25, α = 0.88. Losses loom ~2.25× larger than gains. The S-curve is visualised in the Perception tab.
+2. **Mere Exposure / Neuroplasticity (Zajonc 1980; Hebb 1949)** — cumulative exposures rewire preference. `mere_exposure_bonus(e)` adds a saturating, logarithmic habituation lift to each agent's adoption probability; `consolidation_rate` reports how many agents are past the memory threshold. The curve is in the Perception tab.
+3. **Rogers Diffusion + Bass model (Rogers 1962; Bass 1969)** — adopters are classified into innovators / early adopters / majority waves by rank-order of adoption day; Bass p (innovator) and q (imitation) are fitted on the simulated curve by grid search. R² < 0.3 is reported as "weak fit" — honest, not hidden.
+4. **Psychometrics** — Bearden interpersonal-influence susceptibility (`conformity·0.45 + status·0.25 + social_radius·0.30`), Cacioppo & Petty need-for-cognition. Reported per tier.
+5. **Bootstrap CIs** — adoption proportion gets a 100-replica percentile bootstrap CI; visible in the Perception tab metrics.
+6. **Bayesian anchoring** — category priors from the Atlas (60 sources) still anchor the priors; new Bass coefficients are explicitly labelled as simulation outputs, not measured values.
+
+Front-end: **Perception tab** shows the S-curve, the Rogers chart, the Bass fit, the mere-exposure habituation curve, and the psychometric indices — simple enough for anyone to read, quantitative enough for a researcher to interrogate.
 
 ## Expand the corpus
 

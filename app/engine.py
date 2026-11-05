@@ -18,6 +18,7 @@ import numpy as np
 from . import content, personas, store
 from . import mathcore
 from . import memory, concordia
+from . import cognition
 from .nn import MLP, Value, sgd_update
 
 SCENARIOS = [
@@ -321,6 +322,9 @@ def _run_math_simulation(
     rejected = np.zeros(N, dtype=bool)
     rejection_reason: list[str | None] = [None] * N
     adopt_day = np.full(N, -1, dtype=np.int32)
+    exposures = np.zeros(N, dtype=np.int32)  # cumulative mere-exposure impressions
+    susceptibility = np.array([cognition.susceptibility_to_influence(a["traits"]) for a in agents])
+    need_for_cognition = np.array([cognition.need_for_cognition(a["traits"]) for a in agents])
 
     timeline = []
     posts = []
@@ -376,9 +380,11 @@ def _run_math_simulation(
             sgd_update(mlps[i].parameters(), mlp_lr * temp)
 
         # --- Adoption decision: temperature-scaled sigmoid on learned belief ---
+        # Mere exposure (Zajonc): each impression rewires preference a little.
+        mere = np.array([cognition.mere_exposure_bonus(int(e)) for e in exposures])
         media_lift = topic.get("ad_effect", .04) * mod["ad"] * (0.5 + 0.5 * market_trend)
-        p_effective = np.clip(p_raw + media_lift, 0, 1)
-        willing = p_effective * addressable  # media + learned belief
+        p_effective = np.clip(p_raw + media_lift + mere, 0, 1)
+        willing = p_effective * addressable  # media + learned belief + habituation
         pressure = .62 + .55 * np.clip(p_social, 0, 1.2)
 
         # Scenario event
@@ -431,6 +437,10 @@ def _run_math_simulation(
         sentiment = float(a_stance.mean() * 2 - 1)
         polarization = float(a_stance.std() * 2)
         social_field_prev = p_social
+
+        # Mere exposure accumulates: media + peer signals this day
+        daily_exposures = np.clip(p_raw * 0.25 + media_lift * 2.0, 0, 0.75)
+        exposures = exposures + daily_exposures.astype(np.int32)
 
         top_state = _group_adoption(agents, adopted, "state", 3)
         top_occ = _group_adoption(agents, adopted, "occupation", 3)
@@ -507,6 +517,9 @@ def _run_math_simulation(
         "panel_ids": panel_ids,
         "beliefs": p_raw,
         "adoption_score": p_raw,
+        "susceptibility": susceptibility,
+        "need_for_cognition": need_for_cognition,
+        "exposures": exposures,
     }
 
 
@@ -661,6 +674,52 @@ def run_simulation(
     addressable_mask = math_result["addressable_mask"]
     ceiling = math_result["ceiling"]
     panel_ids = math_result["panel_ids"]
+    susceptibility = math_result["susceptibility"]
+    need_for_cognition = math_result["need_for_cognition"]
+    exposures_arr = math_result["exposures"]
+
+    # --- Cognitive / diffusion analytics (Rogers, Bass, prospect theory) ---
+    total_adopted = int(adopted.sum())
+    market_potential = max(1, n_addressable)
+    bass = cognition.bass_fit(timeline, market_potential)
+    exposure_list = exposures_arr.tolist()
+    exposure_consolidations = cognition.exposure_consolidation(exposure_list)
+    bootstrap = cognition.bootstrap_ci([int(x) for x in adopted], n_boot=100, alpha=0.05)
+    suscept_mean = float(np.mean(susceptibility))
+    nfc_mean = float(np.mean(need_for_cognition))
+    # Rogers wave classification of adopters (by innovativeness: voice + risk + digital)
+    innov_scores = []
+    for a in agents:
+        innov_scores.append(float(a["traits"]["voice"]) * 0.3 + (1 - float(a["traits"]["risk"])) * 0.3 + float(a["traits"]["digital"]) * 0.4)
+    ranked = np.argsort(np.array([a["adopt_day"] if a["adopt_day"] else 10**9 for a in agents]))
+    rogers_buckets = {"innovator": 0, "early_adopter": 0, "early_majority": 0, "late_majority": 0, "laggard": 0}
+    for rank_pos, idx in enumerate(ranked):
+        if not agents[idx]["adopted"]:
+            continue
+        pct = rank_pos / max(1, len(ranked) - 1)
+        if pct < 0.025:
+            rogers_buckets["innovator"] += 1
+        elif pct < 0.16:
+            rogers_buckets["early_adopter"] += 1
+        elif pct < 0.50:
+            rogers_buckets["early_majority"] += 1
+        elif pct < 0.84:
+            rogers_buckets["late_majority"] += 1
+        else:
+            rogers_buckets["laggard"] += 1
+    cognitive_stats = {
+        "bass_p": bass["p"],
+        "bass_q": bass["q"],
+        "bass_r2": bass["r_squared"],
+        "bass_peak_day": bass["peak_day"],
+        "bass_interpretation": bass["interpretation"],
+        "consolidation_rate": round(exposure_consolidations, 3),
+        "susceptibility_mean": round(suscept_mean, 1),
+        "need_for_cognition_mean": round(nfc_mean, 1),
+        "bootstrap_adoption_ci": bootstrap,
+        "rogers": rogers_buckets,
+        "market_potential": market_potential,
+    }
 
     # Social posts (only in non-fast mode)
     if fast:
@@ -719,6 +778,7 @@ def run_simulation(
         "price": price,
         "timeline": timeline,
         "summary": summary,
+        "cognitive": cognitive_stats,
         "agents": agents,
         "posts": posts,
         "debate": debate,

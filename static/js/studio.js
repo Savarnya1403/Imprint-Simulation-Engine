@@ -549,6 +549,75 @@ function renderFocusChat() {
 }
 
 /* ---------- cognition ---------- */
+function renderPerception() {
+  const r = S.run; if (!r) return;
+  const co = r.cognitive || {};
+  const s = r.summary || {};
+
+  $('#perceptionMetrics').innerHTML = [
+    metric('Bass p (innovator)', co.bass_p ?? '—', `q (imitation) ${co.bass_q ?? '—'} · R² ${co.bass_r2 ?? '—'}`),
+    metric('Consolidation rate', pct(co.consolidation_rate || 0, 0), 'agents with ≥5 exposures'),
+    metric('Susceptibility', Number(co.susceptibility_mean || 0).toFixed(1), 'Bearden interpersonal index'),
+    metric('Need for cognition', Number(co.need_for_cognition_mean || 0).toFixed(1), 'Cacioppo & Petty deliberate index'),
+    metric('Rogers: early adopters', String((co.rogers || {}).early_adopter ?? 0), 'before mass adoption'),
+    metric('Bootstrap CI', co.bootstrap_adoption_ci?.lower != null ? `±${pct(co.bootstrap_adoption_ci.half_width, 1)}` : '—', `lower ${pct(co.bootstrap_adoption_ci?.lower || 0, 1)} · upper ${pct(co.bootstrap_adoption_ci?.upper || 0, 1)}`),
+  ].join('');
+
+  $('#bassView').innerHTML = `
+    <div class="causal-row"><span>Innovator coefficient p</span><b>${co.bass_p ?? '—'}</b></div>
+    <div class="causal-row"><span>Imitation coefficient q</span><b>${co.bass_q ?? '—'}</b></div>
+    <div class="causal-row"><span>Fit quality (R²)</span><b class="${(co.bass_r2 || 0) >= 0.3 ? 'good' : 'warn'}">${co.bass_r2 ?? '—'}</b></div>
+    <div class="causal-row"><span>Peak adoption day</span><b>${co.bass_peak_day ?? '—'}</b></div>
+    <div class="causal-row"><span>Bass interpretation</span><b>${esc(co.bass_interpretation || '—')}</b></div>
+    <p class="causal-note">Bass 1969: N(t) = M · (1 − exp(−(p + q·N(t)/M)·t)). Fitted on simulated cumulative adoption; M = addressable pool. Weak R² means the curve is not Bass-shaped at this horizon — information, not failure.</p>`;
+
+  // Rogers chart — bar chart via lineChart with area? Use a custom SVG bar chart
+  const buckets = co.rogers || {};
+  const rogEl = $('#rogersChart');
+  if (rogEl) {
+    const total = Object.values(buckets).reduce((a, b) => a + b, 0) || 1;
+    const items = [
+      ['Innovators', buckets.innovator || 0, '#4ADE80'],
+      ['Early adopters', buckets.early_adopter || 0, '#8ae2a8'],
+      ['Early majority', buckets.early_majority || 0, 'rgba(255,255,255,.55)'],
+      ['Late majority', buckets.late_majority || 0, 'rgba(255,255,255,.3)'],
+      ['Laggards', buckets.laggard || 0, 'rgba(255,255,255,.15)'],
+    ];
+    const maxB = Math.max(...items.map(i => i[1]), 1);
+    rogEl.innerHTML = `<svg viewBox="0 0 620 220" preserveAspectRatio="none">
+      ${items.map(([label, count, color], i) => {
+        const y = 18 + i * 40, w = (count / maxB) * 480 + 4;
+        return `<text x="2" y="${y + 14}" fill="rgba(255,255,255,.6)" font-size="10">${esc(label)}</text>
+          <rect x="110" y="${y}" width="${w}" height="22" rx="3" fill="${color}" opacity=".75"/>
+          <text x="${116 + w}" y="${y + 15}" fill="rgba(255,255,255,.7)" font-size="11">${count}</text>`;
+      }).join('')}
+      <text x="2" y="216" fill="rgba(255,255,255,.3)" font-size="8">Order of adoption waves · ${total} adopters</text>
+    </svg>`;
+  }
+
+  // Prospect S-curve
+  const prosEl = $('#prospectChart');
+  if (prosEl) {
+    const xs = [-100, -75, -50, -25, -10, 0, 10, 25, 50, 75, 100];
+    const lambda = 2.25, alpha = 0.88;
+    const ys = xs.map(x => x >= 0 ? Math.pow(x, alpha) : -lambda * Math.pow(-x, alpha));
+    lineChart(prosEl, [{ values: ys, color: '#a8d8ff', width: 1.8, area: 'rgba(168,216,255,.08)' }], {
+      min: -250, max: 100, fmt: v => v.toFixed(0), labels: xs.map(String), height: 240,
+    });
+    prosEl.insertAdjacentHTML('beforeend', `<text x="310" y="14" fill="rgba(255,255,255,.4)" font-size="9">λ = 2.25 · α = 0.88</text>`);
+  }
+
+  // Mere exposure curve
+  const mereEl = $('#mereExposureChart');
+  if (mereEl) {
+    const values = Array.from({ length: 21 }, (_, i) => 0.35 * (1 - Math.pow(0.5, i / 8)));
+    lineChart(mereEl, [{ values, color: '#fbbf24', width: 1.8, area: 'rgba(251,191,36,.09)' }], {
+      min: 0, max: 0.35, fmt: v => v.toFixed(2), labels: Array.from({ length: 21 }, (_, i) => String(i)), height: 240,
+    });
+    mereEl.insertAdjacentHTML('beforeend', `<text x="290" y="20" fill="rgba(255,255,255,.45)" font-size="9">Zajonc habituation: effect saturates ~15 exposures</text>`);
+  }
+}
+
 function renderCognition() {
   const r = S.run;
   if (!r) return;
@@ -1381,6 +1450,7 @@ function renderAll() {
   renderDebate();
   renderFocus();
   renderCognition();
+  renderPerception();
   renderEvidence();
   renderResearch();
   renderReport();
@@ -1794,6 +1864,7 @@ function switchTab(name) {
   if (name === 'evidence') renderEvidence();
   if (name === 'research') renderResearch();
   if (name === 'cognition') renderCognition();
+  if (name === 'perception') renderPerception();
   if (name === 'atlas') loadAtlas();
   if (name === 'precedents') loadPrecedents();
   if (name === 'causal') loadCausal();

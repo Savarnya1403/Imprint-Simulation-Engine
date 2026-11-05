@@ -923,3 +923,7 @@ body{background:radial-gradient(ellipse at top,rgba(74,222,128,.03),transparent 
 .encounter-dialogue{font-size:8px;line-height:1.6;color:rgba(255,255,255,.55);white-space:pre-wrap}
 .encounter-foot{font-size:7px;color:rgba(255,255,255,.25);margin-top:7px;border-top:1px solid rgba(255,255,255,.05);padding-top:5px}
 @media(max-width:1080px){.encounters-list{grid-template-columns:1fr}}
+
+.perception-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:12px;margin-bottom:12px}
+.perception-grid .chart-box{height:240px}
+@media(max-width:1080px){.perception-grid{grid-template-columns:1fr}}

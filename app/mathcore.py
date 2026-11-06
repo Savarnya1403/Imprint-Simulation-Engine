@@ -346,6 +346,375 @@ def susceptibility(
     return float(np.var(recent))
 
 
+# ---------------------------------------------------------------------------
+# 7. FOKKER-PLANCK EQUATION  (opinion drift in continuous belief space)
+# ---------------------------------------------------------------------------
+# Models how the probability density P(x, t) of agents holding belief x
+# evolves over time under drift A(x,t) and diffusion D:
+#
+#   ∂P/∂t = -∂/∂x [ A(x,t) · P ] + (D/2) · ∂²P/∂x²
+#
+# Discretised on a 1-D grid over [-1, 1].
+# ---------------------------------------------------------------------------
+
+def fokker_planck_step(
+    P: np.ndarray,
+    x_grid: np.ndarray,
+    drift_coeffs: np.ndarray,
+    diffusion: float = 0.05,
+    dt: float = 0.1,
+) -> np.ndarray:
+    """
+    One Euler step of the Fokker-Planck PDE.
+
+    Args:
+        P:             Probability density over x_grid. Shape (N,). Will be
+                       normalised so it sums to 1.
+        x_grid:        Spatial grid of belief values in [-1, 1]. Shape (N,).
+        drift_coeffs:  A(x) evaluated at each grid point. Shape (N,).
+        diffusion:     Diffusion coefficient D (> 0).
+        dt:            Time step size.
+
+    Returns:
+        P_new: Updated probability density (normalised).
+    """
+    dx = x_grid[1] - x_grid[0]
+    N  = len(P)
+
+    # Advection flux  F_adv[i] = A[i] * P[i]  (upwind scheme)
+    flux = drift_coeffs * P
+
+    dflux_dx      = np.zeros(N)
+    dflux_dx[1:-1] = (flux[2:] - flux[:-2]) / (2 * dx)
+    dflux_dx[0]   = (flux[1] - flux[0])  / dx
+    dflux_dx[-1]  = (flux[-1] - flux[-2]) / dx
+
+    # Diffusion  ∂²P/∂x²  (central differences)
+    d2P_dx2        = np.zeros(N)
+    d2P_dx2[1:-1]  = (P[2:] - 2 * P[1:-1] + P[:-2]) / (dx ** 2)
+
+    # Forward-Euler update
+    P_new = P + dt * (-dflux_dx + 0.5 * diffusion * d2P_dx2)
+    P_new = np.maximum(P_new, 0.0)
+    total = P_new.sum() * dx
+    if total > 1e-12:
+        P_new /= total * dx       # re-normalise to density
+    return P_new
+
+
+def fokker_planck_simulate(
+    n_agents: int,
+    initial_stances: np.ndarray,
+    drift_fn,                      # callable(x_grid, t) -> drift array
+    diffusion: float = 0.05,
+    n_steps: int = 20,
+    dt: float = 0.1,
+    n_bins: int = 80,
+) -> dict:
+    """
+    Simulate opinion evolution over time using the Fokker-Planck equation.
+
+    Returns dict with:
+        x_grid         : belief axis values
+        P_history      : (n_steps+1, n_bins) density snapshots
+        mean_belief    : (n_steps+1,) mean belief at each step
+        std_belief     : (n_steps+1,) std of belief distribution
+        bimodality_idx : (n_steps+1,) crude bimodality score (> 0.5 = polarised)
+    """
+    x_grid = np.linspace(-1.0, 1.0, n_bins)
+    dx     = x_grid[1] - x_grid[0]
+
+    # Initialise density from agent stances via histogram
+    counts, _ = np.histogram(np.clip(initial_stances, -1, 1), bins=n_bins, range=(-1, 1))
+    P = counts.astype(float)
+    if P.sum() > 0:
+        P = P / (P.sum() * dx)
+
+    P_history     = [P.copy()]
+    mean_belief   = [float(np.sum(x_grid * P) * dx)]
+    std_belief    = [float(np.sqrt(np.sum(x_grid**2 * P) * dx - mean_belief[-1]**2))]
+
+    def bimodality(p):
+        # Hartigan's dip approximation: variance of density × kurtosis proxy
+        m2 = np.sum((x_grid - mean_belief[-1])**2 * p) * dx
+        m4 = np.sum((x_grid - mean_belief[-1])**4 * p) * dx
+        kurt = m4 / (m2**2 + 1e-10) - 3
+        return float(min(1.0, max(0.0, -kurt / 4 + 0.5)))
+
+    bimodality_idx = [bimodality(P)]
+
+    for step in range(n_steps):
+        t = step * dt
+        A = drift_fn(x_grid, t)
+        P = fokker_planck_step(P, x_grid, A, diffusion=diffusion, dt=dt)
+        P_history.append(P.copy())
+        mu = float(np.sum(x_grid * P) * dx)
+        mean_belief.append(mu)
+        std_belief.append(float(np.sqrt(max(0.0, np.sum(x_grid**2 * P) * dx - mu**2))))
+        bimodality_idx.append(bimodality(P))
+
+    return {
+        "x_grid": x_grid,
+        "P_history": np.array(P_history),
+        "mean_belief": np.array(mean_belief),
+        "std_belief": np.array(std_belief),
+        "bimodality_idx": np.array(bimodality_idx),
+        "final_mean": mean_belief[-1],
+        "final_std": std_belief[-1],
+        "is_polarised": bimodality_idx[-1] > 0.55,
+    }
+
+
+def india_opinion_drift(
+    x_grid: np.ndarray,
+    t: float,
+    social_influence: float = 0.4,
+    conformism_strength: float = 0.3,
+    external_field: float = 0.0,
+) -> np.ndarray:
+    """
+    India-calibrated drift function A(x, t) for the Fokker-Planck equation.
+
+    Models:
+    - Social pull toward mean (conformist drift)
+    - External field (government scheme, media campaign, etc.)
+    - Resistance in extreme zones (stubbornness)
+
+    Returns drift coefficient at each x in x_grid.
+    """
+    conformist = -conformism_strength * x_grid         # pull toward 0
+    field_term = external_field * np.ones_like(x_grid)
+    resistance = -social_influence * np.sign(x_grid) * np.abs(x_grid) ** 2
+    decay       = np.exp(-0.5 * t) * 0.1 * np.sin(np.pi * x_grid)
+
+    return conformist + field_term + resistance + decay
+
+
+# ---------------------------------------------------------------------------
+# 8. ISING MODEL  (social phase transitions)
+# ---------------------------------------------------------------------------
+# Models a population of N agents on a 1-D chain (periodic boundary).
+# Each agent σᵢ ∈ {-1, +1}  (against / in favour of adopting product).
+# Energy:  E = -J Σ σᵢ σⱼ  -  h Σ σᵢ
+# Transitions via Metropolis-Hastings at temperature T.
+#
+# High T → disordered (opinions all over the place)
+# Low T  → ordered (community consensus forms)
+# Critical T (India ~ 0.6-0.8) → tipping / phase transition zone
+# ---------------------------------------------------------------------------
+
+class IsingOpinionModel:
+    """
+    1-D Ising model of opinion dynamics in an Indian consumer population.
+
+    Args:
+        n:          Number of agents.
+        J:          Coupling strength (social influence between neighbours).
+                    Typical India values: 0.4 (metro) to 0.8 (village).
+        h:          External field (advertising / government push).
+        T:          Social temperature (disorder). India range 0.5-1.5.
+        rng:        NumPy random generator.
+    """
+    def __init__(
+        self,
+        n: int,
+        J: float = 0.6,
+        h: float = 0.0,
+        T: float = 1.0,
+        rng: np.random.Generator | None = None,
+    ) -> None:
+        self.n   = n
+        self.J   = J
+        self.h   = h
+        self.T   = max(T, 1e-6)
+        self.rng = rng or np.random.default_rng()
+        # Initialise spins randomly
+        self.spins = self.rng.choice([-1, 1], size=n).astype(float)
+
+    def energy(self) -> float:
+        """Total energy of the current spin configuration."""
+        s = self.spins
+        pair_sum = np.sum(s * np.roll(s, 1))   # periodic boundary
+        return float(-self.J * pair_sum - self.h * np.sum(s))
+
+    def magnetisation(self) -> float:
+        """Order parameter m = Σσᵢ / N.  +1 = all adopt, -1 = all reject."""
+        return float(np.mean(self.spins))
+
+    def metropolis_step(self, n_flips: int | None = None) -> None:
+        """
+        Run n_flips Metropolis-Hastings updates.
+        Default: flip each agent once on average (n_flips = N).
+        """
+        n_flips = n_flips or self.n
+        for _ in range(n_flips):
+            i       = int(self.rng.integers(0, self.n))
+            left_i  = (i - 1) % self.n
+            right_i = (i + 1) % self.n
+            dE      = 2 * self.spins[i] * (
+                self.J * (self.spins[left_i] + self.spins[right_i]) + self.h
+            )
+            if dE < 0 or self.rng.random() < math.exp(-dE / self.T):
+                self.spins[i] *= -1
+
+    def anneal(self, T_start: float, T_end: float, steps: int) -> list[float]:
+        """
+        Simulated annealing: cool social temperature from T_start to T_end.
+        Returns magnetisation history (opinion consensus trajectory).
+        """
+        history = []
+        for step in range(steps):
+            self.T = T_start + (T_end - T_start) * step / max(steps - 1, 1)
+            self.metropolis_step()
+            history.append(self.magnetisation())
+        return history
+
+    def simulate(self, rounds: int, record_every: int = 1) -> dict:
+        """
+        Run simulation for `rounds` Metropolis sweeps.
+
+        Returns:
+            magnetisation  : list of m per recorded round
+            energy         : list of E per recorded round
+            final_spins    : array of final spin values
+            tipping_round  : first round m crosses 0 from below (None if not)
+            consensus_round: first round |m| > 0.8 (None if not)
+        """
+        mag_hist  = []
+        e_hist    = []
+        tipping   = None
+        consensus = None
+        prev_m    = self.magnetisation()
+
+        for r in range(rounds):
+            self.metropolis_step()
+            if r % record_every == 0:
+                m = self.magnetisation()
+                e = self.energy()
+                mag_hist.append(m)
+                e_hist.append(e)
+                if tipping is None and prev_m < 0 and m >= 0:
+                    tipping = r
+                if consensus is None and abs(m) > 0.8:
+                    consensus = r
+                prev_m = m
+
+        return {
+            "magnetisation": mag_hist,
+            "energy": e_hist,
+            "final_spins": self.spins.copy(),
+            "final_magnetisation": mag_hist[-1] if mag_hist else 0.0,
+            "tipping_round": tipping,
+            "consensus_round": consensus,
+            "adoption_fraction": float(np.mean(self.spins > 0)),
+        }
+
+
+def ising_tier_parameters(tier: int) -> dict[str, float]:
+    """
+    Return India-calibrated Ising parameters for each consumer tier.
+
+    Tier 1 (Metro): high temperature (individualistic), low coupling
+    Tier 4 (Rural): low temperature (herd), high coupling (conformism)
+    """
+    params = {
+        1: {"J": 0.35, "T": 1.40, "note": "Metro individualism; weak peer pressure"},
+        2: {"J": 0.52, "T": 1.10, "note": "Urban middle; moderate social influence"},
+        3: {"J": 0.68, "T": 0.80, "note": "Semi-urban; strong community conformism"},
+        4: {"J": 0.82, "T": 0.55, "note": "Rural; near-unanimous herd behaviour"},
+    }
+    return params.get(tier, params[3])
+
+
+# ---------------------------------------------------------------------------
+# 9. CULTURAL TRANSMISSION  (Boyd & Richerson 1985)
+# ---------------------------------------------------------------------------
+# Three modes of belief transmission between agents:
+#   1. Conformist bias   — copy the majority
+#   2. Prestige bias     — copy high-status/successful individuals
+#   3. Content bias      — copy beliefs that match existing priors
+# ---------------------------------------------------------------------------
+
+def cultural_transmission_weight(
+    agent_stance: float,
+    model_stance: float,
+    model_prestige: float,
+    population_majority_stance: float,
+    conformism_strength: float = 0.4,
+    prestige_strength: float = 0.3,
+    content_strength: float = 0.3,
+) -> float:
+    """
+    Compute net transmission weight from model → agent.
+    Returns probability that agent updates toward model's belief.
+
+    India defaults: conformism > prestige > content (caste/peer society).
+    """
+    # Conformist: how close is model to majority?
+    conformist_signal = 1.0 - abs(model_stance - population_majority_stance) / 2.0
+
+    # Prestige: direct prestige score (0-1)
+    prestige_signal = model_prestige
+
+    # Content: similarity of beliefs (content bias = resistance to change)
+    content_signal = 1.0 - abs(agent_stance - model_stance) / 2.0
+
+    weight = (
+        conformism_strength * conformist_signal +
+        prestige_strength   * prestige_signal   +
+        content_strength    * content_signal
+    )
+    return float(np.clip(weight, 0.0, 1.0))
+
+
+def cultural_transmission_step(
+    stances: np.ndarray,
+    prestige: np.ndarray,
+    rng: np.random.Generator,
+    n_encounters: int = 20,
+    conformism_strength: float = 0.4,
+    prestige_strength: float = 0.3,
+    content_strength: float = 0.3,
+    learning_rate: float = 0.15,
+) -> np.ndarray:
+    """
+    One round of cultural transmission across the population.
+
+    Args:
+        stances:    Current stance vector in [-1, 1]. Shape (N,).
+        prestige:   Prestige score per agent in [0, 1]. Shape (N,).
+        rng:        NumPy Generator.
+        n_encounters: Random pairwise encounters per step.
+        learning_rate: How much the learner moves toward the model.
+
+    Returns:
+        Updated stances.
+    """
+    N = len(stances)
+    new_stances = stances.copy()
+    majority_stance = float(np.mean(stances))
+
+    learners = rng.integers(0, N, size=n_encounters)
+    models   = rng.integers(0, N, size=n_encounters)
+
+    for li, mi in zip(learners, models):
+        if li == mi:
+            continue
+        w = cultural_transmission_weight(
+            agent_stance              = stances[li],
+            model_stance              = stances[mi],
+            model_prestige            = prestige[mi],
+            population_majority_stance= majority_stance,
+            conformism_strength       = conformism_strength,
+            prestige_strength         = prestige_strength,
+            content_strength          = content_strength,
+        )
+        # Learner moves toward model's stance proportional to weight
+        new_stances[li] += learning_rate * w * (stances[mi] - stances[li])
+
+    return np.clip(new_stances, -1.0, 1.0)
+
+
 __all__ = [
     "belief_ode_rhs",
     "rk4_step",
@@ -360,4 +729,12 @@ __all__ = [
     "refractory_period",
     "order_parameter",
     "susceptibility",
+    # New: statistical mechanics
+    "fokker_planck_step",
+    "fokker_planck_simulate",
+    "india_opinion_drift",
+    "IsingOpinionModel",
+    "ising_tier_parameters",
+    "cultural_transmission_weight",
+    "cultural_transmission_step",
 ]

@@ -2,6 +2,11 @@ fastapi>=0.115
 uvicorn[standard]>=0.30
 numpy>=1.26
 pydantic>=2.7
+eval_type_backport>=0.2    # Python 3.9 compat for pydantic v2 union syntax
+httpx>=0.27
+
+# Anthropic SDK — primary LLM backbone (Claude Opus 4.7)
+anthropic>=0.40
 
 # Optional: PDF corpus ingestion. Without pypdf, PDF ingestion fails with a clear message.
 pypdf>=4.0

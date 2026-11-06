@@ -1,4 +1,4 @@
-"""FastAPI surface for Imprint Bharat."""
+"""FastAPI surface for Imprint Simulation Engine."""
 from __future__ import annotations
 
 import threading
@@ -11,9 +11,11 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from typing import Optional
 from pydantic import BaseModel, Field
 
 from . import atlas, calibration, causal, content, engine, forecast, ingest, llm, perception, personas, reasoning, store
+from . import query_interpreter, emergence
 
 ROOT = Path(__file__).resolve().parent.parent
 STATIC = ROOT / "static"
@@ -153,6 +155,22 @@ class ScenarioRequest(BaseModel):
     focus_state: str | None = None
 
 
+class QueryRequest(BaseModel):
+    """Universal simulation query — accepts any natural language question or hypothesis."""
+    query: str = Field(
+        min_length=10,
+        max_length=800,
+        description="Any natural language query. Examples: "
+        "'How would US senators vote on UBI?', "
+        "'Will a 4-day work week reduce productivity?', "
+        "'How does demonetization affect rural India?'",
+    )
+    seed: int = Field(default=42, ge=0, le=10_000_000)
+    n_agents: Optional[int] = Field(default=None, ge=40, le=1600, description="Override agent count (default: auto from spec)")
+    deep_reason: bool = Field(default=True, description="Run full deliberation + Claude analysis")
+    all_scenarios: bool = Field(default=False, description="Run all 5 scenarios (slower but richer)")
+
+
 @app.get("/")
 def index():
     target = STATIC / "index.html"
@@ -171,17 +189,29 @@ def studio():
 
 @app.get("/api/health")
 def health():
+    llm_st = llm.status()
     return {
         "ok": True,
-        "service": "imprint-bharat",
-        "version": "0.1.0",
-        "simulation_engine": "Imprint Reasoning Core v2",
+        "service": "imprint-simulation-engine",
+        "version": "2.0.0",
+        "simulation_engine": "Imprint Universal Reasoning Core v2",
+        "capabilities": {
+            "universal_query": True,
+            "india_market": True,
+            "dynamic_domains": ["market", "politics", "social", "finance", "technology", "organizational", "historical", "science", "custom"],
+            "emergence_metrics": True,
+            "awi_tracking": True,
+            "coalition_tracking": True,
+            "concordia_gm": True,
+            "timesfm_forecast": True,
+            "claude_deliberation": llm_st.get("available") and llm_st.get("backend") == "anthropic",
+        },
         "forecast": forecast.status(),
         "topics": len(store.topics()),
         "agents_possible": 1600,
         "context": {"sources": len(atlas.sources()), "nodes": len(atlas.all_nodes())},
         "calibration": calibration.load_params(),
-        "llm": llm.status(),
+        "llm": llm_st,
         "disclaimer": "Synthetic rehearsal, not a representative survey.",
     }
 
@@ -386,7 +416,7 @@ def scenarios(req: ScenarioRequest):
 @app.post("/api/reason")
 def reason(req: ReasonRequest):
     try:
-        return reasoning.deliberate(
+        result = reasoning.deliberate(
             req.brief,
             n_agents=req.n_agents,
             rounds=req.rounds,
@@ -397,6 +427,172 @@ def reason(req: ReasonRequest):
             question=req.question,
             replicates=req.replicates,
         )
+        # Enrich with Claude analysis if available
+        return reasoning.claude_enrich(result, query=req.brief, domain="market")
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"{type(exc).__name__}: {exc}") from exc
+
+
+@app.post("/api/query")
+def universal_query(req: QueryRequest):
+    """Universal simulation endpoint — accepts any natural language query.
+
+    The engine:
+    1. Interprets the query with Claude Opus 4.7 to build a SimulationSpec
+    2. Generates an appropriate agent population (India or universal)
+    3. Runs the multi-agent simulation with the full reasoning loop
+    4. Computes Emergence World AWI metrics
+    5. Returns a Claude-enriched analysis memo
+
+    Examples:
+      POST /api/query {"query": "How will Indian farmers react to crop insurance mandate?"}
+      POST /api/query {"query": "Will a 4-day work week be adopted by Silicon Valley firms?"}
+      POST /api/query {"query": "How does social media ban affect teenage wellbeing?"}
+    """
+    import time
+    t0 = time.perf_counter()
+
+    try:
+        # --- Step 1: Interpret query → SimulationSpec ---
+        spec = query_interpreter.interpret(req.query)
+        domain = spec.get("domain", "market")
+        is_india = spec.get("is_india_context", False)
+
+        # --- Step 2: Build simulation kwargs from spec ---
+        sim_kwargs = query_interpreter.spec_to_simulate_kwargs(spec)
+        n = req.n_agents if req.n_agents else sim_kwargs.get("n_agents", 240)
+        rounds = sim_kwargs.get("rounds", 36)
+        brief = sim_kwargs.get("brief", req.query)
+
+        # --- Step 3: Run base simulation ---
+        base_result = engine.run_simulation(
+            brief,
+            n_agents=n,
+            rounds=rounds,
+            seed=req.seed,
+            scenario="base",
+            _simulation_spec=spec if not is_india else None,
+        )
+        _store_run(base_result)
+
+        # --- Step 4: Run all scenarios if requested ---
+        scenario_results = None
+        if req.all_scenarios:
+            scenario_results = []
+            spec_scenarios = spec.get("scenarios", [])[:5]
+            for sc in spec_scenarios:
+                sc_id = sc.get("id", "base")
+                try:
+                    r = engine.run_simulation(
+                        brief, n_agents=n, rounds=rounds, seed=req.seed,
+                        scenario=sc_id if sc_id in engine.SCENARIO_MODS else "base",
+                        fast=True,
+                    )
+                    scenario_results.append({
+                        "scenario": sc,
+                        "adoption": r["summary"]["adoption"],
+                        "conversion": r["summary"]["conversion"],
+                        "sentiment": r["summary"]["sentiment"],
+                        "verdict": r["summary"]["verdict"],
+                    })
+                except Exception:
+                    pass
+
+        # --- Step 5: Compute AWI emergence metrics ---
+        stances = [float(a.get("stance", 0.5)) for a in (base_result.get("agents") or [])]
+        adopted = [bool(a.get("adopted")) for a in (base_result.get("agents") or [])]
+
+        energy_sys = emergence.EnergySystem(n=len(stances), seed=req.seed)
+        coalition_tracker = emergence.CoalitionTracker()
+        em_detector = emergence.EmergenceDetector()
+
+        # Feed timeline into emergence detector
+        for i, row in enumerate(base_result.get("timeline", [])):
+            em_detector.observe(
+                round_num=i,
+                adoption_rate=float(row.get("adoption", 0)),
+                stances=stances,
+                energy_sys=energy_sys,
+            )
+
+        awi = emergence.compute_awi(
+            agents=base_result.get("agents", []),
+            adopted_mask=adopted,
+            stances=stances,
+            energy_sys=energy_sys,
+            coalition_tracker=coalition_tracker,
+            round_num=rounds,
+            total_rounds=rounds,
+            emergence_detector=em_detector,
+        )
+
+        # --- Step 6: Deep deliberation + Claude enrichment ---
+        deliberation = None
+        if req.deep_reason:
+            try:
+                deliberation = reasoning.deliberate(
+                    brief,
+                    n_agents=n,
+                    rounds=rounds,
+                    seed=req.seed,
+                    scenario="base",
+                    replicates=2,
+                )
+                deliberation = reasoning.claude_enrich(deliberation, query=req.query, domain=domain)
+
+                # Inject domain-specific hypotheses from Claude if available
+                claude_hyps = reasoning.generate_domain_hypotheses(req.query, domain, base_result)
+                if claude_hyps:
+                    deliberation["claude_hypotheses"] = claude_hyps
+            except Exception as exc:
+                deliberation = {"error": f"{type(exc).__name__}: {exc}"}
+
+        elapsed_ms = int((time.perf_counter() - t0) * 1000)
+
+        return {
+            "query": req.query,
+            "domain": domain,
+            "is_india_context": is_india,
+            "simulation_spec": {
+                "interpreter_mode": spec.get("interpreter_mode", "deterministic"),
+                "brief": brief,
+                "motion": spec.get("motion", ""),
+                "language": spec.get("language", "en"),
+                "population_context": (spec.get("population_spec") or {}).get("context", ""),
+                "segments": (spec.get("population_spec") or {}).get("segments", []),
+                "scenarios_available": spec.get("scenarios", []),
+                "hypotheses": spec.get("hypotheses", []),
+            },
+            "simulation_result": {
+                "run_id": base_result.get("run_id"),
+                "n_agents": n,
+                "rounds": rounds,
+                "summary": base_result.get("summary"),
+                "topic": base_result.get("topic"),
+                "timeline": base_result.get("timeline"),
+                "encounters": base_result.get("encounters"),
+            },
+            "emergence_metrics": {
+                "awi": awi.to_dict(),
+                "awi_status": awi.status_label(),
+                "emergence_events": em_detector.to_dict(),
+                "energy": energy_sys.to_dict(),
+            },
+            "scenario_comparison": emergence.compare_scenarios(
+                [base_result] + ([r for r in (scenario_results or [])
+                                  if isinstance(r, dict) and "summary" in r])
+            ) if scenario_results else None,
+            "scenarios": scenario_results,
+            "deliberation": deliberation,
+            "llm": llm.status(),
+            "elapsed_ms": elapsed_ms,
+            "disclaimer": (
+                "This is a synthetic simulation, not a representative survey or poll. "
+                "Confidence scores are modelled stability metrics, not sampling errors. "
+                "Use to stress-test hypotheses and decide what to validate with real data."
+            ),
+        }
+
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"{type(exc).__name__}: {exc}") from exc
 

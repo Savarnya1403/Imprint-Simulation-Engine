@@ -207,16 +207,17 @@ def _llm_status():
         return {"available": False}
 
 
-def _run_generative_layer(agents, adopted, topic, rounds, rng):
-    """Stanford memory stream + Concordia Game Master adjudication.
+def _run_generative_layer(agents, adopted, topic, rounds, rng, domain: str = "market"):
+    """Stanford memory stream + Concordia Game Master adjudication (domain-aware).
 
-    Caps LLM usage so the page stays responsive: hosted models get the full
-    generative treatment; local tiny models get a small budget (deterministic
-    templates fill the rest). Every layer has a deterministic fallback.
+    Caps LLM usage so the page stays responsive: Claude/hosted models get the full
+    generative treatment; local tiny models get a small budget. Every layer has a
+    deterministic fallback.
     """
     llm_generate = _get_llm_generate()
-    hosted = (_llm_status().get("backend") == "openai-compatible")
-    llm_budget = 4 if hosted else 1  # tiny local model: keep the page fast
+    backend = _llm_status().get("backend", "")
+    hosted = backend in ("anthropic", "openai-compatible")
+    llm_budget = 6 if hosted else 1  # Claude gets a generous budget; tiny local stays fast
     topic_label = topic.get("label", "this")
     streams = {}
     for a in agents:
@@ -231,7 +232,7 @@ def _run_generative_layer(agents, adopted, topic, rounds, rng):
         use_llm = llm_generate if llm_budget > 0 else None
         if use_llm is not None:
             llm_budget -= 1
-        out = concordia.resolve_encounter(a, b, topic, rounds, topic_label, use_llm, rng)
+        out = concordia.resolve_encounter(a, b, topic, rounds, topic_label, use_llm, rng, domain=domain)
         encounters.append(out)
         streams[a["id"]].add(f"Talked to {b.get('name')} about {topic_label}. Outcome: {out['outcome']}.", "observation", 0.7, day=rounds)
         streams[b["id"]].add(f"Talked to {a.get('name')} about {topic_label}. Outcome: {out['outcome']}.", "observation", 0.7, day=rounds)
@@ -612,19 +613,33 @@ def run_simulation(
     question: str | None = None,
     params: dict | None = None,
     fast: bool = False,
+    _simulation_spec: dict | None = None,
 ) -> dict[str, Any]:
     rng = _rng(seed)
     topic = store.pick_topic(brief)
     if price_override is not None and price_override > 0:
         topic = dict(topic)
         topic["price"] = price_override
+    # Merge topic from spec if provided (non-India domains get spec-derived topic)
+    if _simulation_spec and not _simulation_spec.get("is_india_context"):
+        spec_topic = _simulation_spec.get("topic") or {}
+        if spec_topic.get("id"):
+            topic = {**topic, **{k: v for k, v in spec_topic.items() if v}}
     mod = SCENARIO_MODS.get(scenario, SCENARIO_MODS["base"])
     price = float(topic.get("price", 0)) * mod["price"]
     n_agents = max(40, min(1600, int(n_agents)))
     rounds = max(12, min(120, int(rounds)))
     tier_mix = _tier_mix_from_req(tier_mix)
 
-    agents = personas.build_population(n_agents, seed, tier_mix, topic, focus_state)
+    # Use universal personas for non-India specs; fall back to India personas otherwise
+    if _simulation_spec and not _simulation_spec.get("is_india_context"):
+        try:
+            from .universal_personas import build_population as universal_build
+            agents = universal_build(n=n_agents, spec=_simulation_spec, seed=seed, focus_segment=focus_state)
+        except Exception:
+            agents = personas.build_population(n_agents, seed, tier_mix, topic, focus_state)
+    else:
+        agents = personas.build_population(n_agents, seed, tier_mix, topic, focus_state)
     src, dst = build_network(agents, rng)
 
     from . import atlas, perception
@@ -741,7 +756,8 @@ def run_simulation(
             rng,
         )
         focus = _make_focus_group(agents, topic, question or "Would you adopt this? Why or why not?", rng, rounds)
-        encounters = _run_generative_layer(agents, adopted, topic, rounds, rng)
+        _domain = (_simulation_spec or {}).get("domain", "market")
+        encounters = _run_generative_layer(agents, adopted, topic, rounds, rng, domain=_domain)
 
     # Summary
     summary = _summary(topic, timeline, agents, adopted, np.array([a["stance"] for a in agents]),

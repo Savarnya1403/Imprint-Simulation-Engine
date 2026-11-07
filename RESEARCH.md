@@ -1,0 +1,122 @@
+# Imprint Bharat — Research symposium & roadmap
+
+**Imprint Research** · Head of Research + 10 subordinate researchers  
+**Engine**: `imprint-core/3.1` · **Repo**: `Savarnya1403/Imprint-Simulation-Engine`  
+**Status**: scenarios fixed, calibration wired, validation battery green, uncertainty/sensitivity/model-card endpoints live, tests passing.
+
+---
+
+## 1. Premise
+
+Imprint is a synthetic consumer-rehearsal engine for India. It answers the question *"what would happen if we launched X?"* with an agent-based model of ~100–1,600 synthetic agents stratified by state, tier, occupation, income, and digital access.
+
+The contract with the user is honest:
+
+- **Real and stochastic**: same brief, different seed → different run. Same seed → bit-for-bit identical run (provenance fingerprint included).
+- **Region/tier variation**: built-in tier mix, focus state, region-shift factors per category.
+- **Complex maths backend, simple frontend**: belief ODEs integrated by RK4, per-agent nano-MLPs updated by gradient descent on a cognitive-dissonance loss, graph-Laplacian social diffusion, annealed temperature, TimesFM demand signal. The UI stays a warm, dense editorial studio.
+- **Indian public data**: Census/state population, TRAI internet penetration, NITI Aayog/RBI/HCES income and tier distributions, 19 category histories (~94 months each), 38 evidence cards, 60 public sources. All cited in the atlas and model card.
+- **No fake multipliers**: never claim 10,000×/500×/70× gains. Every number ships with uncertainty and a falsifier.
+
+---
+
+## 2. The ten researchers (who we convened)
+
+Each researcher owns a domain and can be outvoted by evidence. Their names are roles, not people.
+
+| # | Role | What they argue |
+|---|------|-----------------|
+| 1 | **Simulation lead** | The ABM must be deterministic-per-seed and the calibration knobs must actually move conversion. |
+| 2 | **Cognitive modeller** | Prospect theory (λ = 2.25), β–δ present bias, Granovetter thresholds, Slovic trust repair, dual-process appraisal — each must satisfy an analytic identity. |
+| 3 | **Forecaster** | TimesFM 3.0 as an exogenous demand trend, backtested rolling-origin against drift; the level forecast does not beat naive, so it is used for trend only and labelled as such. |
+| 4 | **Causal analyst** | Counterfactuals, conformal intervals, in-time placebos, synthetic control — decision support, never identification without a real decision date and comparison group. |
+| 5 | **Validation lead** | Known-answer battery (12/12), held-out calibration on demand, no in-sample-only claims. |
+| 6 | **Uncertainty analyst** | Seed × parameter Latin-hypercube ensemble; percentile intervals, P(SCALE), P(conversion ≥ target), epistemic vs aleatoric variance split. |
+| 7 | **Sensitivity analyst** | Jansen total-order + linear response surface over the six behavioural parameters; ST < 0.05 = not worth tuning. |
+| 8 | **Ethics & limits** | No real individuals, no credit/insurance/employment decisions, synthetic names, region as structural context never essentialist. |
+| 9 | **Product / UX** | Keep the warm studio design (`landing.css` + `studio.css`, no `theme.css` regression); Research tab is restrained and additive. |
+| 10 | **Ops / reproducibility** | 16-char SHA-256 fingerprint on every run, bounded run bundles (max 24), markdown/json/csv export, REST-API git flow because `git push` is server-blocked. |
+
+---
+
+## 3. Audit findings (what we found broken)
+
+| # | Finding | Severity | Fix |
+|---|---------|----------|-----|
+| 1 | Every non-base scenario returned HTTP 500 `NameError: name 'scenario' is not defined`. | Critical | `_run_math_simulation` now takes `scenario`; event computation moved before trust. All 7 scenarios return 200. |
+| 2 | Calibration largely inert: `price_sensitivity`, `social_mult`, `trust_weight`, `atlas_strength`, `precedent` were accepted but unused; only `ceiling_mult`/`hazard_mult` had effect. | Critical | All six wired: `price_sensitivity` steepens affordability and gates the addressable mask; `social_mult` scales the social field; `trust_weight` scales trust; `atlas_strength` scales structural shifts; precedent adds bounded shift + recovery window. |
+| 3 | Non-deterministic per seed: MLP weights drew from global `random`, belief ODE noise from global `np.random`. Same seed ≠ same run. | High | `run_simulation` now seeds Python `random` and NumPy global streams; `provenance.fingerprint` proves reproducibility. Verified by test. |
+| 4 | Validation was in-sample only: no falsifiable check that the maths behaves, no backtest, no held-out calibration. | High | Added `validation.py` (known-answer battery, rolling-origin MASE backtest vs drift, held-out calibration on demand) and `uncertainty.py` / `sensitivity.py`. |
+| 5 | Cognitive primitives existed but were not exposed or wired into decisions. | Medium | 8 new primitives (`dual_process_blend`, `social_threshold`/`granovetter_gate`, `present_bias_weight`, `trust_repair_step`, `construal_weights`, …) wired into the engine; stats reported per run. |
+| 6 | No model card, no export, no run retrieval. | Medium | `modelcard.py`, six new FastAPI endpoints (`/api/model-card`, `/api/validation`, `/api/robustness`, `/api/sensitivity`, `/api/runs/{id}`, `/api/runs/{id}/export`), Research/Validation UI tab. |
+
+Benchmarks after wiring (n=300, rounds=36, seeds 42/43/44): EV scooter conv 0.35–0.53 TEST; quick commerce 0.43–0.46 TEST; AI tutor 0.28–0.50 HOLD/TEST; rooftop solar 0.36–0.50 TEST; rural credit 0.29–0.55 TEST/HOLD. Parameter effects: default conv 0.167; `social_mult=1.5` → 0.444; `trust_weight=1.5` → 0.278; `price_sensitivity` direction noisy across seeds (0.413 / 0.384 / 0.428 for ps 0.6/1.0/1.6 at n=400) — documented as an open question below.
+
+---
+
+## 4. Open disagreements (recorded, not resolved by fiat)
+
+1. **TimesFM licence** — weights are non-commercial (google/timesfm-3.0-pytorch). The module falls back to a labelled damped-trend baseline. Researcher 9 wants the fallback labelled everywhere it surfaces; researcher 3 wants a commercial licence check before any paid deployment. *Acceptance: model card lists the licence and the fallback path; backend `status()` reports backend.*
+2. **β–δ power** — present bias only bites above ₹25,000 upfront and is cube-root tempered so it stays a nudge. Researcher 2 wants stronger discounting for durables; researcher 5 worries it overwhelms the price knob. *Acceptance: `future_gate` is a constant in code; tune via calibration budget if evidence warrants.*
+3. **Granovetter width / trust recovery half-life** — both are precedent-derived (recovery_days) or fixed (width 0.16). Researcher 6 wants them in the sensitivity box; researcher 7 notes they're already structural. *Acceptance: width fixed at 0.16, recovery from precedent; both reported in the cognitive block.*
+4. **Price sensitivity direction** — observed noisy across seeds (0.413/0.384/0.428). Hypothesis: price enters both the addressable mask (gate) and affordability (surface), so at fixed ceiling the mask absorbs part of the effect. *Acceptance: logged as a known behaviour; held-out calibration can settle it; not claimed as a finding.*
+5. **Sobol estimator at small N** — first-order Saltelli estimates are noisy below N≈64, so we report Jansen total-order + a stable linear response surface instead, explicitly labelled. *Acceptance: documented in `sensitivity.py` note and UI.*
+
+---
+
+## 5. Roadmap (priority order) with acceptance criteria
+
+| Priority | Item | Acceptance criteria |
+|----------|------|---------------------|
+| 1 | Fix broken scenarios | All 7 scenarios return HTTP 200; `scenario` appears in `provenance.params` and summary. |
+| 2 | Wire ignored calibration params | `price_sensitivity`, `social_mult`, `trust_weight`, `atlas_strength`, `precedent` each move conversion; monotonicity test for social passes. |
+| 3 | Validation battery | `GET /api/validation` returns 12/12 known-answer passes; backtest reports median MASE, vs-drift ratio, trend skill, and an honest verdict; `deep=1` runs held-out calibration. |
+| 4 | Uncertainty & sensitivity | `POST /api/robustness` returns percentile intervals, P(SCALE), epistemic share; `POST /api/sensitivity` returns total-order indices with `inert` list; estimator recovers (0.9/0.1/0.0) on y=3x₀+x₁. |
+| 5 | Model card & export | `GET /api/model-card` returns intended use, out-of-scope, limitations, systems status, validation results; `GET /api/runs/{id}/export` serves md/json/csv with content-disposition. |
+| 6 | Research UI tab | Restrained Research/Validation view added to studio; no `theme.css`; renders battery, backtest table, ensemble fan, sensitivity bars, model card, export links. Zero new console errors in Playwright. |
+| 7 | Tests & docs | `tests/` with known-answer identities, determinism, scenario coverage, param monotonicity, ensemble bounds, API contract; 33 tests pass; `pytest` added to dev requirements; `RESEARCH.md` written. |
+| 8 | Ship & sync | Commit via REST API (blobs → tree → commit → PATCH ref); `git fetch origin && git reset --hard origin/main`. |
+
+**Done**: items 1–7 (tests pass, endpoints smoke-tested, UI verified with Playwright). **Remaining**: item 8.
+
+---
+
+## 6. How to validate the build
+
+```bash
+# server
+cd imprint-bharat && pkill -9 -f "uvicorn app.main"; sleep 2
+nohup ../.venv/bin/python -m uvicorn app.main:app --port 7777 > /tmp/imprint-server.log 2>&1 &
+sleep 14
+
+# health
+curl -s http://127.0.0.1:7777/api/health
+
+# research endpoints
+curl -s http://127.0.0.1:7777/api/model-card \| python3 -m json.tool \| head -40
+curl -s "http://127.0.0.1:7777/api/validation" \| python3 -m json.tool | \
+  python3 -c "import json,sys;d=json.load(sys.stdin);print(d['summary'])"
+
+# robustness (15–25 s)
+curl -s -X POST http://127.0.0.1:7777/api/robustness -H 'Content-Type: application/json' \
+  -d '{"brief":"A ₹1.2 lakh electric scooter for tier-2 India","n_agents":150,"rounds":20,"seed":42}'
+
+# sensitivity (20 s)
+curl -s -X POST http://127.0.0.1:7777/api/sensitivity -H 'Content-Type: application/json' \
+  -d '{"brief":"A ₹1.2 lakh electric scooter for tier-2 India","n_agents":140,"rounds":18,"seed":42}'
+
+# run + export
+RUN_ID=$(curl -s -X POST .../api/simulate ... \| python3 -c "import json,sys;print(json.load(sys.stdin)['run_id'])")
+curl -s http://127.0.0.1:7777/api/runs/$RUN_ID/export?format=md
+
+# tests
+../.venv/bin/python -m pytest tests -q   # 33 passed
+```
+
+**UI**: open `http://127.0.0.1:7777/studio`, click **Validation**. The view shows the 12/12 known-answer battery, the backtest table (MASE vs TimesFM vs drift), the ensemble fan with P(SCALE), sensitivity bars, the model card, and run export.
+
+---
+
+## 7. What this is not
+
+Not a representative survey, not a causal estimate, not a substitute for a pilot. Anchors are analyst ranges from public sources. The social graph is synthetic homophily. WhatsApp — India's largest social channel — is under-observed in public data. Outputs must travel with their uncertainty interval and the falsifier that would overturn them.

@@ -28,6 +28,7 @@ const S = {
   focusRounds: [], drawerAgent: null, chats: {},
   map: null,
   atlas: null, precedents: null, causal: null, calibration: null,
+  validation: null, modelcard: null, robust: null, sens: null, validationLoading: false,
   atlasQuery: '', atlasDimension: '', atlasTimer: null,
   causalLoaded: false, calibrationLoaded: false,
   reasoning: null, reasoningLoaded: false, reasoningBusy: false, reasoningKey: '', agentField: { raf: null, agents: [] },
@@ -1415,6 +1416,7 @@ async function runSimulation() {
     S.agentLimit = 36;
     S.chats = {};
     S.forecast = null; S.scenarios = null;
+    S.robust = null; S.sens = null;
     S.reasoning = null; S.reasoningLoaded = false; S.reasoningKey = '';
     townState.initialised = false;
     $('#crumbTopic').textContent = d.topic.label;
@@ -1456,6 +1458,7 @@ function renderAll() {
   renderResearch();
   renderReport();
   renderEncounters();
+  if (S.validation) renderValidation();
 }
 
 /* ---------- playback ---------- */
@@ -1941,9 +1944,239 @@ function renderResearch() {
   if (note) note.textContent = res.ok ? 'Research is cached by brief text. Re-running the same phrase is instant.' : 'Network or no match; the simulation still runs on generic priors.';
 }
 
+/* ---------- validation & research audit ---------- */
+function valRow(cells, head = false, cls = '') {
+  return `<div class="val-row ${head ? 'val-row--head' : ''} ${cls}">${cells.map((c, i) =>
+    `<span${i ? ' class="num"' : ''}>${c}</span>`).join('')}</div>`;
+}
+
+function renderValidation() {
+  const v = S.validation;
+  const mc = S.modelcard;
+  if (!v) return;
+  const sum = v.summary || {};
+  const bt = v.backtest || {};
+  const ka = v.known_answer || {};
+  const r = S.robust;
+
+  if (mc?.identity) {
+    $('#valEngine').textContent = `${mc.identity.engine} · v${mc.identity.version}`;
+    $('#valCardMeta').textContent = mc.identity.generated_at?.slice(0, 10) || '';
+  }
+
+  $('#valMetrics').innerHTML = [
+    metric('Known-answer', `${sum.known_answer_passed || '—'}`, 'analytic identities', sum.known_answer_score === 1 ? 'metric--green' : '', sum.known_answer_score || 0),
+    metric('Backtest MASE', bt.median_vs_drift_timesfm != null ? Number(bt.median_vs_drift_timesfm).toFixed(2) : '—', 'vs drift · below 1 adds value', (bt.median_vs_drift_timesfm != null && bt.median_vs_drift_timesfm < 1) ? 'metric--green' : ''),
+    metric('Trend skill', bt.median_trend_skill != null ? signed(bt.median_trend_skill, 2) : '—', 'beyond an always-up rule'),
+    metric('Ensemble runs', r ? String(r.runs) : '—', r ? `${r.seeds} seeds × ${r.param_draws} draws` : 'not run yet'),
+    metric('Epistemic share', r ? pct(r.variance.epistemic_share, 0) : '—', 'spread from assumptions'),
+    metric('Model card', mc ? `${(mc.limitations || []).length} limits` : '—', mc ? `${mc.population.counts.topics} categories · ${mc.population.counts.evidence} evidence cards` : ''),
+  ].join('');
+
+  $('#valBatteryMeta').textContent = `${ka.passed || 0}/${ka.total || 0} passed`;
+  $('#valBattery').innerHTML = (ka.checks || []).map(c =>
+    reasonCheck(c.label, c.ok, c.detail)
+  ).join('') || '<p class="small-copy">Battery unavailable.</p>';
+
+  $('#valBacktestMeta').textContent = bt.n_topics ? `${bt.n_topics} categories · horizon ${bt.horizon}m` : '';
+  const rows = (bt.topics || []).slice(0, 9);
+  $('#valBacktest').innerHTML = rows.length ? (
+    valRow(['Category', 'MASE', 'TFM', 'vs drift', 'skill'], true) +
+    rows.map(t => valRow([
+      `<b>${esc(t.label)}</b>`,
+      t.mase != null ? Number(t.mase).toFixed(2) : '—',
+      t.mase_timesfm != null ? Number(t.mase_timesfm).toFixed(2) : '—',
+      t.vs_drift_timesfm != null ? `<span style="color:${t.vs_drift_timesfm < 1 ? 'var(--green)' : 'var(--amber)'}">${Number(t.vs_drift_timesfm).toFixed(2)}</span>` : '—',
+      t.trend_skill != null ? signed(t.trend_skill, 2) : '—',
+    ])).join('')
+  ) : '<p class="small-copy">No category history was long enough to backtest.</p>';
+  $('#valBacktestNote').textContent = bt.note || '';
+  if (bt.verdict) $('#valBacktestMeta').textContent += ` · ${bt.verdict.split(';')[0]}`;
+
+  renderEnsemble();
+  renderSensitivity();
+  renderModelCard();
+  renderExport();
+}
+
+function renderEnsemble() {
+  const r = S.robust;
+  const box = $('#valEnsemble');
+  if (!r) {
+    box.innerHTML = '<p class="small-copy">Run the ensemble to see the interval, the decision probabilities and whether the spread comes from assumptions or from seed noise.</p>';
+    return;
+  }
+  const c = r.conversion || {};
+  const d = r.decision || {};
+  const span = (c.p90 != null && c.p10 != null) ? Math.max(0.01, c.p90 - c.p10) : 0;
+  const left = clamp((c.p10 || 0) * 100, 0, 100);
+  const width = clamp(span * 100, 1, 100);
+  const mid = clamp((c.p50 || 0) * 100, 0, 100);
+  const target = clamp((d.target_conversion || 0) * 100, 0, 100);
+  $('#valEnsembleMeta').textContent = `${r.runs} runs · seed ${r.rows?.[0]?.seed ?? ''}`;
+  box.innerHTML = `
+    <div class="val-fan">
+      <div class="val-fan__head"><span>p10 ${pct(c.p10)}</span><span class="val-fan__mid">p50 ${pct(c.p50)}</span><span>p90 ${pct(c.p90)}</span></div>
+      <div class="val-fan__track">
+        <span class="val-fan__range" style="left:${left}%;width:${width}%"></span>
+        <span class="val-fan__median" style="left:${mid}%"></span>
+        <span class="val-fan__target" style="left:${target}%"></span>
+      </div>
+      <div class="val-fan__foot"><span>0%</span><span>target ${pct(d.target_conversion, 0)}</span><span>100%</span></div>
+    </div>
+    ${valRow(['Decision', 'Probability'], true)}
+    ${valRow(['Conversion ≥ target', pct(d.p_at_or_above_target, 0)])}
+    ${valRow(['Verdict SCALE', pct(d.p_scale, 0)])}
+    ${valRow(['SCALE or TEST', pct(d.p_scale_or_test, 0)])}
+    ${valRow(['Robust call', r.robust ? '<span style="color:var(--green)">yes</span>' : '<span style="color:var(--amber)">no</span>'])}
+    <div class="val-split">
+      <div><span class="panel__eyebrow">Epistemic</span><b>${pct(r.variance.epistemic_share, 0)}</b><small>assumption risk</small></div>
+      <div><span class="panel__eyebrow">Aleatoric</span><b>${pct(1 - r.variance.epistemic_share, 0)}</b><small>seed noise</small></div>
+    </div>
+    <div class="val-corr">${(r.param_corr || []).map(p =>
+      `<span class="chip ${Math.abs(p.corr) > .5 ? 'chip--warn' : 'chip--muted'}">${esc(p.param.replace(/_/g, ' '))} ${signed(p.corr, 2)}</span>`).join('')}</div>`;
+  $('#valEnsembleNote').textContent = r.note || '';
+}
+
+function renderSensitivity() {
+  const se = S.sens;
+  const box = $('#valSensitivity');
+  const note = $('#valSensNote');
+  if (!se) {
+    box.innerHTML = '<p class="small-copy">A total-order variance decomposition tells you which parameters are worth tuning and which are theatre.</p>';
+    note.textContent = '';
+    return;
+  }
+  if (!se.available) {
+    box.innerHTML = `<p class="small-copy">${esc(se.note || 'No variance in the output at this setting.')}</p>`;
+    note.textContent = '';
+    return;
+  }
+  box.innerHTML = `<div class="param-lab">${se.indices.map(i => `
+    <div class="param-row" title="ST ${i.st} · linear ${i.linear_share} · interaction ${i.interaction}">
+      <span class="name">${esc(i.param.replace(/_/g, ' '))}</span>
+      <div class="track"><div class="fill" style="width:${clamp(i.st, 0, 1) * 100}%"></div></div>
+      <span class="val">${Number(i.st).toFixed(2)}</span>
+    </div>`).join('')}</div>
+    <p class="small-copy">Linear fit R² ${se.linear_fit_r2} · ${se.evaluations} simulations · most influential: <b>${esc((se.most_influential || '').replace(/_/g, ' '))}</b>${se.inert?.length ? ` · inert: ${se.inert.map(x => esc(x.replace(/_/g, ' '))).join(', ')}` : ''}</p>`;
+  note.textContent = se.note || '';
+  $('#valSensitivity').querySelectorAll('.param-row').forEach((row, idx) => {
+    const i = se.indices[idx];
+    row.querySelector('.track').title = `ST ${i.st} · linear share ${i.linear_share} · interaction ${i.interaction}`;
+  });
+}
+
+function renderModelCard() {
+  const mc = S.modelcard;
+  if (!mc) return;
+  const list = (items, cls = '') => `<ul class="reason-limits ${cls}">${(items || []).map(x => `<li>${esc(x)}</li>`).join('')}</ul>`;
+  $('#valCard').innerHTML = `
+    <span class="panel__eyebrow">Intended use</span>${list(mc.intended_use)}
+    <span class="panel__eyebrow">Out of scope</span>${list(mc.out_of_scope)}
+    <span class="panel__eyebrow">Limitations</span>${list(mc.limitations)}
+    <div class="val-corr">${['timesfm', 'llm'].map(k => {
+      const s = mc.systems?.[k] || {};
+      const ok = k === 'timesfm' ? s.loaded : s.available;
+      return `<span class="chip ${ok ? 'chip--green' : 'chip--warn'}">${k}: ${ok ? (k === 'timesfm' ? 'loaded' : (s.backend || 'available')) : 'fallback'}</span>`;
+    }).join('')}</div>`;
+}
+
+function renderExport() {
+  const r = S.run;
+  const box = $('#valExport');
+  if (!r) {
+    box.innerHTML = '<p class="small-copy">Run a simulation to make it citable. Every run stores its provenance, timeline and parameters for export.</p>';
+    $('#valProvenance').textContent = '';
+    return;
+  }
+  const p = r.provenance || {};
+  $('#valProvenance').textContent = p.fingerprint ? `fingerprint ${p.fingerprint}` : '';
+  box.innerHTML = `
+    <div class="val-export">
+      <div><b>${esc(r.topic?.label || 'Run')}</b><br><span>${esc(r.run_id)} · seed ${r.seed} · ${r.population} agents · ${r.rounds} rounds</span></div>
+      <div class="val-export__actions">
+        <a class="btn btn--ghost btn--sm" href="/api/runs/${encodeURIComponent(r.run_id)}/export?format=md" download>Markdown memo</a>
+        <a class="btn btn--ghost btn--sm" href="/api/runs/${encodeURIComponent(r.run_id)}/export?format=json" download>JSON bundle</a>
+        <a class="btn btn--ghost btn--sm" href="/api/runs/${encodeURIComponent(r.run_id)}/export?format=csv" download>Timeline CSV</a>
+        <a class="btn btn--ghost btn--sm" href="/api/runs/${encodeURIComponent(r.run_id)}" target="_blank" rel="noopener">Open bundle</a>
+      </div>
+    </div>
+    <p class="causal-note">${esc(p.replay || 'Same brief + seed + parameters + engine version reproduces the run.')}</p>`;
+}
+
+async function loadValidation(force = false) {
+  if (S.validationLoading) return;
+  S.validationLoading = true;
+  try {
+    const [v, mc] = await Promise.all([
+      fetch('/api/validation').then(r => r.json()),
+      fetch('/api/model-card').then(r => r.json()),
+    ]);
+    S.validation = v;
+    S.modelcard = mc;
+    renderValidation();
+  } catch (err) {
+    $('#valBattery').innerHTML = `<p class="small-copy">Validation unavailable: ${esc(err.message)}</p>`;
+  } finally {
+    S.validationLoading = false;
+  }
+}
+
+async function runEnsemble() {
+  const btn = $('#valEnsembleRun');
+  if (!S.run) { toast('Run a simulation first.'); return; }
+  btn.disabled = true; const label = btn.innerHTML;
+  btn.textContent = 'Running 25 simulations…';
+  $('#valEnsembleMeta').textContent = 'working';
+  try {
+    const res = await fetch('/api/robustness', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        brief: S.run.brief, n_agents: 150, rounds: 20, seed: S.run.seed,
+        scenario: S.run.scenario || 'base', focus_state: S.run.focus_state || null,
+        tier_mix: S.run.tier_mix || null,
+      }),
+    });
+    const d = await res.json();
+    if (!res.ok) throw new Error(d.detail || 'Ensemble failed');
+    S.robust = d; renderValidation();
+    toast(`Ensemble · conv ${pct(d.conversion.p10, 0)}–${pct(d.conversion.p90, 0)} · P(SCALE) ${pct(d.decision.p_scale, 0)}`);
+  } catch (err) {
+    toast(err.message);
+    $('#valEnsembleMeta').textContent = 'failed';
+  } finally {
+    btn.disabled = false; btn.innerHTML = label; injectIcons(btn);
+  }
+}
+
+async function runSensitivity() {
+  const btn = $('#valSensRun');
+  if (!S.run) { toast('Run a simulation first.'); return; }
+  btn.disabled = true; const label = btn.innerHTML;
+  btn.textContent = 'Scanning…';
+  try {
+    const res = await fetch('/api/sensitivity', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        brief: S.run.brief, n_agents: 140, rounds: 18, seed: S.run.seed,
+        scenario: S.run.scenario || 'base', focus_state: S.run.focus_state || null,
+        tier_mix: S.run.tier_mix || null, metric: 'conversion', n_base: 6,
+      }),
+    });
+    const d = await res.json();
+    if (!res.ok) throw new Error(d.detail || 'Sensitivity failed');
+    S.sens = d; renderSensitivity();
+    toast(`Sensitivity · ${d.most_influential?.replace(/_/g, ' ')} dominates`);
+  } catch (err) {
+    toast(err.message);
+  } finally {
+    btn.disabled = false; btn.innerHTML = label; injectIcons(btn);
+  }
+}
+
 /* ---------- command palette ---------- */
 const CMD_ITEMS = [
-  ...['world','social','debate','focus','cognition','forecast','evidence','research','atlas','precedents','causal','calibration','reasoning','report'].map(t => ({ label: `Go to ${t}`, kind: 'tab', value: t, hint: 'tab' })),
+  ...['world','social','debate','focus','cognition','forecast','evidence','research','atlas','precedents','causal','calibration','validation','reasoning','report'].map(t => ({ label: `Go to ${t}`, kind: 'tab', value: t, hint: 'tab' })),
   { label: 'Run simulation', kind: 'action', value: 'run', hint: 'Enter' },
   { label: 'Play / pause timeline', kind: 'action', value: 'play', hint: 'Space' },
   { label: 'Deep reason', kind: 'action', value: 'reason', hint: 'R' },
@@ -2174,6 +2407,7 @@ function switchTab(name) {
   if (name === 'precedents') loadPrecedents();
   if (name === 'causal') loadCausal();
   if (name === 'calibration') loadCalibration();
+  if (name === 'validation') loadValidation();
   if (name === 'reasoning') loadReasoning();
   if (name === 'world' && S.run) { initTownAgents(); if (townState.raf) cancelAnimationFrame(townState.raf); townState.raf = requestAnimationFrame(drawTown); }
   if (name !== 'world') { if (townState.raf) { cancelAnimationFrame(townState.raf); townState.raf = null; } if (S.agentField && S.agentField.raf) { cancelAnimationFrame(S.agentField.raf); S.agentField.raf = null; } }
@@ -2275,6 +2509,8 @@ async function boot() {
   $('#causalRun').addEventListener('click', runCausal);
   $('#causalTopic').addEventListener('change', runCausal);
   $('#calibrationRun').addEventListener('click', runCalibration);
+  $('#valEnsembleRun').addEventListener('click', runEnsemble);
+  $('#valSensRun').addEventListener('click', runSensitivity);
   $('#reasonRun').addEventListener('click', () => runReasoning());
   $('#compareBtn')?.addEventListener('click', openCompare);
   $('#reasonBtn')?.addEventListener('click', runReasoningBtn);

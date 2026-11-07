@@ -88,7 +88,8 @@ def _affordability(price: float, hh_income: np.ndarray) -> np.ndarray:
     return 1 / (1 + np.exp(-(hh_income * share - emi) / scale))
 
 
-def _addressable_mask(agents: list[dict], topic: dict, rng: random.Random, ceiling: float) -> np.ndarray:
+def _addressable_mask(agents: list[dict], topic: dict, rng: random.Random, ceiling: float,
+                      price_sens: float = 1.0) -> np.ndarray:
     n = len(agents)
     k = max(1, min(n, int(round(ceiling * n))))
     price = float(topic.get("price", 0))
@@ -104,6 +105,10 @@ def _addressable_mask(agents: list[dict], topic: dict, rng: random.Random, ceili
         score = .15 + .55 * hh_norm + .30 * digital + .10 * tier_norm
     else:
         score = .70 * hh_norm + .18 * digital + .12 * tier_norm
+    # Price sensitivity gates the market: more price-sensitive populations
+    # shrink the realistic in-market pool even at the same sticker price.
+    aff = _affordability(price, hh) ** max(.35, float(price_sens))
+    score = score * (0.55 + 0.45 * aff)
     score = np.clip(score, .01, None)
     keys = np.array([rng.random() for _ in range(n)])
     rank = np.argsort(-(np.log(keys) / score))
@@ -273,6 +278,7 @@ def _run_math_simulation(
     precedent: dict[str, Any],
     price: float,
     mod: dict[str, float],
+    scenario: str,
     ceiling_mult: float,
     price_sens: float,
     social_mult: float,
@@ -287,7 +293,7 @@ def _run_math_simulation(
 
     N = n
     ceiling = float(np.clip(ADOPTION_CEILING.get(topic_id, .12) * ceiling_mult, .01, .95))
-    addressable = _addressable_mask(agents, topic, rng, ceiling)
+    addressable = _addressable_mask(agents, topic, rng, ceiling, price_sens=price_sens)
     n_addressable = max(1, int(addressable.sum()))
 
     traits = {k: np.array([a["traits"][k] for a in agents]) for k in agents[0]["traits"]}
@@ -300,6 +306,31 @@ def _run_math_simulation(
     tier_shift = np.array([topic.get("tier_shift", {}).get(int(t), 0) for t in tier_arr])
     region_shift = np.array([topic.get("region_shift", {}).get(a["region"], 0) for a in agents])
     occ_shift = np.array([topic.get("occupation_shift", {}).get(a["occupation_id"], 0) for a in agents])
+
+    # --- Cognitive parameter vectors (see cognition.py) -----------------
+    # Need for cognition routes each agent between deliberate appraisal
+    # (System 2) and the affective/social shortcut (System 1).
+    susceptibility = np.array([cognition.susceptibility_to_influence(a["traits"]) for a in agents])
+    need_for_cognition = np.array([cognition.need_for_cognition(a["traits"]) for a in agents])
+    deliberate_w = np.array([cognition.dual_process_blend(float(v)) for v in need_for_cognition])
+    # Granovetter thresholds: the peer fraction that must adopt before an
+    # agent moves. Heterogeneous thresholds create cascades in some
+    # neighbourhoods and none in others.
+    thresholds = np.array([
+        cognition.social_threshold(float(a["traits"]["conformity"]),
+                                   float(a["traits"]["risk"]),
+                                   float(a["traits"]["optimism"]))
+        for a in agents
+    ])
+    # β–δ present bias. Only bites on categories with a real upfront outlay.
+    patience = traits["patience"]
+    future_value = np.array([cognition.present_bias_weight(float(v)) for v in patience])
+    future_gate = 1.0 if price >= 25000 else 0.0
+
+    # --- Precedent prior (bounded, see perception.prior_for_simulation) ---
+    padj = (precedent or {}).get("adjustments") or {}
+    precedent_shift = (0.5 - float(padj.get("negative_outcome_share", 0.5))) * 0.18
+    recovery_days = float(padj.get("recovery_days", 30) or 30)
 
     # --- Belief state: 6 dimensions per agent ---
     # [affordability, relative_advantage, social_proof, trust, risk, status]
@@ -323,8 +354,6 @@ def _run_math_simulation(
     rejection_reason: list[str | None] = [None] * N
     adopt_day = np.full(N, -1, dtype=np.int32)
     exposures = np.zeros(N, dtype=np.int32)  # cumulative mere-exposure impressions
-    susceptibility = np.array([cognition.susceptibility_to_influence(a["traits"]) for a in agents])
-    need_for_cognition = np.array([cognition.need_for_cognition(a["traits"]) for a in agents])
 
     timeline = []
     posts = []
@@ -338,6 +367,7 @@ def _run_math_simulation(
     panel_ids = {a["id"] for a in panel}
 
     social_field_prev = np.zeros(N)  # initial social signal observed by agents
+    trust_gap = np.zeros(N)          # negative after a trust shock, decays slowly
 
     for day in range(1, rounds + 1):
         # --- Annealed temperature (exploration early, commitment late) ---
@@ -346,14 +376,42 @@ def _run_math_simulation(
         # --- Market trend from TimesFM ---
         market_trend = demand_signal.market_trend_signal(day, rounds)
 
+        # --- Scenario event (must be known before trust is computed) ---
+        event_mult = 1.0
+        shock_text = None
+        if day == mod.get("event_day", 0) and mod.get("event_day", 0) > 0:
+            event_mult, shock_text = _event_effect(scenario, day, topic)
+            events.append({"day": day, "type": scenario, "label": scenario,
+                           "text": shock_text, "impact": round(event_mult, 2)})
+            if event_mult < 1.0:
+                # Slovic asymmetry: trust collapses fast and recovers slowly.
+                trust_gap = np.minimum(trust_gap - 0.90 * (1.0 - event_mult), 0.0)
+
+        event_scale = event_mult if day >= mod.get("event_day", 0) else 1.0
+        if scenario == "trust_shock" and day > mod.get("event_day", 0) > 0:
+            # A one-day shock does not permanently halve the hazard: the
+            # penalty decays toward 1 over the precedent's recovery window.
+            event_scale = 1.0 - (1.0 - event_mult) * math.exp(
+                -(day - mod.get("event_day", 0)) / max(1.0, recovery_days))
+
         # --- Context features per agent (6 inputs to each nano-MLP) ---
-        afford = _affordability(price, hh_income)
-        relative = np.clip(.52 + tier_shift * 1.25 + occ_shift * 1.35 + region_shift * .85
-                           + (traits["optimism"] - .5) * .28, 0, 1)
+        # price_sensitivity steepens or flattens the affordability surface.
+        afford = np.clip(_affordability(price, hh_income) ** max(.35, price_sens), 0, 1)
+
+        # atlas_strength scales the category-prior structural shifts;
+        # the retrieved precedent nudges them by its analogue base rate.
+        relative_raw = (.52
+                        + atlas_strength * (tier_shift * 1.25 + occ_shift * 1.35 + region_shift * .85)
+                        + (traits["optimism"] - .5) * .28
+                        + precedent_shift)
+        relative = np.clip(relative_raw * (1.0 - future_gate * (1.0 - future_value) * .28), 0, 1)
+
         risk = np.clip(.42 + (1 - traits["risk"]) * .30 + bias["loss_aversion"] * .20
                        + bias["ambiguity"] * .16 - (traits["education"] - .5) * .10, 0, 1)
-        trust = np.clip(traits["trust_gov"] * .26 + traits["trust_media"] * .14
-                        + (1 - bias["loss_aversion"]) * .26 + traits["education"] * .22 + .08, 0, 1)
+        # trust_weight is a real calibration knob; trust_gap carries the shock.
+        trust_base = (traits["trust_gov"] * .26 + traits["trust_media"] * .14
+                      + (1 - bias["loss_aversion"]) * .26 + traits["education"] * .22 + .08)
+        trust = np.clip(trust_base * trust_weight + trust_gap, 0, 1)
         status = np.clip(traits["status"], 0, 1)
         social = np.clip(.55 + (traits["conformity"] - .5) * .3, 0, 1)
 
@@ -364,9 +422,15 @@ def _run_math_simulation(
                  Value(trust[i]), Value(risk[i]), Value(status[i])]
             p_raw[i] = float(mlps[i](x).data)
 
+        # --- Dual-process appraisal (Kahneman 2011) ---
+        # High need-for-cognition agents use the deliberate attribute model.
+        # Low-NFC agents fall back on the affective/social shortcut.
+        affect = np.clip(.40 * afford + .32 * status + .28 * social, 0, 1)
+        p_appraise = np.clip(deliberate_w * p_raw + (1.0 - deliberate_w) * affect, 0, 1)
+
         # --- Social field: Laplacian diffusion of adoption probabilities ---
         p_social = mathcore.laplacian_diffusion(p_raw, L, deg, dt=0.1, diffusivity=0.15)
-        p_social = p_social * (1.0 + 0.5 * market_trend)
+        p_social = p_social * (1.0 + 0.5 * market_trend) * max(.4, social_mult)
 
         # --- Backprop: cognitive dissonance (my belief vs what peers actually do) ---
         peer_adopt_rate = peer_mean(adopted.astype(float), src, dst, N)
@@ -383,18 +447,16 @@ def _run_math_simulation(
         # Mere exposure (Zajonc): each impression rewires preference a little.
         mere = np.array([cognition.mere_exposure_bonus(int(e)) for e in exposures])
         media_lift = topic.get("ad_effect", .04) * mod["ad"] * (0.5 + 0.5 * market_trend)
-        p_effective = np.clip(p_raw + media_lift + mere, 0, 1)
+        p_effective = np.clip(p_appraise + media_lift + mere, 0, 1)
         willing = p_effective * addressable  # media + learned belief + habituation
-        pressure = .62 + .55 * np.clip(p_social, 0, 1.2)
 
-        # Scenario event
-        event_mult = 1.0
-        shock_text = None
-        if day == mod.get("event_day", 0) and mod.get("event_day", 0) > 0:
-            event_mult, shock_text = _event_effect(scenario, day, topic)
-            events.append({"day": day, "type": scenario, "label": scenario, "text": shock_text, "impact": round(event_mult, 2)})
+        # --- Granovetter threshold gate: cascades need a critical mass ---
+        gate = np.array([
+            cognition.granovetter_gate(float(peer_adopt_rate[i]), float(thresholds[i]))
+            for i in range(N)
+        ])
+        pressure = (.62 + .55 * np.clip(p_social, 0, 1.2)) * (0.75 + 0.55 * gate)
 
-        event_scale = event_mult if day >= mod.get("event_day", 0) else 1.0
         hazard = (0.095 * hazard_mult * willing * (.25 + .75 * p_effective)
                   * pressure * event_scale)
         hazard = np.clip(hazard, 0, .35)
@@ -437,6 +499,10 @@ def _run_math_simulation(
         sentiment = float(a_stance.mean() * 2 - 1)
         polarization = float(a_stance.std() * 2)
         social_field_prev = p_social
+
+        # Trust gap decays toward the baseline at the precedent's recovery rate.
+        if trust_gap.any():
+            trust_gap = np.array([cognition.trust_repair_step(float(g), recovery_days) for g in trust_gap])
 
         # Mere exposure accumulates: media + peer signals this day
         daily_exposures = np.clip(p_raw * 0.25 + media_lift * 2.0, 0, 0.75)
@@ -520,6 +586,10 @@ def _run_math_simulation(
         "susceptibility": susceptibility,
         "need_for_cognition": need_for_cognition,
         "exposures": exposures,
+        "dual_process_mean": float(np.mean(deliberate_w)),
+        "threshold_mean": float(np.mean(thresholds)),
+        "present_bias_mean": float(np.mean(future_value)),
+        "trust_repair_days": float(recovery_days),
     }
 
 
@@ -613,7 +683,13 @@ def run_simulation(
     params: dict | None = None,
     fast: bool = False,
 ) -> dict[str, Any]:
+    seed = int(seed)
+    # Determinism contract: seed both RNG streams the engine touches so the same
+    # brief + seed reproduces a run exactly (MLP init, network, belief noise).
     rng = _rng(seed)
+    import random as _py_random
+    _py_random.seed(seed)
+    np.random.seed(seed & 0xFFFFFFFF)
     topic = store.pick_topic(brief)
     if price_override is not None and price_override > 0:
         topic = dict(topic)
@@ -655,6 +731,7 @@ def run_simulation(
         precedent=precedent,
         price=price,
         mod=mod,
+        scenario=scenario,
         ceiling_mult=ceiling_mult,
         price_sens=price_sensitivity,
         social_mult=social_mult,
@@ -719,6 +796,10 @@ def run_simulation(
         "bootstrap_adoption_ci": bootstrap,
         "rogers": rogers_buckets,
         "market_potential": market_potential,
+        "dual_process_mean": round(float(math_result.get("dual_process_mean", 0.0)), 3),
+        "threshold_mean": round(float(math_result.get("threshold_mean", 0.0)), 3),
+        "present_bias_mean": round(float(math_result.get("present_bias_mean", 0.0)), 3),
+        "trust_repair_days": int(math_result.get("trust_repair_days", 0) or 0),
     }
 
     # Social posts (only in non-fast mode)
@@ -758,8 +839,25 @@ def run_simulation(
 
     context_bundle = atlas.bundle(topic, limit=6)
     run_id = uuid.uuid4().hex[:12]
+    import hashlib
+    import json as _json
+    fingerprint = hashlib.sha256(_json.dumps({
+        "brief": brief, "seed": seed, "scenario": scenario, "population": n_agents,
+        "rounds": rounds, "tier_mix": {str(k): round(float(v), 4) for k, v in tier_mix.items()},
+        "params": {k: round(float(p.get(k, 0)), 4) for k in sorted(p)},
+        "engine": "imprint-core/3.1",
+    }, sort_keys=True).encode()).hexdigest()[:16]
     result = {
         "run_id": run_id,
+        "provenance": {
+            "engine": "imprint-core/3.1",
+            "fingerprint": fingerprint,
+            "seed": seed,
+            "params": {k: round(float(p.get(k, 0)), 4) for k in
+                       ("ceiling_mult", "price_sensitivity", "social_mult", "trust_weight",
+                        "hazard_mult", "atlas_strength")},
+            "replay": "Same brief + seed + params + engine version reproduces this run exactly.",
+        },
         "context": context_bundle,
         "precedents": precedent,
         "params": {k: p.get(k) for k in ("ceiling_mult", "price_sensitivity", "social_mult", "trust_weight", "hazard_mult", "atlas_strength")},

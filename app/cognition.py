@@ -204,6 +204,114 @@ def bootstrap_ci(samples: list[float], n_boot: int = 200, alpha: float = 0.05) -
     return {"lower": round(lo, 4), "upper": round(hi, 4), "half_width": round((hi - lo) / 2, 4)}
 
 
+# ---------------------------------------------------------------------------
+# 6. Intertemporal choice — quasi-hyperbolic (β–δ) discounting
+#    Laibson (1997); O'Donoghue & Rabin (1999).
+#
+#    Indian categories with a large upfront cost and a delayed payoff (EV,
+#    solar, insurance, edtech, coaching) are exactly the ones present bias
+#    should suppress. A patient agent is close to 1.0; an impatient agent
+#    discounts a 90-day payoff heavily.
+# ---------------------------------------------------------------------------
+
+def quasi_hyperbolic_discount(t: float, beta: float = 0.70, delta: float = 0.96) -> float:
+    """D(t) = 1 for t = 0, β·δ^t for t > 0. Bounded to [0, 1]."""
+    if t <= 0:
+        return 1.0
+    return float(max(0.0, min(1.0, beta * (delta ** t))))
+
+
+def present_bias_weight(patience: float, horizon_days: float = 90.0,
+                        beta_base: float = 0.62, delta_base: float = 0.975) -> float:
+    """Per-agent weight on a delayed benefit, tempered to stay a nudge.
+
+    Cube-root tempering keeps the discount factor inside the decision model
+    rather than letting it dominate every other attribute.
+    """
+    p = max(0.0, min(1.0, float(patience)))
+    beta = min(1.0, beta_base + 0.30 * p)
+    delta = min(1.0, delta_base + 0.022 * p)
+    d = quasi_hyperbolic_discount(horizon_days, beta, delta)
+    return float(max(0.0, min(1.0, d ** (1.0 / 3.0))))
+
+
+# ---------------------------------------------------------------------------
+# 7. Social thresholds — Granovetter (1978)
+#
+#    Adoption is not a linear function of "how many peers adopted". Each
+#    agent has a threshold; below it nothing happens, above it a cascade can
+#    start. Heterogeneous thresholds are why identical villages diverge.
+# ---------------------------------------------------------------------------
+
+def social_threshold(conformity: float, risk: float, optimism: float) -> float:
+    """Fraction of peers that must adopt before this agent moves.
+
+    High conformity and low risk aversion lower the threshold; optimism
+    lowers it a little. Bounded to [0.05, 0.90] so nobody is purely
+    autonomous or purely imitative.
+    """
+    c = max(0.0, min(1.0, float(conformity)))
+    r = max(0.0, min(1.0, float(risk)))
+    o = max(0.0, min(1.0, float(optimism)))
+    t = 0.62 - 0.50 * c + 0.22 * (1.0 - r) - 0.12 * (o - 0.5)
+    return float(max(0.05, min(0.90, t)))
+
+
+def granovetter_gate(peer_fraction: float, threshold: float, width: float = 0.16) -> float:
+    """Smooth 0→1 switch around the threshold (logistic in peer fraction)."""
+    z = (float(peer_fraction) - float(threshold)) / max(1e-6, width)
+    return float(1.0 / (1.0 + math.exp(-max(-60.0, min(60.0, z)))))
+
+
+# ---------------------------------------------------------------------------
+# 8. Dual-process appraisal — System 1 / System 2
+#    Kahneman (2011); Petty & Cacioppo (1986) elaboration likelihood.
+#
+#    Need for cognition decides how much weight the deliberate attribute
+#    model gets versus the affective/social shortcut. This is not cosmetic:
+#    it changes which variables predict adoption for which agents.
+# ---------------------------------------------------------------------------
+
+def dual_process_blend(need_for_cognition: float) -> float:
+    """Weight on deliberate appraisal, from a 0–100 NFC score."""
+    n = max(0.0, min(1.0, float(need_for_cognition) / 100.0))
+    return float(max(0.20, min(0.92, 0.28 + 0.62 * n)))
+
+
+def affective_shortcut(affordability: float, status: float, social: float,
+                       media_lift: float = 0.0) -> float:
+    """Fast, cue-driven appraisal: can I afford it, does it signal status,
+    is everyone else doing it. Bounded to [0, 1]."""
+    v = 0.40 * affordability + 0.32 * status + 0.28 * social + 0.12 * media_lift
+    return float(max(0.0, min(1.0, v)))
+
+
+# ---------------------------------------------------------------------------
+# 9. Trust repair — Slovic (1993) asymmetry
+#
+#    Trust collapses fast and recovers slowly. The gap decays exponentially
+#    toward the baseline with a category-specific recovery half-life.
+# ---------------------------------------------------------------------------
+
+def trust_repair_step(gap: float, recovery_days: float) -> float:
+    """One-day decay of a trust gap (negative after a shock)."""
+    return float(gap * math.exp(-1.0 / max(1.0, float(recovery_days))))
+
+
+# ---------------------------------------------------------------------------
+# 10. Construal level / psychological distance — Trope & Liberman (2010)
+#
+#    Near, concrete, low-education and lower-tier contexts weight tangible
+#    features (price, service, warranty). Distant, abstract contexts weight
+#    category-level benefits. Returned as a (concrete, abstract) pair.
+# ---------------------------------------------------------------------------
+
+def construal_weights(tier: int, education: float) -> tuple[float, float]:
+    distance = 0.55 * (max(1, min(4, int(tier))) - 1) / 3.0 + 0.45 * (1.0 - max(0.0, min(1.0, float(education))))
+    concrete = max(0.30, min(0.90, 0.35 + 0.55 * distance))
+    return round(concrete, 3), round(1.0 - concrete, 3)
+
+
 __all__ = [
     "prospect_value",
     "diminishing_sensitivity",
@@ -216,4 +324,12 @@ __all__ = [
     "need_for_cognition",
     "price_sensitivity_meter",
     "bootstrap_ci",
+    "quasi_hyperbolic_discount",
+    "present_bias_weight",
+    "social_threshold",
+    "granovetter_gate",
+    "dual_process_blend",
+    "affective_shortcut",
+    "trust_repair_step",
+    "construal_weights",
 ]

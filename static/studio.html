@@ -122,6 +122,7 @@
       <button class="tab" data-tab="precedents">Precedents</button>
       <button class="tab" data-tab="causal">Causal</button>
       <button class="tab" data-tab="calibration">Calibration</button>
+      <button class="tab" data-tab="validation">Validation</button>
       <button class="tab" data-tab="reasoning">Reasoning</button>
       <button class="tab" data-tab="report">Report</button>
       <span class="tabs__spacer"></span>
@@ -563,6 +564,48 @@
         <div class="panel">
           <div class="panel__head"><div><span class="panel__eyebrow">History</span><h2 class="panel__title">Every adopted change is logged</h2></div></div>
           <div id="calibrationHistory"></div>
+        </div>
+      </section>
+
+      <!-- VALIDATION -->
+      <section class="view" id="view-validation">
+        <div class="view-head">
+          <div><span class="panel__eyebrow">Research audit · model card</span><h1 class="view-title">Every claim is <em>checkable.</em></h1></div>
+          <div class="view-head__stats">
+            <span class="chip chip--muted" id="valEngine">—</span>
+            <button class="btn-sm" id="valEnsembleRun"><span data-icon="bolt"></span>Run uncertainty</button>
+          </div>
+        </div>
+        <p class="reason-note">Three independent checks: analytic identities the maths must satisfy, a rolling-origin backtest of the demand signal, and a seed × parameter ensemble that separates assumption risk from run noise. Where a check fails, it says so.</p>
+        <div class="metrics" id="valMetrics"></div>
+        <div class="reason-grid">
+          <div class="panel">
+            <div class="panel__head"><div><span class="panel__eyebrow">Known answers</span><h2 class="panel__title">Does the mathematics still behave?</h2></div><span class="panel__meta" id="valBatteryMeta"></span></div>
+            <div id="valBattery" class="reason-checks"></div>
+            <div class="panel__head" style="margin-top:14px"><div><span class="panel__eyebrow">Backtest</span><h2 class="panel__title">Demand signal vs a drift benchmark</h2></div><span class="panel__meta" id="valBacktestMeta"></span></div>
+            <div id="valBacktest"></div>
+            <p class="causal-note" id="valBacktestNote"></p>
+          </div>
+          <div class="panel">
+            <div class="panel__head"><div><span class="panel__eyebrow">Uncertainty</span><h2 class="panel__title">The answer is a range, not a number</h2></div><span class="panel__meta" id="valEnsembleMeta"></span></div>
+            <div id="valEnsemble"><p class="small-copy">Run the ensemble to see the interval, the decision probabilities and whether the spread comes from assumptions or from seed noise.</p></div>
+            <p class="causal-note" id="valEnsembleNote"></p>
+          </div>
+        </div>
+        <div class="reason-grid">
+          <div class="panel">
+            <div class="panel__head"><div><span class="panel__eyebrow">Sensitivity</span><h2 class="panel__title">Which knobs actually move the answer</h2></div><button class="btn-xs" id="valSensRun">Scan</button></div>
+            <div id="valSensitivity"><p class="small-copy">A total-order variance decomposition tells you which parameters are worth tuning and which are theatre.</p></div>
+            <p class="causal-note" id="valSensNote"></p>
+          </div>
+          <div class="panel">
+            <div class="panel__head"><div><span class="panel__eyebrow">Model card</span><h2 class="panel__title">Intended use and hard limits</h2></div><span class="panel__meta" id="valCardMeta"></span></div>
+            <div id="valCard"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel__head"><div><span class="panel__eyebrow">Export</span><h2 class="panel__title">Cite the run, not the screenshot</h2></div><span class="panel__meta" id="valProvenance"></span></div>
+          <div id="valExport"></div>
         </div>
       </section>
 

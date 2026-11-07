@@ -9,11 +9,13 @@ from typing import Any
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import atlas, calibration, causal, content, engine, forecast, ingest, llm, perception, personas, reasoning, store
+from . import (atlas, calibration, causal, content, engine, forecast, ingest, llm,
+               modelcard, perception, personas, reasoning, sensitivity, store,
+               uncertainty, validation)
 
 ROOT = Path(__file__).resolve().parent.parent
 STATIC = ROOT / "static"
@@ -26,6 +28,13 @@ TOPIC_CARDS = (
 
 RUN_STORE: list[dict] = []
 MAX_RUNS = 200
+
+# Full run bundles for export. Bounded: agents are excluded, so each bundle is
+# small. This is what makes a run citable rather than ephemeral.
+from collections import OrderedDict
+RUN_BUNDLES: "OrderedDict[str, dict]" = OrderedDict()
+MAX_BUNDLES = 24
+
 
 def _store_run(result: dict) -> None:
     entry = {
@@ -48,6 +57,17 @@ def _store_run(result: dict) -> None:
     RUN_STORE.insert(0, entry)
     if len(RUN_STORE) > MAX_RUNS:
         RUN_STORE.pop()
+
+    rid = result.get("run_id")
+    if rid:
+        keep = ("run_id", "provenance", "brief", "question", "topic", "scenario",
+                "scenario_label", "seed", "population", "rounds", "tier_mix",
+                "focus_state", "price", "timeline", "summary", "cognitive",
+                "report", "params", "meta", "audit", "context", "precedents")
+        RUN_BUNDLES[rid] = {k: result.get(k) for k in keep if k in result}
+        RUN_BUNDLES.move_to_end(rid)
+        while len(RUN_BUNDLES) > MAX_BUNDLES:
+            RUN_BUNDLES.popitem(last=False)
 
 
 @asynccontextmanager
@@ -151,6 +171,31 @@ class ScenarioRequest(BaseModel):
     seed: int = 42
     tier_mix: dict[str, float] | None = None
     focus_state: str | None = None
+
+
+class RobustnessRequest(BaseModel):
+    brief: str = Field(default="A ₹1.2 lakh electric scooter for tier-2 India", max_length=400)
+    n_agents: int = Field(default=180, ge=40, le=600)
+    rounds: int = Field(default=24, ge=12, le=60)
+    seed: int = Field(default=42, ge=0, le=10_000_000)
+    tier_mix: dict[str, float] | None = None
+    scenario: str = "base"
+    focus_state: str | None = None
+    seeds: int = Field(default=5, ge=2, le=12)
+    param_draws: int = Field(default=5, ge=2, le=16)
+    target_conversion: float = Field(default=.50, ge=0, le=1)
+
+
+class SensitivityRequest(BaseModel):
+    brief: str = Field(default="A ₹1.2 lakh electric scooter for tier-2 India", max_length=400)
+    metric: str = Field(default="conversion", pattern="^(conversion|adoption|sentiment)$")
+    n_agents: int = Field(default=150, ge=40, le=500)
+    rounds: int = Field(default=20, ge=12, le=48)
+    seed: int = Field(default=42, ge=0, le=10_000_000)
+    tier_mix: dict[str, float] | None = None
+    scenario: str = "base"
+    focus_state: str | None = None
+    n_base: int = Field(default=6, ge=4, le=32)
 
 
 @app.get("/")
@@ -568,8 +613,178 @@ def corpus_ingest(req: IngestRequest):
 @app.get("/api/llm")
 def llm_status():
     return llm.status()
+
+
+@app.get("/api/topics/{topic_id}")
 def topic_detail(topic_id: str):
     t = store.topic_map().get(topic_id)
     if not t:
         raise HTTPException(status_code=404, detail="Unknown topic")
     return t
+
+
+# ---------------------------------------------------------------------------
+# Research surface: model card, validation, uncertainty, sensitivity, export
+# ---------------------------------------------------------------------------
+
+@app.get("/api/model-card")
+def model_card():
+    try:
+        return modelcard.card()
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"{type(exc).__name__}: {exc}") from exc
+
+
+@app.get("/api/validation")
+def validation_battery(deep: bool = Query(default=False)):
+    try:
+        return validation.battery(deep=deep)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"{type(exc).__name__}: {exc}") from exc
+
+
+@app.post("/api/robustness")
+def robustness(req: RobustnessRequest):
+    try:
+        return uncertainty.ensemble(
+            req.brief, n_agents=req.n_agents, rounds=req.rounds,
+            scenario=req.scenario, focus_state=req.focus_state, tier_mix=req.tier_mix,
+            seeds=req.seeds, param_draws=req.param_draws, seed0=req.seed,
+            target_conversion=req.target_conversion,
+        )
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"{type(exc).__name__}: {exc}") from exc
+
+
+@app.post("/api/sensitivity")
+def sensitivity_scan(req: SensitivityRequest):
+    try:
+        return sensitivity.sobol(
+            req.brief, metric=req.metric, n_base=req.n_base, n_agents=req.n_agents,
+            rounds=req.rounds, scenario=req.scenario, focus_state=req.focus_state,
+            tier_mix=req.tier_mix, seed=req.seed,
+        )
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"{type(exc).__name__}: {exc}") from exc
+
+
+@app.get("/api/runs/{run_id}")
+def run_bundle(run_id: str):
+    bundle = RUN_BUNDLES.get(run_id)
+    if not bundle:
+        raise HTTPException(status_code=404, detail="Run not found or evicted from memory.")
+    return bundle
+
+
+def _fmt_pct(x: Any) -> str:
+    try:
+        return f"{float(x) * 100:.1f}%"
+    except (TypeError, ValueError):
+        return "—"
+
+
+def _export_md(bundle: dict) -> str:
+    summary = bundle.get("summary") or {}
+    prov = bundle.get("provenance") or {}
+    topic = bundle.get("topic") or {}
+    params = bundle.get("params") or prov.get("params") or {}
+    lines = [
+        f"# Imprint run · {bundle.get('run_id', '—')}",
+        "",
+        f"**Brief.** {bundle.get('brief', '—')}",
+        "",
+        f"**Verdict.** {summary.get('verdict', '—')} "
+        f"(confidence {summary.get('confidence', '—')})",
+        "",
+        summary.get("headline", ""),
+        "",
+        "## What the simulation reports",
+        "",
+        "| Metric | Value |",
+        "| --- | --- |",
+        f"| Adoption | {_fmt_pct(summary.get('adoption'))} of {bundle.get('population', '—')} agents |",
+        f"| Conversion | {_fmt_pct(summary.get('conversion'))} of addressable |",
+        f"| Awareness | {_fmt_pct(summary.get('awareness'))} |",
+        f"| Sentiment | {summary.get('sentiment', '—')} |",
+        f"| Addressable pool | {summary.get('addressable', '—')} |",
+        f"| Rejection rate | {_fmt_pct(summary.get('rejection_rate'))} |",
+        f"| Tipping point | day {summary.get('tipping_point') or '—'} |",
+        "",
+        "## Provenance",
+        "",
+        f"- Engine: `{prov.get('engine', '—')}`",
+        f"- Fingerprint: `{prov.get('fingerprint', '—')}`",
+        f"- Seed: `{bundle.get('seed', '—')}`",
+        f"- Scenario: `{bundle.get('scenario', 'base')}`",
+        f"- Population / rounds: {bundle.get('population', '—')} / {bundle.get('rounds', '—')}",
+        f"- Parameters: " + ", ".join(f"`{k}={v}`" for k, v in sorted(params.items())) if params else "- Parameters: —",
+        "",
+        "## Timeline",
+        "",
+        "| Day | Awareness | Adoption | Conversion | New | Sentiment | Trust |",
+        "| --- | --- | --- | --- | --- | --- | --- |",
+    ]
+    for row in (bundle.get("timeline") or []):
+        lines.append(
+            f"| {row.get('day')} | {_fmt_pct(row.get('awareness'))} | "
+            f"{_fmt_pct(row.get('adoption'))} | {_fmt_pct(row.get('conversion'))} | "
+            f"{row.get('new', '—')} | {row.get('sentiment', '—')} | {row.get('trust', '—')} |"
+        )
+    cog = bundle.get("cognitive") or {}
+    if cog:
+        lines += [
+            "",
+            "## Cognitive layer",
+            "",
+            f"- Dual-process (deliberate weight): {cog.get('dual_process_mean', '—')}",
+            f"- Granovetter threshold mean: {cog.get('threshold_mean', '—')}",
+            f"- Present-bias weight: {cog.get('present_bias_mean', '—')}",
+            f"- Trust repair half-life: {cog.get('trust_repair_days', '—')} days",
+        ]
+    lines += [
+        "",
+        "## Limits",
+        "",
+        "This is a synthetic rehearsal, not a survey or a causal estimate. "
+        "Every number above should travel with its uncertainty interval and the "
+        "falsifier that would overturn it. See `/api/model-card`.",
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def _timeline_csv(bundle: dict) -> str:
+    rows = bundle.get("timeline") or []
+    cols = ["day", "awareness", "adoption", "conversion", "addressable", "new",
+            "rejected", "sentiment", "polarization", "trust", "wom"]
+    out = [",".join(cols)]
+    for r in rows:
+        out.append(",".join(str(r.get(c, "")) for c in cols))
+    return "\n".join(out) + "\n"
+
+
+@app.get("/api/runs/{run_id}/export")
+def export_run(run_id: str, format: str = Query(default="md")):
+    bundle = RUN_BUNDLES.get(run_id)
+    if not bundle:
+        raise HTTPException(status_code=404, detail="Run not found or evicted from memory.")
+    fmt = (format or "md").lower().strip()
+    if fmt == "json":
+        body = JSONResponse(bundle).body
+        media = "application/json"
+        ext = "json"
+    elif fmt == "csv":
+        body = _timeline_csv(bundle).encode("utf-8")
+        media = "text/csv"
+        ext = "csv"
+    elif fmt in ("md", "markdown"):
+        body = _export_md(bundle).encode("utf-8")
+        media = "text/markdown"
+        ext = "md"
+    else:
+        raise HTTPException(status_code=400, detail="format must be md, json or csv")
+    return Response(
+        content=body, media_type=media,
+        headers={"Content-Disposition": f'attachment; filename="imprint-{run_id}.{ext}"'},
+    )
+

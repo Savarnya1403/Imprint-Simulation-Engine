@@ -15,7 +15,7 @@ The contract with the user is honest:
 - **Real and stochastic**: same brief, different seed → different run. Same seed → bit-for-bit identical run (provenance fingerprint included).
 - **Region/tier variation**: built-in tier mix, focus state, region-shift factors per category.
 - **Complex maths backend, simple frontend**: belief ODEs integrated by RK4, per-agent nano-MLPs updated by gradient descent on a cognitive-dissonance loss, graph-Laplacian social diffusion, annealed temperature, TimesFM demand signal. The UI stays a warm, dense editorial studio.
-- **Indian public data**: Census/state population, TRAI internet penetration, NITI Aayog/RBI/HCES income and tier distributions, 19 category histories (~94 months each), 38 evidence cards, 60 public sources. All cited in the atlas and model card.
+- **Indian public data**: Census/state population, TRAI internet penetration, NITI Aayog/RBI/HCES income and tier distributions, 19 category histories (~94 months each), 50 evidence cards and 64 public sources. All cited in the atlas and model card.
 - **No fake multipliers**: never claim 10,000×/500×/70× gains. Every number ships with uncertainty and a falsifier.
 
 ---
@@ -51,6 +51,51 @@ Each researcher owns a domain and can be outvoted by evidence. Their names are r
 | 6 | No model card, no export, no run retrieval. | Medium | `modelcard.py`, six new FastAPI endpoints (`/api/model-card`, `/api/validation`, `/api/robustness`, `/api/sensitivity`, `/api/runs/{id}`, `/api/runs/{id}/export`), Research/Validation UI tab. |
 
 Benchmarks after wiring (n=300, rounds=36, seeds 42/43/44): EV scooter conv 0.35–0.53 TEST; quick commerce 0.43–0.46 TEST; AI tutor 0.28–0.50 HOLD/TEST; rooftop solar 0.36–0.50 TEST; rural credit 0.29–0.55 TEST/HOLD. Parameter effects: default conv 0.167; `social_mult=1.5` → 0.444; `trust_weight=1.5` → 0.278; `price_sensitivity` direction noisy across seeds (0.413 / 0.384 / 0.428 for ps 0.6/1.0/1.6 at n=400) — documented as an open question below.
+
+### 3.1 Forecasting: what worked, what did not
+
+The forecast layer is scored like everything else — rolling-origin, no lookahead, 19 category histories, horizon 6 months, four origins per topic (`min_train=48`). Error is absolute error relative to a random-walk-with-drift benchmark; below 1.0 means the model adds value.
+
+| Path | median vs drift | median MASE | 80% band coverage | Topics better than raw |
+|---|---|---|---|---|
+| Raw TimesFM 3.0 | 0.961 | 1.864 | 58.3% | — |
+| Fixed 0.75 blend with cheap ensemble | 0.870 | — | — | 8/19 (mixed; median improved, most topics worse) |
+| **Test-time augmentation (`aug3`)** | **0.764** | **1.306** | **79.2%** | **14/19 (2 worse)** |
+| `aug3` + reasoning/critique | 0.764 | 1.306 | 83.3% | point path unchanged |
+
+**Adopted: `aug3`.** TimesFM is a univariate foundation model and is not invariant to a monotone transform of its input. We forecast the level, the log of the level and the first difference, invert each view exactly (exp / cumulative sum), and average. Each view is visible in the API response under `test_time_augmentation.views`; a failed view is named and dropped rather than silently absorbed. This is an ensemble, not a reasoning model, and it is labelled as such.
+
+**Rejected: a fixed 0.75 foundation/ensemble blend.** It lowered the median error (0.961 → 0.870) but helped only 8 of 19 topics, with most categories worse. That is a mixed, unstable result rather than a robust gain, so it is available as `blend_weight` for sensitivity analysis but is not the default. No multiplier is claimed.
+
+**Reasoning/critique layer.** The default is `foundation_first_with_critique`: the foundation path is kept and four cheap hypotheses (drift, damped trend, mean reversion, seasonal naive) audit it. The rules are named — implausible-trend gate, non-negativity clamp, band cap, direction-disagreement penalty, thin-history warning — and each firing is returned in `reasoned.critique`. On the current series no point-rule fires, so the point path is unchanged; the honest contribution is interval calibration, where 80% coverage rises from 79.2% to 83.3%. The layer is reported as an audit trail, not a point-accuracy claim.
+
+Reproduce:
+
+```bash
+../.venv/bin/python - <<'PY'
+from app import validation
+b = validation.real_series_backtest()
+for k in ("median_vs_drift_timesfm", "median_vs_drift_timesfm_aug3",
+          "median_coverage_timesfm_aug3", "median_coverage_timesfm_reasoned",
+          "augmentation_delta", "reasoning_verdict"):
+    print(k, b.get(k))
+PY
+```
+
+### 3.2 Evidence corpus: what was added
+
+The context layer is only as good as its public record. We added four official sources and 24 curated facts, and wired 12 new evidence cards into the topic packs that depend on them. Every figure below was checked against the publishing body before entry; projections are labelled `medium` confidence and are never presented as observations.
+
+| Source | Year | New facts | Why it changes the simulation |
+|---|---|---|---|
+| Time Use Survey 2024 (MoSPI) | 2025 | 5 | Unpaid care is the binding constraint on women's paid work: 289 vs 88 minutes/day; 83.9% of women 15-59 do domestic work. |
+| Elderly in India 2021 (MoSPI) | 2021 | 4 | 138 million people 60+ (10.1%), projected 13.1% by 2031, with Kerala at 16.5%. |
+| Economic Survey 2023-24 (Ministry of Finance) | 2024 | 3 | 78.5 lakh non-farm jobs/year needed to 2030; agriculture's workforce share projected to fall to 25% by 2047. |
+| India's Booming Gig and Platform Economy (NITI Aayog) | 2022 | 1 | 7.7 million gig workers in 2020-21, projected 23.5 million by 2029-30. |
+
+We also filled gaps in existing sources: NFHS-5 nutrition and insurance (stunting 35.5%, women's anaemia 57.0%, household health-insurance coverage 41.0%), NHA 2021-22 (health spending 3.83% of GDP; OOPE 39.4%, correcting the older 47.1% card), RBI's FI-Index (64.2 for March 2024), and Census 2011 literacy (74.04%), disability (2.21%) and slum population (65.5 million). `atlas.audit()` now reports 64 sources, 147 facts and 291 nodes, with zero unresolved references and zero duplicate ids.
+
+One attribution error was corrected: `job_gig` had been pointing at the Aspirational Districts source. It now resolves to the NITI Aayog gig report.
 
 ---
 

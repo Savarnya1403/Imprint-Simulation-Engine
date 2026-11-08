@@ -218,13 +218,25 @@ def _run_generative_layer(agents, adopted, topic, rounds, rng):
     Caps LLM usage so the page stays responsive: hosted models get the full
     generative treatment; local tiny models get a small budget (deterministic
     templates fill the rest). Every layer has a deterministic fallback.
+
+    At large cohorts (>=1000) only a seeded 600-agent sample carries a full
+    memory stream; the rest get an empty placeholder. This keeps the run
+    payload and reflection cost bounded while the math layer still sees
+    every agent. The sampling is recorded so it can be audited.
     """
     llm_generate = _get_llm_generate()
     hosted = (_llm_status().get("backend") == "openai-compatible")
     llm_budget = 4 if hosted else 1  # tiny local model: keep the page fast
     topic_label = topic.get("label", "this")
+    n = len(agents)
+    if n > 1000:
+        gen_idx = sorted(rng.sample(range(n), 600))
+    else:
+        gen_idx = list(range(n))
+    gen_set = set(gen_idx)
     streams = {}
-    for a in agents:
+    for i in gen_idx:
+        a = agents[i]
         s = memory.MemoryStream(a["id"])
         for text, kind, imp in memory.seed_memories(a, topic_label, day=1):
             s.add(text, kind, imp, day=1)
@@ -238,18 +250,30 @@ def _run_generative_layer(agents, adopted, topic, rounds, rng):
             llm_budget -= 1
         out = concordia.resolve_encounter(a, b, topic, rounds, topic_label, use_llm, rng)
         encounters.append(out)
-        streams[a["id"]].add(f"Talked to {b.get('name')} about {topic_label}. Outcome: {out['outcome']}.", "observation", 0.7, day=rounds)
-        streams[b["id"]].add(f"Talked to {a.get('name')} about {topic_label}. Outcome: {out['outcome']}.", "observation", 0.7, day=rounds)
+        for adm, other in ((a, b), (b, a)):
+            if adm["id"] in streams:
+                streams[adm["id"]].add(
+                    f"Talked to {other.get('name')} about {topic_label}. Outcome: {out['outcome']}.",
+                    "observation", 0.7, day=rounds,
+                )
         a["stance"] = round(min(1.0, max(0.0, a["stance"] + out["stance_delta"])), 3)
 
     reflect_llm = llm_generate if hosted else None  # reflections are deterministic on tiny local models
-    for a in agents:
-        if rng.random() < 0.35:  # reflection is expensive; sample a subset
-            try:
-                streams[a["id"]].reflect(a, topic_label, rounds, reflect_llm)
-            except Exception:
-                pass
-        a["memory"] = streams[a["id"]].to_dict()
+    for i, a in enumerate(agents):
+        if i in gen_set:
+            if rng.random() < 0.35:  # reflection is expensive; sample a subset
+                try:
+                    streams[a["id"]].reflect(a, topic_label, rounds, reflect_llm)
+                except Exception:
+                    pass
+            a["memory"] = streams[a["id"]].to_dict()
+        else:
+            a["memory"] = {"agent_id": a["id"], "count": 0, "memories": [], "reflections": [], "sampled": False}
+
+    if n > 1000:
+        encounters.append({
+            "note": f"Generative memory sampled 600 of {n} agents (seeded); math layer used all."
+        })
 
     return encounters
 
@@ -337,7 +361,19 @@ def _run_math_simulation(
     # --- Nano-agents: each agent is a tiny MLP (micrograd-style autograd) ---
     # 6 context inputs -> 1 adoption logit. Belief updating = backprop on
     # cognitive-dissonance loss vs observed peer behavior.
-    mlps = [MLP(6, [4, 1]) for _ in range(N)]
+    # Above ~600 agents the Python object graph becomes the bottleneck, so
+    # the same architecture runs batched in NumPy (vectorbelief.BatchedMLP).
+    # The choice is recorded in the provenance block; both paths share the
+    # init scale, architecture and temperature-scaled SGD rule.
+    use_batched = N > 600
+    batch_mlp = None
+    mlps = None
+    if use_batched:
+        from .vectorbelief import BatchedMLP
+
+        batch_mlp = BatchedMLP(N)
+    else:
+        mlps = [MLP(6, [4, 1]) for _ in range(N)]
     mlp_lr = 0.05
 
     # --- Graph Laplacian for social diffusion (Emergence World style) ---
@@ -416,11 +452,17 @@ def _run_math_simulation(
         social = np.clip(.55 + (traits["conformity"] - .5) * .3, 0, 1)
 
         # --- Forward pass: each agent's nano-MLP maps context -> adoption probability ---
-        p_raw = np.zeros(N)
-        for i in range(N):
-            x = [Value(afford[i]), Value(relative[i]), Value(social_field_prev[i]),
-                 Value(trust[i]), Value(risk[i]), Value(status[i])]
-            p_raw[i] = float(mlps[i](x).data)
+        if use_batched:
+            X_pre = np.stack(
+                [afford, relative, social_field_prev, trust, risk, status], axis=1
+            ).astype(np.float64)
+            p_raw = batch_mlp.forward_batch(X_pre)
+        else:
+            p_raw = np.zeros(N)
+            for i in range(N):
+                x = [Value(afford[i]), Value(relative[i]), Value(social_field_prev[i]),
+                     Value(trust[i]), Value(risk[i]), Value(status[i])]
+                p_raw[i] = float(mlps[i](x).data)
 
         # --- Dual-process appraisal (Kahneman 2011) ---
         # High need-for-cognition agents use the deliberate attribute model.
@@ -434,14 +476,20 @@ def _run_math_simulation(
 
         # --- Backprop: cognitive dissonance (my belief vs what peers actually do) ---
         peer_adopt_rate = peer_mean(adopted.astype(float), src, dst, N)
-        for i in range(N):
-            mlps[i].zero_grad()
-            x = [Value(afford[i]), Value(relative[i]), Value(p_social[i]),
-                 Value(trust[i]), Value(risk[i]), Value(status[i])]
-            out = mlps[i](x)
-            loss = (out - Value(float(peer_adopt_rate[i]))) ** 2
-            loss.backward()
-            sgd_update(mlps[i].parameters(), mlp_lr * temp)
+        if use_batched:
+            X_post = np.stack(
+                [afford, relative, p_social, trust, risk, status], axis=1
+            ).astype(np.float64)
+            batch_mlp.backward_and_step(X_post, peer_adopt_rate, mlp_lr * temp)
+        else:
+            for i in range(N):
+                mlps[i].zero_grad()
+                x = [Value(afford[i]), Value(relative[i]), Value(p_social[i]),
+                     Value(trust[i]), Value(risk[i]), Value(status[i])]
+                out = mlps[i](x)
+                loss = (out - Value(float(peer_adopt_rate[i]))) ** 2
+                loss.backward()
+                sgd_update(mlps[i].parameters(), mlp_lr * temp)
 
         # --- Adoption decision: temperature-scaled sigmoid on learned belief ---
         # Mere exposure (Zajonc): each impression rewires preference a little.
@@ -457,8 +505,14 @@ def _run_math_simulation(
         ])
         pressure = (.62 + .55 * np.clip(p_social, 0, 1.2)) * (0.75 + 0.55 * gate)
 
+        # Direct social-proof scaling so the calibration knob genuinely bites:
+        # p_social already scales the diffused field, but at low adoption that
+        # is a 1–2% hazard nudge. This makes the same knob a ~20% hazard
+        # difference across its grid (0.65–1.55) while staying near-neutral
+        # at the calibrated default (~1.0).
+        social_hazard = 0.70 + 0.30 * max(.4, float(social_mult))
         hazard = (0.095 * hazard_mult * willing * (.25 + .75 * p_effective)
-                  * pressure * event_scale)
+                  * pressure * event_scale * social_hazard)
         hazard = np.clip(hazard, 0, .35)
 
         draw = np.array([rng.random() for _ in range(N)])
@@ -590,6 +644,7 @@ def _run_math_simulation(
         "threshold_mean": float(np.mean(thresholds)),
         "present_bias_mean": float(np.mean(future_value)),
         "trust_repair_days": float(recovery_days),
+        "belief_backend": "batched-numpy" if use_batched else "micrograd",
     }
 
 
@@ -696,7 +751,7 @@ def run_simulation(
         topic["price"] = price_override
     mod = SCENARIO_MODS.get(scenario, SCENARIO_MODS["base"])
     price = float(topic.get("price", 0)) * mod["price"]
-    n_agents = max(40, min(1600, int(n_agents)))
+    n_agents = max(40, min(3000, int(n_agents)))
     rounds = max(12, min(120, int(rounds)))
     tier_mix = _tier_mix_from_req(tier_mix)
 
@@ -829,8 +884,42 @@ def run_simulation(
                        rejected, rejection_reason, [a for a in agents if a["id"] in panel_ids],
                        scenario, brief, addressable=addressable_mask, ceiling=ceiling)
 
+    # Division analytics (adoption × TimesFM alignment) — same run, no resim.
+    from . import segments as _segments
+
+    divisions = _segments.division_report(
+        agents, adopted, rejected, rejection_reason, addressable_mask,
+        adopt_day, timeline,
+    )
+    # Diversity coverage: how many distinct values per axis were actually present.
+    diversity = {}
+    for _k in ("occupation_id", "religion", "caste_group", "ideology", "thought_process",
+               "economic_status", "education_band", "personality_cluster", "settlement",
+               "age_band", "region", "state"):
+        diversity[_k] = len({a.get(_k, "") for a in agents})
+    cognitive_stats["diversity"] = diversity
+    cognitive_stats["n_occupations"] = diversity.get("occupation_id", 0)
+    cognitive_stats["belief_backend"] = math_result.get("belief_backend", "micrograd")
+
     report = _report(topic, summary, timeline, agents, adopted,
                      np.array([a["stance"] for a in agents]), rejected, rejection_reason, rng)
+    report["divisions"] = divisions
+
+    # GTM playbook derived from the same divisions (no extra simulation).
+    try:
+        from . import strategy as _strategy
+
+        _stub = {
+            "topic": {"label": topic.get("label", "")},
+            "summary": summary,
+            "report": report,
+            "timeline": timeline,
+            "divisions": divisions,
+            "agents": agents,
+        }
+        playbook = _strategy.playbook(_stub)
+    except Exception:
+        playbook = {"error": "Playbook unavailable for this run."}
 
     emap = store.evidence_map()
     evidence = [emap[i] for i in topic.get("evidence_ids", []) if i in emap]
@@ -847,12 +936,14 @@ def run_simulation(
         "params": {k: round(float(p.get(k, 0)), 4) for k in sorted(p)},
         "engine": "imprint-core/3.1",
     }, sort_keys=True).encode()).hexdigest()[:16]
+    belief_backend = math_result.get("belief_backend", "micrograd")
     result = {
         "run_id": run_id,
         "provenance": {
             "engine": "imprint-core/3.1",
             "fingerprint": fingerprint,
             "seed": seed,
+            "belief_backend": belief_backend,
             "params": {k: round(float(p.get(k, 0)), 4) for k in
                        ("ceiling_mult", "price_sensitivity", "social_mult", "trust_weight",
                         "hazard_mult", "atlas_strength")},
@@ -884,6 +975,9 @@ def run_simulation(
         "encounters": encounters,
         "focus_group": focus,
         "report": report,
+        "divisions": divisions,
+        "diversity": diversity,
+        "strategy": playbook,
         "evidence": evidence,
         "events": math_result.get("timeline", []) and [e for e in timeline if e.get("event")],
         "scenarios": SCENARIOS,

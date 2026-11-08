@@ -37,15 +37,16 @@ def card() -> dict:
             "It should not be used for credit, insurance, employment or policing decisions about real people.",
         ],
         "population": {
-            "design": "Stratified synthetic sample by state, tier, occupation, gender, age and digital access.",
+            "design": "Stratified synthetic sample by state, tier, occupation, gender, age, digital access, religion, caste, ideology, thought process, economic band, schooling, settlement and Big Five personality.",
             "public_inputs": [
                 "State population, urbanisation and internet penetration (Census / TRAI).",
                 "Tier and income distributions (NITI Aayog, RBI, HCES).",
-                "Occupation archetypes and 315 regional names.",
-                "33 occupation archetypes with explicit trait ranges.",
+                "Occupation archetypes and regional names.",
+                f"{len(store.archetypes())} occupation archetypes with explicit trait ranges (up to 3,000 agents per run).",
                 "16 behavioural biases with tier-specific base rates.",
                 "19 category packs with 94-month public histories.",
                 f"{len(ev)} evidence cards and {len(atlas.sources())} cited public sources, including Census 2011, NFHS-5, Time Use Survey 2024, Elderly in India 2021, NHA 2021-22, RBI FI-Index and Economic Survey 2023-24.",
+                "Division analytics (adoption × TimesFM market trend) and a GTM playbook derived from the same run, not re-simulated.",
             ],
             "counts": {
                 "states": len(store.states()),
@@ -58,7 +59,9 @@ def card() -> dict:
             },
         },
         "methods": [
-            {"name": "Belief updating", "detail": "Each agent is a micrograd-style MLP; beliefs update by backprop on a cognitive-dissonance loss (nn.py)."},
+            {"name": "Belief updating", "detail": "Each agent is a 6-4-1 MLP; beliefs update by backprop on a cognitive-dissonance loss (nn.py / vectorbelief.py). Cohorts above ~600 run the same architecture batched in NumPy for speed; the backend is recorded per run."},
+            {"name": "Diversity", "detail": f"{len(store.archetypes())} occupations plus ideology, thought process, economic band, schooling, settlement, age band and Big Five personality — all modelled as structural context with small explicit effects, never as identity claims."},
+            {"name": "Divisions × TimesFM", "detail": "Per-division conversion, rejection, lead/lag and correlation with the TimesFM market-trend signal; the GTM playbook is derived from these divisions, not invented."},
             {"name": "Dual-process appraisal", "detail": "Need for cognition routes agents between deliberate attribute weighting (System 2) and an affective/social shortcut (System 1). Kahneman 2011; Petty & Cacioppo 1986."},
             {"name": "Prospect theory", "detail": "Reference-dependent value, λ = 2.25, α = 0.88. Kahneman & Tversky 1979/1992."},
             {"name": "Present bias", "detail": "Quasi-hyperbolic β–δ discounting suppresses delayed payoffs for costly-now categories. Laibson 1997."},

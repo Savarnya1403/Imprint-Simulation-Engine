@@ -97,6 +97,22 @@ We also filled gaps in existing sources: NFHS-5 nutrition and insurance (stuntin
 
 One attribution error was corrected: `job_gig` had been pointing at the Aspirational Districts source. It now resolves to the NITI Aayog gig report.
 
+### 3.3 Diversity at scale: 48 occupations × 12 axes, 3,000 agents
+
+The population grew from 33 to 48 occupations (adding domestic work, long-haul driving, barber/salon, pharma, tuition, temple work, security, dairy, fisherfolk, powerloom, BPO, guesthouses, trades, online resale and FPO entrepreneurship — each with explicit tier and income priors) and from five diversity axes to twelve: ideology, thought process, economic band, schooling band, settlement, age band and Big Five personality (Openness / Conscientiousness / Extraversion / Agreeableness / Neuroticism with a six-cluster label) now sit alongside religion, caste, region and state. Every axis has a small, explicit effect on trust, risk or conformity — for example ideology shifts `trust_gov`/`trust_media` by at most 0.05 — and is documented as structural context, never as an identity claim. Protected axes (religion, caste, ideology) are diagnostic only: the playbook never recommends targeting or excluding by them.
+
+At 3,000 agents a 240-agent rehearsal that previously capped at 1,600 now runs in about 1.4 seconds. Above ~600 agents the belief network switches from the micrograd object graph to the same 6-4-1 architecture batched in NumPy (`app/vectorbelief.py`); the backend is recorded per run (`provenance.belief_backend`). Generative memory is sampled to 600 agents at large cohorts so the payload stays bounded. Division analytics (`app/segments.py`) reconcile exactly to run totals and add TimesFM market correlation and lead/lag per division; the GTM playbook (`app/strategy.py`) is derived from those divisions — beachhead, next wave, messaging, channels, pricing read, 90-day plan with stop rules, and falsifiers — and is served at `/api/strategy`. The Reasoning loop gained a `Divide` step.
+
+Two honest corrections came with the scale-up. The social multiplier's hazard channel was a 1–2% nudge at low adoption, so at N=90 it was undetectable (the monotone test was underpowered); the hazard now carries an explicit `social_hazard` factor that is near-neutral at the calibrated default but moves ~20% across the grid. The monotone test was re-powered to N=240 (verified monotone 0.38 → 0.46) rather than weakened.
+
+Reproduce:
+
+```python
+from app import engine
+r = engine.run_simulation("A ₹1.2 lakh electric scooter for tier-2 India", n_agents=3000, rounds=24, seed=42)
+print(r["provenance"]["belief_backend"], r["diversity"]["occupation_id"], r["strategy"]["beachhead"])
+```
+
 ---
 
 ## 4. Open disagreements (recorded, not resolved by fiat)

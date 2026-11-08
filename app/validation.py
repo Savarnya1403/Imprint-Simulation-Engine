@@ -30,7 +30,7 @@ from typing import Any
 
 import numpy as np
 
-from . import cognition, forecast, store
+from . import cognition, forecast, forecast_reasoning, store
 
 _CACHE: dict[str, tuple[float, dict]] = {}
 _LOCK = threading.Lock()
@@ -256,6 +256,10 @@ def real_series_backtest(horizon: int = 6, step: int = 6, min_train: int = 48) -
 
             f_mase, f_dir, tf_mase, tf_dir, base_dir = [], [], [], [], []
             f_ratio, tf_ratio = [], []
+            a_mase, a_dir, a_ratio = [], [], []
+            tf_cov, a_cov, tr_cov = [], [], []
+            r_mase, r_dir, r_ratio = [], [], []
+            tr_mase, tr_dir, tr_ratio = [], [], []
             for t0 in origins:
                 train, truth = values[:t0], values[t0:t0 + horizon]
                 actual = float(truth[-1] - train[-1])
@@ -277,14 +281,31 @@ def real_series_backtest(horizon: int = 6, step: int = 6, min_train: int = 48) -
                     d = _direction_hit(train, truth, pred)
                     if d is not None:
                         f_dir.append(d)
+                    # --- reasoning blend over the same surrogate ---
+                    try:
+                        rpred = np.asarray(forecast_reasoning.reasoned_fast_forecast(train, horizon), dtype=float)
+                    except Exception:
+                        rpred = np.array([])
+                    if len(rpred) == horizon and np.all(np.isfinite(rpred)):
+                        m = _mase(truth, rpred, train)
+                        if math.isfinite(m):
+                            r_mase.append(m)
+                        if drift_mae > 1e-9:
+                            r_ratio.append(float(np.mean(np.abs(truth - rpred))) / drift_mae)
+                        d = _direction_hit(train, truth, rpred)
+                        if d is not None:
+                            r_dir.append(d)
                 # --- TimesFM on a capped number of origins ---
                 if t0 in tf_origins:
                     try:
-                        res = forecast.forecast_series(train, horizon, model="timesfm")
-                        tpred = np.asarray(res.get("point", []), dtype=float)
-                        engine = res.get("engine", "")
+                        raw = forecast.forecast_series(
+                            train, horizon, model="timesfm", test_time_augmentation=False
+                        )
+                        tpred = np.asarray(raw.get("point", []), dtype=float)
+                        engine = raw.get("engine", "")
+                        rqraw = raw.get("quantiles")
                     except Exception:
-                        tpred, engine = np.array([]), "error"
+                        tpred, engine, rqraw = np.array([]), "error", None
                     if len(tpred) == horizon and np.all(np.isfinite(tpred)) and engine.startswith("timesfm"):
                         m = _mase(truth, tpred, train)
                         if math.isfinite(m):
@@ -294,6 +315,56 @@ def real_series_backtest(horizon: int = 6, step: int = 6, min_train: int = 48) -
                         d = _direction_hit(train, truth, tpred)
                         if d is not None:
                             tf_dir.append(d)
+                        if isinstance(rqraw, np.ndarray) and rqraw.shape[0] == horizon:
+                            tf_cov.append(float(np.mean((truth >= rqraw[:, 0]) & (truth <= rqraw[:, 8]))))
+
+                        # --- test-time augmentation: level + log + difference ---
+                        try:
+                            aug = forecast.forecast_series(
+                                train, horizon, model="timesfm", test_time_augmentation=True
+                            )
+                            apred = np.asarray(aug.get("point", []), dtype=float)
+                            aq = aug.get("quantiles")
+                            if not str(aug.get("engine", "")).startswith("timesfm"):
+                                apred = np.array([])
+                        except Exception:
+                            apred, aq = np.array([]), None
+                        if len(apred) == horizon and np.all(np.isfinite(apred)):
+                            m = _mase(truth, apred, train)
+                            if math.isfinite(m):
+                                a_mase.append(m)
+                            if drift_mae > 1e-9:
+                                a_ratio.append(float(np.mean(np.abs(truth - apred))) / drift_mae)
+                            d = _direction_hit(train, truth, apred)
+                            if d is not None:
+                                a_dir.append(d)
+                            if isinstance(aq, np.ndarray) and aq.shape[0] == horizon:
+                                a_cov.append(float(np.mean((truth >= aq[:, 0]) & (truth <= aq[:, 8]))))
+
+                            # --- reasoning/critique over the production aug3 path ---
+                            try:
+                                qmat = np.asarray(aq, dtype=float) if aq is not None else None
+                                if qmat is not None and (qmat.ndim != 2 or qmat.shape[0] != horizon):
+                                    qmat = None
+                                reasoned = forecast_reasoning.reason(train, horizon, apred, qmat)
+                                trpred = np.asarray(reasoned.get("point", []), dtype=float)
+                                rq = reasoned.get("p10"), reasoned.get("p90")
+                            except Exception:
+                                trpred, rq = np.array([]), (None, None)
+                            if len(trpred) == horizon and np.all(np.isfinite(trpred)):
+                                m = _mase(truth, trpred, train)
+                                if math.isfinite(m):
+                                    tr_mase.append(m)
+                                if drift_mae > 1e-9:
+                                    tr_ratio.append(float(np.mean(np.abs(truth - trpred))) / drift_mae)
+                                d = _direction_hit(train, truth, trpred)
+                                if d is not None:
+                                    tr_dir.append(d)
+                                if rq[0] is not None and rq[1] is not None:
+                                    tr_cov.append(float(np.mean(
+                                        (truth >= np.asarray(rq[0], dtype=float))
+                                        & (truth <= np.asarray(rq[1], dtype=float))
+                                    )))
 
             if not f_mase and not tf_mase:
                 continue
@@ -303,35 +374,132 @@ def real_series_backtest(horizon: int = 6, step: int = 6, min_train: int = 48) -
                 "origins": max(len(f_mase), len(tf_mase)),
                 "mase": round(float(np.median(f_mase)), 3) if f_mase else None,
                 "mase_timesfm": round(float(np.median(tf_mase)), 3) if tf_mase else None,
+                "mase_timesfm_aug3": round(float(np.median(a_mase)), 3) if a_mase else None,
+                "mase_reasoned": round(float(np.median(r_mase)), 3) if r_mase else None,
+                "mase_timesfm_reasoned": round(float(np.median(tr_mase)), 3) if tr_mase else None,
                 "beats_naive_share": round(sum(1 for m in f_mase if m < 1) / max(1, len(f_mase)), 3),
                 "trend_hit": round(float(np.mean(f_dir)), 3) if f_dir else None,
                 "trend_hit_timesfm": round(float(np.mean(tf_dir)), 3) if tf_dir else None,
+                "trend_hit_timesfm_aug3": round(float(np.mean(a_dir)), 3) if a_dir else None,
+                "trend_hit_reasoned": round(float(np.mean(r_dir)), 3) if r_dir else None,
+                "trend_hit_timesfm_reasoned": round(float(np.mean(tr_dir)), 3) if tr_dir else None,
                 "trend_base": round(float(np.mean(base_dir)), 3) if base_dir else None,
                 "trend_skill": (
                     round(float(np.mean(f_dir)) - float(np.mean(base_dir)), 3)
                     if f_dir and base_dir else None
                 ),
+                "trend_skill_timesfm_aug3": (
+                    round(float(np.mean(a_dir)) - float(np.mean(base_dir)), 3)
+                    if a_dir and base_dir else None
+                ),
+                "trend_skill_timesfm_reasoned": (
+                    round(float(np.mean(tr_dir)) - float(np.mean(base_dir)), 3)
+                    if tr_dir and base_dir else None
+                ),
+                "trend_skill_reasoned": (
+                    round(float(np.mean(r_dir)) - float(np.mean(base_dir)), 3)
+                    if r_dir and base_dir else None
+                ),
                 "vs_drift": round(float(np.median(f_ratio)), 3) if f_ratio else None,
                 "vs_drift_timesfm": round(float(np.median(tf_ratio)), 3) if tf_ratio else None,
+                "vs_drift_timesfm_aug3": round(float(np.median(a_ratio)), 3) if a_ratio else None,
+                "vs_drift_reasoned": round(float(np.median(r_ratio)), 3) if r_ratio else None,
+                "vs_drift_timesfm_reasoned": round(float(np.median(tr_ratio)), 3) if tr_ratio else None,
+                "coverage_timesfm": round(float(np.mean(tf_cov)), 3) if tf_cov else None,
+                "coverage_timesfm_aug3": round(float(np.mean(a_cov)), 3) if a_cov else None,
+                "coverage_timesfm_reasoned": round(float(np.mean(tr_cov)), 3) if tr_cov else None,
             })
 
         rows.sort(key=lambda r: (r["vs_drift_timesfm"] if r["vs_drift_timesfm"] is not None else 99,
                                  r["vs_drift"] if r["vs_drift"] is not None else 99))
         f_all = [r["mase"] for r in rows if r["mase"] is not None]
         tf_all = [r["mase_timesfm"] for r in rows if r["mase_timesfm"] is not None]
+        a_all = [r["mase_timesfm_aug3"] for r in rows if r["mase_timesfm_aug3"] is not None]
+        r_all = [r["mase_reasoned"] for r in rows if r["mase_reasoned"] is not None]
+        tr_all = [r["mase_timesfm_reasoned"] for r in rows if r["mase_timesfm_reasoned"] is not None]
         f_dir_all = [r["trend_hit"] for r in rows if r["trend_hit"] is not None]
         tf_dir_all = [r["trend_hit_timesfm"] for r in rows if r["trend_hit_timesfm"] is not None]
+        a_dir_all = [r["trend_hit_timesfm_aug3"] for r in rows if r["trend_hit_timesfm_aug3"] is not None]
+        r_dir_all = [r["trend_hit_reasoned"] for r in rows if r["trend_hit_reasoned"] is not None]
+        tr_dir_all = [r["trend_hit_timesfm_reasoned"] for r in rows if r["trend_hit_timesfm_reasoned"] is not None]
         base_all = [r["trend_base"] for r in rows if r["trend_base"] is not None]
         skill_all = [r["trend_skill"] for r in rows if r["trend_skill"] is not None]
+        r_skill_all = [r["trend_skill_reasoned"] for r in rows if r["trend_skill_reasoned"] is not None]
+        a_skill_all = [r["trend_skill_timesfm_aug3"] for r in rows if r["trend_skill_timesfm_aug3"] is not None]
+        tr_skill_all = [r["trend_skill_timesfm_reasoned"] for r in rows if r["trend_skill_timesfm_reasoned"] is not None]
+        tf_cov_all = [r["coverage_timesfm"] for r in rows if r["coverage_timesfm"] is not None]
+        a_cov_all = [r["coverage_timesfm_aug3"] for r in rows if r["coverage_timesfm_aug3"] is not None]
+        tr_cov_all = [r["coverage_timesfm_reasoned"] for r in rows if r["coverage_timesfm_reasoned"] is not None]
         ratio_all = [r["vs_drift"] for r in rows if r["vs_drift"] is not None]
         tf_ratio_all = [r["vs_drift_timesfm"] for r in rows if r["vs_drift_timesfm"] is not None]
+        a_ratio_all = [r["vs_drift_timesfm_aug3"] for r in rows if r["vs_drift_timesfm_aug3"] is not None]
+        r_ratio_all = [r["vs_drift_reasoned"] for r in rows if r["vs_drift_reasoned"] is not None]
+        tr_ratio_all = [r["vs_drift_timesfm_reasoned"] for r in rows if r["vs_drift_timesfm_reasoned"] is not None]
         median_mase = round(float(np.median(f_all)), 3) if f_all else None
         median_tf = round(float(np.median(tf_all)), 3) if tf_all else None
+        median_a = round(float(np.median(a_all)), 3) if a_all else None
+        median_r = round(float(np.median(r_all)), 3) if r_all else None
+        median_tr = round(float(np.median(tr_all)), 3) if tr_all else None
         median_base = round(float(np.median(base_all)), 3) if base_all else None
         median_skill = round(float(np.median(skill_all)), 3) if skill_all else None
+        median_a_skill = round(float(np.median(a_skill_all)), 3) if a_skill_all else None
+        median_tr_skill = round(float(np.median(tr_skill_all)), 3) if tr_skill_all else None
+        median_r_skill = round(float(np.median(r_skill_all)), 3) if r_skill_all else None
         median_ratio = round(float(np.median(ratio_all)), 3) if ratio_all else None
         median_tf_ratio = round(float(np.median(tf_ratio_all)), 3) if tf_ratio_all else None
-        benchmark = median_tf_ratio if median_tf_ratio is not None else median_ratio
+        median_a_ratio = round(float(np.median(a_ratio_all)), 3) if a_ratio_all else None
+        median_r_ratio = round(float(np.median(r_ratio_all)), 3) if r_ratio_all else None
+        median_tr_ratio = round(float(np.median(tr_ratio_all)), 3) if tr_ratio_all else None
+        median_tf_cov = round(float(np.median(tf_cov_all)), 3) if tf_cov_all else None
+        median_a_cov = round(float(np.median(a_cov_all)), 3) if a_cov_all else None
+        median_tr_cov = round(float(np.median(tr_cov_all)), 3) if tr_cov_all else None
+
+        def paired(a_key: str, b_key: str) -> tuple[list[float], int, int, int]:
+            ds = [
+                r[a_key] - r[b_key] for r in rows
+                if r.get(a_key) is not None and r.get(b_key) is not None
+            ]
+            return ds, sum(1 for d in ds if d < -0.01), sum(1 for d in ds if d > 0.01), len(ds)
+
+        aug_d, aug_helped, aug_hurt, aug_n = paired("vs_drift_timesfm_aug3", "vs_drift_timesfm")
+        aug_skill_d, _, _, _ = paired("trend_skill_timesfm_aug3", "trend_skill")
+        rsn_d, rsn_helped, rsn_hurt, rsn_n = paired(
+            "vs_drift_timesfm_reasoned", "vs_drift_timesfm_aug3")
+        rsn_skill_d, _, _, _ = paired(
+            "trend_skill_timesfm_reasoned", "trend_skill_timesfm_aug3")
+
+        # Production path is augmented TimesFM; fall back to raw foundation, then
+        # to the surrogate if the model did not load.
+        benchmark = (median_a_ratio if median_a_ratio is not None
+                     else median_tf_ratio if median_tf_ratio is not None
+                     else median_ratio)
+        augmentation_verdict = (
+            "test-time augmentation beats the raw foundation path on the median category"
+            if (median_a_ratio is not None and median_tf_ratio is not None
+                and median_a_ratio < median_tf_ratio - 1e-9)
+            else "test-time augmentation did not beat the raw foundation path on this backtest; "
+                 "keep it visible as a sensitivity check, not as an accuracy claim"
+        )
+        coverage_gain = (
+            median_tr_cov - median_a_cov
+            if median_tr_cov is not None and median_a_cov is not None else None
+        )
+        if (median_tr_ratio is not None and median_a_ratio is not None
+                and median_tr_ratio < median_a_ratio - 1e-9):
+            reasoning_verdict = (
+                "reasoning/critique improves the augmented production path on the median category"
+            )
+        elif coverage_gain is not None and coverage_gain > 0.01:
+            reasoning_verdict = (
+                "reasoning/critique leaves the point path unchanged on this backtest but "
+                f"raises 80% interval coverage from {median_a_cov:.0%} to {median_tr_cov:.0%}; "
+                "it is a calibration and audit layer, not a point-accuracy multiplier"
+            )
+        else:
+            reasoning_verdict = (
+                "reasoning/critique does not improve the augmented path on this backtest; "
+                "it is surfaced as an audit trail, not an accuracy claim"
+            )
         return {
             "horizon": horizon,
             "step": step,
@@ -340,27 +508,73 @@ def real_series_backtest(horizon: int = 6, step: int = 6, min_train: int = 48) -
             "timesfm_loaded": timesfm_loaded,
             "median_mase": median_mase,
             "median_mase_timesfm": median_tf,
+            "median_mase_timesfm_aug3": median_a,
+            "median_mase_reasoned": median_r,
+            "median_mase_timesfm_reasoned": median_tr,
             "median_beats_naive_share": (
                 round(float(np.median([r["beats_naive_share"] for r in rows])), 3) if rows else None
             ),
             "median_trend_hit": round(float(np.median(f_dir_all)), 3) if f_dir_all else None,
             "median_trend_hit_timesfm": round(float(np.median(tf_dir_all)), 3) if tf_dir_all else None,
+            "median_trend_hit_timesfm_aug3": round(float(np.median(a_dir_all)), 3) if a_dir_all else None,
+            "median_trend_hit_reasoned": round(float(np.median(r_dir_all)), 3) if r_dir_all else None,
+            "median_trend_hit_timesfm_reasoned": round(float(np.median(tr_dir_all)), 3) if tr_dir_all else None,
             "median_trend_base": median_base,
             "median_trend_skill": median_skill,
+            "median_trend_skill_timesfm_aug3": median_a_skill,
+            "median_trend_skill_timesfm_reasoned": median_tr_skill,
+            "median_trend_skill_reasoned": median_r_skill,
             "median_vs_drift": median_ratio,
             "median_vs_drift_timesfm": median_tf_ratio,
+            "median_vs_drift_timesfm_aug3": median_a_ratio,
+            "median_vs_drift_reasoned": median_r_ratio,
+            "median_vs_drift_timesfm_reasoned": median_tr_ratio,
+            "median_coverage": median_tf_cov,
+            "median_coverage_timesfm": median_tf_cov,
+            "median_coverage_timesfm_aug3": median_a_cov,
+            "median_coverage_timesfm_reasoned": median_tr_cov,
+            "augmentation_delta": {
+                "vs_drift_timesfm": round(float(np.median(aug_d)), 3) if aug_d else None,
+                "trend_skill": round(float(np.median(aug_skill_d)), 3) if aug_skill_d else None,
+                "topics_helped": aug_helped,
+                "topics_hurt": aug_hurt,
+                "topics_compared": aug_n,
+                "note": (
+                    "Test-time augmentation (level + log + first difference) versus the raw "
+                    "TimesFM path, paired on the same origins. Negative is better for the "
+                    "error ratio."
+                ),
+            },
+            "reasoning_delta": {
+                "vs_drift_timesfm": round(float(np.median(rsn_d)), 3) if rsn_d else None,
+                "trend_skill": round(float(np.median(rsn_skill_d)), 3) if rsn_skill_d else None,
+                "coverage": round(coverage_gain, 3) if coverage_gain is not None else None,
+                "topics_helped": rsn_helped,
+                "topics_hurt": rsn_hurt,
+                "topics_compared": rsn_n,
+                "note": (
+                    "Reasoning/critique layer versus the augmented production path, paired on "
+                    "the same origins. Negative is better for the error ratio. A mixed result "
+                    "is reported, not hidden."
+                ),
+            },
             "verdict": (
                 "beats a drift benchmark on the median category (still not causal)"
                 if benchmark is not None and benchmark < 1.0
                 else "does not beat a simple drift benchmark; the signal is a weak, "
                      "explicitly labelled prior"
             ),
+            "augmentation_verdict": augmentation_verdict,
+            "reasoning_verdict": reasoning_verdict,
             "note": (
                 "MASE < 1 means the forecast beats a random walk in-sample scale. "
                 "vs_drift compares absolute error to a random-walk-with-drift "
                 "forecast; below 1 there is real added value. trend_skill is "
                 "direction accuracy minus the always-up base rate, so monotone "
-                "series cannot inflate it. Rolling-origin, no future leakage."
+                "series cannot inflate it. Rolling-origin, no future leakage. "
+                "The aug3 column averages TimesFM forecasts on the level, log and "
+                "first-differenced series; the reasoned column applies the critique "
+                "layer on top of that production path."
             ),
         }
 
@@ -462,13 +676,27 @@ def battery(deep: bool = False) -> dict[str, Any]:
             "known_answer_passed": f"{known['passed']}/{known['total']}",
             "median_mase": backtest["median_mase"],
             "median_mase_timesfm": backtest.get("median_mase_timesfm"),
+            "median_mase_timesfm_aug3": backtest.get("median_mase_timesfm_aug3"),
             "forecast_beats_naive_share": backtest["median_beats_naive_share"],
             "trend_hit": backtest.get("median_trend_hit"),
             "trend_hit_timesfm": backtest.get("median_trend_hit_timesfm"),
+            "trend_hit_timesfm_aug3": backtest.get("median_trend_hit_timesfm_aug3"),
             "trend_base": backtest.get("median_trend_base"),
             "trend_skill": backtest.get("median_trend_skill"),
+            "trend_skill_timesfm_aug3": backtest.get("median_trend_skill_timesfm_aug3"),
             "vs_drift": backtest.get("median_vs_drift"),
             "vs_drift_timesfm": backtest.get("median_vs_drift_timesfm"),
+            "vs_drift_timesfm_aug3": backtest.get("median_vs_drift_timesfm_aug3"),
+            "vs_drift_reasoned": backtest.get("median_vs_drift_reasoned"),
+            "vs_drift_timesfm_reasoned": backtest.get("median_vs_drift_timesfm_reasoned"),
+            "coverage": backtest.get("median_coverage_timesfm"),
+            "coverage_aug3": backtest.get("median_coverage_timesfm_aug3"),
+            "coverage_reasoned": backtest.get("median_coverage_timesfm_reasoned"),
+            "trend_skill_reasoned": backtest.get("median_trend_skill_reasoned"),
+            "augmentation_delta": backtest.get("augmentation_delta"),
+            "reasoning_delta": backtest.get("reasoning_delta"),
+            "augmentation_verdict": backtest.get("augmentation_verdict"),
+            "reasoning_verdict": backtest.get("reasoning_verdict"),
             "forecast_verdict": backtest.get("verdict"),
         },
         "limits": [

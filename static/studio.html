@@ -50,13 +50,20 @@
     <div class="field field--row">
       <label class="mini">
         <span>Agents <b id="agentsVal">240</b></span>
-        <input type="range" id="agentsRange" min="80" max="800" step="40" value="240" />
+        <input type="range" id="agentsRange" min="80" max="3000" step="40" value="240" />
       </label>
       <label class="mini">
         <span>Rounds <b id="roundsVal">36</b></span>
         <input type="range" id="roundsRange" min="12" max="72" step="4" value="36" />
       </label>
     </div>
+    <div class="agent-presets" id="agentPresets">
+      <button type="button" data-agents="240">240 · fast</button>
+      <button type="button" data-agents="800">800</button>
+      <button type="button" data-agents="1500">1500</button>
+      <button type="button" data-agents="3000">3000 · batched</button>
+    </div>
+    <p class="rail-note" style="margin-top:6px">Above 600 agents the belief network switches to a batched NumPy backend (same 6-4-1 architecture, recorded in provenance). Large cohorts run in seconds.</p>
 
     <div class="field">
       <span class="field__label">Tier mix <em id="tierTotal">100%</em></span>
@@ -202,7 +209,7 @@
           <div class="prov-grid">
             <div class="prov-item"><span class="prov-tag">Simulation</span><span>Awareness · adoption · sentiment · rejection · tier conversion — agent-based diffusion, explicit parameters, auditable seed.</span></div>
             <div class="prov-item"><span class="prov-tag">TimesFM 3.0</span><span>Category demand history & counterfactual — Google Research zero-shot forecast, non-commercial checkpoint.</span></div>
-            <div class="prov-item"><span class="prov-tag">Atlas</span><span>Sourced context graph — 60 sources, 123 curated facts, 267 nodes; per-agent citations.</span></div>
+            <div class="prov-item"><span class="prov-tag">Atlas</span><span>Sourced context graph — 64 sources, 147 curated facts, 291 nodes; per-agent citations.</span></div>
             <div class="prov-item"><span class="prov-tag">Precedents</span><span>16 reconstructed Indian market perception arcs — illustrative, not measured panels or causal estimates.</span></div>
             <div class="prov-item"><span class="prov-tag">Research</span><span>Live public-record lookup (Wikipedia) for custom briefs; cached by brief text.</span></div>
             <div class="prov-item"><span class="prov-tag">LLM</span><span>Optional open-source/hosted model for citizen replies & debate challenges; deterministic fallback when unavailable.</span></div>
@@ -339,9 +346,20 @@
       <section class="view" id="view-cognition">
         <div class="view-head">
           <div><span class="panel__eyebrow">Cognition model</span><h1 class="view-title">Not a persona. <em>A decision function.</em></h1></div>
-          <span class="chip chip--muted">4 tiers · 33 occupations · 16 biases</span>
+          <span class="chip chip--muted" id="cognitionChip">4 tiers · 48 occupations · 16 biases</span>
         </div>
         <div class="tier-cards" id="tierCards"></div>
+        <div class="cognition-grid">
+          <div class="panel">
+            <div class="panel__head"><div><span class="panel__eyebrow">Diversity</span><h2 class="panel__title">Who is actually in the room</h2></div><span class="panel__meta" id="diversityMeta">—</span></div>
+            <div id="diversityView" class="bar-list"><p class="small-copy">Run a simulation to see coverage across occupations, ideology, thought, class, schooling and personality.</p></div>
+            <p class="causal-note">Divisions are structural context with small explicit effects, never identity claims. Protected axes (religion, caste, ideology) are diagnostic only.</p>
+          </div>
+          <div class="panel">
+            <div class="panel__head"><div><span class="panel__eyebrow">Divisions</span><h2 class="panel__title">Where it actually converts</h2></div></div>
+            <div id="divisionView"><p class="small-copy">Run a simulation to see conversion by division, with TimesFM market correlation and lead/lag.</p></div>
+          </div>
+        </div>
         <div class="cognition-grid">
           <div class="panel">
             <div class="panel__head"><div><span class="panel__eyebrow">Drivers</span><h2 class="panel__title">What correlates with adoption</h2></div></div>
@@ -358,6 +376,9 @@
             <div class="agent-filters">
               <input class="input input--sm" id="agentSearch" placeholder="Search name, city, occupation…" />
               <select class="select select--sm" id="agentTier"><option value="">All tiers</option><option value="1">Tier 1</option><option value="2">Tier 2</option><option value="3">Tier 3</option><option value="4">Tier 4</option></select>
+              <select class="select select--sm" id="agentIdeology"><option value="">All ideologies</option><option>Progressive</option><option>Moderate</option><option>Traditional</option><option>Nationalist</option></select>
+              <select class="select select--sm" id="agentClass"><option value="">All classes</option><option>Economically weaker (EWS)</option><option>Lower-middle (LIG)</option><option>Middle (MIG)</option><option>Upper-middle (HIG)</option><option>Affluent</option></select>
+              <select class="select select--sm" id="agentThought"><option value="">All thought</option><option>Analytical</option><option>Deliberative</option><option>Intuitive</option><option>Heuristic-driven</option></select>
             </div>
           </div>
           <div class="agent-grid" id="agentGrid"></div>
@@ -437,7 +458,7 @@
       <section class="view" id="view-evidence">
         <div class="view-head">
           <div><span class="panel__eyebrow">Cited public data</span><h1 class="view-title">Every claim <em>has a source.</em></h1></div>
-          <span class="chip chip--muted" id="evidenceCount">38 cards</span>
+          <span class="chip chip--muted" id="evidenceCount">50 cards</span>
         </div>
         <div class="filters evidence-filters">
           <input class="input input--search" id="evidenceSearch" placeholder="Search evidence, organisations, claims…" />
@@ -622,7 +643,7 @@
             <button class="btn-sm" id="reasonRun"><span data-icon="bolt"></span>Deep reason</button>
           </div>
         </div>
-        <p class="reason-note">Frame → retrieve → simulate → replicate → stress → challenge → revise → verify. The loop is allowed to lower its own confidence, downgrade a scale call and name what would change its mind. That is the quality claim — not a multiplier.</p>
+        <p class="reason-note">Frame → retrieve → simulate → replicate → stress → divide → challenge → revise → verify. The loop is allowed to lower its own confidence, downgrade a scale call and name what would change its mind. That is the quality claim — not a multiplier.</p>
         <div class="reason-posture" id="reasonPosture"><div class="skeleton" style="height:88px"></div></div>
         <div class="metrics" id="reasonMetrics"></div>
         <div class="reason-grid">
@@ -639,7 +660,7 @@
             <div id="reasonHypotheses"></div>
           </div>
           <div class="panel">
-            <div class="panel__head"><div><span class="panel__eyebrow">Loop trace</span><h2 class="panel__title">Eight auditable steps</h2></div></div>
+            <div class="panel__head"><div><span class="panel__eyebrow">Loop trace</span><h2 class="panel__title">Nine auditable steps</h2></div></div>
             <div id="reasonTrace" class="reason-trace"></div>
           </div>
           <div class="panel">
@@ -678,6 +699,8 @@
             <div class="panel" id="reportCaveats"></div>
           </aside>
         </div>
+        <div class="panel report-method" id="reportDivisions"></div>
+        <div class="panel report-method" id="reportStrategy"></div>
         <div class="panel report-method" id="reportMethod"></div>
       </section>
     </div>

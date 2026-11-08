@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import datetime as dt
 import math
+import os
 import threading
 from typing import Any
 
@@ -93,6 +94,83 @@ def _fallback(values: np.ndarray, horizon: int) -> tuple[np.ndarray, np.ndarray]
     return point, q
 
 
+def _timesfm_predict(m, values, horizon: int, *, make_positive: bool = True):
+    out = m.predict(
+        np.asarray(values, dtype=np.float32),
+        horizon=horizon,
+        return_quantiles=True,
+        make_positive=make_positive,
+    )
+    return np.asarray(out.forecast, dtype=float), np.asarray(out.quantiles, dtype=float)
+
+
+def _augmented_forecast(m, values, horizon: int):
+    """Test-time augmentation across level, log and first-difference views.
+
+    TimesFM is a univariate foundation model, so it is not invariant to a
+    monotone transform of its input. Forecasting the level, the log of the
+    level and the first difference, then inverting each view and averaging,
+    is a cheap ensemble. On the rolling-origin backtest it beat the raw
+    foundation path on the median and on most topics; the exact numbers are
+    in the model card rather than asserted here.
+
+    Each view is inverted exactly (exp / cumulative sum) before averaging, so
+    the result stays on the original scale. Views that fail are dropped and
+    named in ``notes``; with fewer than two surviving views the raw path is
+    returned unchanged.
+    """
+    y = np.asarray(values, dtype=float)
+    notes: list[str] = []
+    views: dict[str, tuple[np.ndarray, np.ndarray]] = {}
+
+    point_lvl, q_lvl = _timesfm_predict(m, y, horizon, make_positive=True)
+    views["level"] = (point_lvl, q_lvl)
+
+    shift = 0.0
+    if float(np.min(y)) <= 0:
+        shift = float(-np.min(y)) + 1e-6
+    if np.all(y + shift > 0):
+        try:
+            p, q = _timesfm_predict(m, np.log(y + shift), horizon, make_positive=False)
+            p, q = np.exp(p) - shift, np.exp(q) - shift
+            if np.all(np.isfinite(p)) and np.all(np.isfinite(q)):
+                views["log"] = (p, q)
+        except Exception as exc:  # a failed view must not break the forecast
+            notes.append(f"log view failed: {type(exc).__name__}")
+    else:
+        notes.append("log view skipped: series not strictly positive")
+
+    d = np.diff(y)
+    if len(d) >= 8:
+        try:
+            p, q = _timesfm_predict(m, d, horizon, make_positive=False)
+            p = np.cumsum(p) + float(y[-1])
+            q = np.cumsum(q, axis=0) + float(y[-1])
+            if np.all(np.isfinite(p)) and np.all(np.isfinite(q)):
+                views["diff"] = (p, q)
+        except Exception as exc:
+            notes.append(f"difference view failed: {type(exc).__name__}")
+    else:
+        notes.append("difference view skipped: too few differences")
+
+    meta = {
+        "views": list(views),
+        "augmented": len(views) >= 2,
+        "notes": notes,
+        "method": "mean of TimesFM forecasts on level, log and first-differenced series",
+    }
+    if len(views) < 2:
+        return point_lvl, q_lvl, meta
+
+    point = np.mean([v[0] for v in views.values()], axis=0)
+    quantiles = np.mean([v[1] for v in views.values()], axis=0)
+    if float(np.min(y)) >= 0:
+        point = np.maximum(point, 0.0)
+        quantiles = np.maximum(quantiles, 0.0)
+    quantiles = np.sort(quantiles, axis=1)
+    return point, quantiles, meta
+
+
 def _trend_note(values: np.ndarray) -> str:
     y = np.asarray(values, dtype=float)
     if len(y) < 13:
@@ -109,12 +187,17 @@ def _trend_note(values: np.ndarray) -> str:
     return f"The last 12 months are {growth:+.0%} versus the prior year — a plateau, not a take-off."
 
 
-def forecast_series(values, horizon: int, model: str = "auto") -> dict[str, Any]:
+def forecast_series(values, horizon: int, model: str = "auto",
+                    test_time_augmentation: bool = True) -> dict[str, Any]:
     """Forecast an arbitrary series.
 
     Used by the causal layer, which needs a counterfactual for a *truncated*
     series rather than the topic's full history. Returns point, quantiles and
     an honest engine label.
+
+    ``test_time_augmentation`` averages level, log and differenced TimesFM
+    views. Set it to ``False`` to recover the raw foundation path for a
+    controlled comparison.
     """
     y = np.asarray(values, dtype=np.float32)
     horizon = max(1, min(36, int(horizon)))
@@ -124,14 +207,18 @@ def forecast_series(values, horizon: int, model: str = "auto") -> dict[str, Any]
     engine = "fallback:damped-trend"
     point = None
     quantiles = None
+    augmentation = {"views": [], "augmented": False, "notes": []}
     if use_model and len(y) >= 8:
         try:
             m = _load_model()
             if m is not None:
-                out = m.predict(y, horizon=horizon, return_quantiles=True, make_positive=True)
-                point = np.asarray(out.forecast, dtype=float)
-                quantiles = np.asarray(out.quantiles, dtype=float)
-                engine = "timesfm-3.0-mlx"
+                if test_time_augmentation:
+                    point, quantiles, augmentation = _augmented_forecast(m, y, horizon)
+                    engine = ("timesfm-3.0-mlx (aug3)" if augmentation["augmented"]
+                              else "timesfm-3.0-mlx")
+                else:
+                    point, quantiles = _timesfm_predict(m, y, horizon, make_positive=True)
+                    engine = "timesfm-3.0-mlx"
         except Exception as exc:
             engine = f"fallback:damped-trend ({type(exc).__name__})"
     if point is None:
@@ -140,6 +227,7 @@ def forecast_series(values, horizon: int, model: str = "auto") -> dict[str, Any]
         "point": point,
         "quantiles": quantiles,
         "engine": engine,
+        "augmentation": augmentation,
         "horizon": horizon,
         "quantile_labels": _Q_LABELS,
     }
@@ -196,14 +284,14 @@ def forecast_topic(
     engine = "fallback:damped-trend"
     point = None
     quantiles = None
+    augmentation = {"views": [], "augmented": False, "notes": []}
     if use_model:
         try:
             m = _load_model()
             if m is not None:
-                out = m.predict(values, horizon=horizon, return_quantiles=True, make_positive=True)
-                point = np.asarray(out.forecast, dtype=float)
-                quantiles = np.asarray(out.quantiles, dtype=float)
-                engine = "timesfm-3.0-mlx"
+                point, quantiles, augmentation = _augmented_forecast(m, values, horizon)
+                engine = ("timesfm-3.0-mlx (aug3)" if augmentation["augmented"]
+                          else "timesfm-3.0-mlx")
         except Exception as exc:  # keep the product useful on failure
             engine = f"fallback:damped-trend ({type(exc).__name__})"
     if point is None:
@@ -219,6 +307,19 @@ def forecast_topic(
     base = float(values[-1])
     end = float(point[-1])
     change = (end - base) / abs(base) if base else 0.0
+
+    # Reasoning-over-forecast: treat the foundation path as one hypothesis,
+    # score it against cheap forecasters on the series' own history, and audit
+    # the blend. Never replaces the raw path; both are returned.
+    try:
+        from . import forecast_reasoning
+        reasoned = forecast_reasoning.reason(
+            values, horizon, point, quantiles, label=topic["label"],
+            include_llm=os.environ.get("IMPRINT_FORECAST_LLM", "").strip().lower() in ("1", "true", "yes", "on"),
+        )
+    except Exception as exc:  # keep the forecast endpoint useful
+        reasoned = {"available": False, "reason": f"{type(exc).__name__}: {exc}"}
+
     result = {
         "topic": {
             "id": topic_id,
@@ -246,12 +347,23 @@ def forecast_topic(
             "trend_note": _trend_note(values),
             "band_width_end": round(float(q["p90"][-1] - q["p10"][-1]), 4),
         },
+        "reasoned": reasoned,
+        "reasoned_forecast": ({
+            "labels": future_labels,
+            "point": reasoned.get("point"),
+            "quantiles": reasoned.get("quantiles"),
+            "p50": reasoned.get("p50"),
+            "p10": reasoned.get("p10"),
+            "p90": reasoned.get("p90"),
+        } if reasoned.get("available") else None),
+        "test_time_augmentation": augmentation,
         "engine": {
             "name": engine,
             "model": "TimesFM 3.0 (zero-shot, 200M)",
             "backend": "Apple MLX" if engine.startswith("timesfm") else "numpy fallback",
             "checkpoint": "google/timesfm-3.0-pytorch",
             "zero_shot": True,
+            "test_time_augmentation": augmentation,
             "horizon_months": horizon,
             "license_note": "TimesFM 3.0 weights are released for non-commercial use. This rehearsal is a research demo.",
             "caveat": "A forecast is a conditional extrapolation, not a causal claim. The simulation is a separate, explicitly synthetic exercise.",

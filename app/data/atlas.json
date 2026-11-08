@@ -1,6 +1,6 @@
 {
  "version": "2026.11-seed",
- "built": "2026-11-05",
+ "built": "2026-11-08",
  "scope_note": "Curated public-data seed. It is not a census and not a trained foundation model. Indicators are cited; derived context nodes are generated from public distributions. Add documents with app/ingest.py to expand the corpus.",
  "sources": [
   {
@@ -602,6 +602,46 @@
    "type": "industry body",
    "coverage": "national",
    "note": "Retail, FMCG and MSME context."
+  },
+  {
+   "id": "mospi_tus2024",
+   "org": "Ministry of Statistics and Programme Implementation (MoSPI)",
+   "title": "Time Use Survey 2024 (January-December 2024)",
+   "year": 2025,
+   "url": "https://www.mospi.gov.in/sites/default/files/press_release/PR_TUS_25022025.pdf",
+   "type": "government survey",
+   "coverage": "national / state / gender / age",
+   "note": "Paid and unpaid work time, care burden and the gender gap; second TUS after 2019."
+  },
+  {
+   "id": "mospi_elderly2021",
+   "org": "Ministry of Statistics and Programme Implementation (MoSPI)",
+   "title": "Elderly in India 2021",
+   "year": 2021,
+   "url": "https://mospi.gov.in/sites/default/files/publication_reports/Elderly%20in%20India%202021.pdf",
+   "type": "government report",
+   "coverage": "national / state",
+   "note": "Population ageing, dependency ratios, literacy and living arrangements of persons 60+."
+  },
+  {
+   "id": "economic_survey2324",
+   "org": "Ministry of Finance, Government of India",
+   "title": "Economic Survey 2023-24",
+   "year": 2024,
+   "url": "https://www.indiabudget.gov.in/economicsurvey/",
+   "type": "government report",
+   "coverage": "national",
+   "note": "Jobs requirement, structural change in workforce, gig projection and AI exposure."
+  },
+  {
+   "id": "niti_gig2022",
+   "org": "NITI Aayog",
+   "title": "India's Booming Gig and Platform Economy",
+   "year": 2022,
+   "url": "https://niti.gov.in/sites/default/files/2022-06/India_Gig_and_Platform_Economy_Report_2022.pdf",
+   "type": "government report",
+   "coverage": "national",
+   "note": "Gig workforce estimates and projections; definitional boundaries are wide."
   }
  ],
  "facts": [
@@ -1462,15 +1502,14 @@
    "unit": "million",
    "year": 2022,
    "source_ids": [
-    "niti_adp",
-    "plfs2324"
+    "niti_gig2022"
    ],
    "tags": [
     "gig",
     "platform",
     "jobs"
    ],
-   "detail": "NITI Aayog 2022 estimate; projected 23.5 million by 2029-30. Definitional debates are large.",
+   "detail": "NITI Aayog 2022 baseline; projected 23.5 million by 2029-30. Definitional debates are large.",
    "confidence": "medium",
    "geo": "India"
   },
@@ -2977,6 +3016,468 @@
     "norms"
    ],
    "detail": "In small communities, visible excess can invite envy or suspicion; understatement is sometimes the safer signal.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "tus_women_domestic",
+   "dimension": "gender",
+   "claim": "Time women spend on unpaid domestic services",
+   "value": "289",
+   "unit": "minutes / day",
+   "year": 2024,
+   "source_ids": [
+    "mospi_tus2024"
+   ],
+   "tags": [
+    "gender",
+    "care",
+    "time-use",
+    "unpaid-work"
+   ],
+   "detail": "TUS 2024, persons 6+. Down from 299 minutes in 2019; men spent 88 minutes in 2024.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "tus_men_domestic",
+   "dimension": "gender",
+   "claim": "Time men spend on unpaid domestic services",
+   "value": "88",
+   "unit": "minutes / day",
+   "year": 2024,
+   "source_ids": [
+    "mospi_tus2024"
+   ],
+   "tags": [
+    "gender",
+    "care",
+    "time-use",
+    "unpaid-work"
+   ],
+   "detail": "TUS 2024, persons 6+. Women's burden is 3.3x men's; the gap narrowed only ~10 minutes in five years.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "tus_women_care",
+   "dimension": "gender",
+   "claim": "Time women spend on unpaid caregiving",
+   "value": "137",
+   "unit": "minutes / day",
+   "year": 2024,
+   "source_ids": [
+    "mospi_tus2024"
+   ],
+   "tags": [
+    "gender",
+    "care",
+    "time-use",
+    "elderly"
+   ],
+   "detail": "TUS 2024, participants. Men spent 75 minutes. Care load rises with ageing and illness.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "tus_women_unpaid_participation",
+   "dimension": "gender",
+   "claim": "Women 15-59 engaged in unpaid domestic work",
+   "value": "83.9",
+   "unit": "%",
+   "year": 2024,
+   "source_ids": [
+    "mospi_tus2024"
+   ],
+   "tags": [
+    "gender",
+    "care",
+    "time-use",
+    "labour"
+   ],
+   "detail": "TUS 2024. Only 30.4% of men in the same age band did any domestic work.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "tus_women_paid_time",
+   "dimension": "gender",
+   "claim": "Time women spend on paid employment",
+   "value": "62",
+   "unit": "minutes / day",
+   "year": 2024,
+   "source_ids": [
+    "mospi_tus2024"
+   ],
+   "tags": [
+    "gender",
+    "labour",
+    "time-use",
+    "women-work"
+   ],
+   "detail": "TUS 2024, persons 6+. Up from 56 minutes in 2019; men's paid time is several times higher.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "elderly_pop",
+   "dimension": "demography",
+   "claim": "Population aged 60 and above",
+   "value": "138",
+   "unit": "million",
+   "year": 2021,
+   "source_ids": [
+    "mospi_elderly2021"
+   ],
+   "tags": [
+    "ageing",
+    "demography",
+    "elderly"
+   ],
+   "detail": "67 million men and 71 million women. Projected 193.8 million by 2031.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "elderly_share",
+   "dimension": "demography",
+   "claim": "Share of population aged 60 and above",
+   "value": "10.1",
+   "unit": "%",
+   "year": 2021,
+   "source_ids": [
+    "mospi_elderly2021"
+   ],
+   "tags": [
+    "ageing",
+    "demography",
+    "elderly"
+   ],
+   "detail": "Up from 8.6% in 2011; projected 13.1% by 2031. Kerala is highest at 16.5%.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "elderly_dependency",
+   "dimension": "demography",
+   "claim": "Old-age dependency ratio",
+   "value": "15.7",
+   "unit": "per 100 (15-59)",
+   "year": 2021,
+   "source_ids": [
+    "mospi_elderly2021"
+   ],
+   "tags": [
+    "ageing",
+    "dependency",
+    "elderly"
+   ],
+   "detail": "Projected 20.1 by 2031. Kerala's dependency is structurally higher than the national average.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "elderly_kerala",
+   "dimension": "geography",
+   "claim": "Kerala share of population aged 60+",
+   "value": "16.5",
+   "unit": "%",
+   "year": 2021,
+   "source_ids": [
+    "mospi_elderly2021"
+   ],
+   "tags": [
+    "ageing",
+    "kerala",
+    "elderly"
+   ],
+   "detail": "Highest among major states; Bihar is lowest at 7.7%. Ageing is regionally uneven.",
+   "confidence": "high",
+   "geo": "Kerala"
+  },
+  {
+   "id": "es_jobs_needed",
+   "dimension": "jobs",
+   "claim": "Annual non-farm jobs required until 2030",
+   "value": "78.5",
+   "unit": "lakh / year",
+   "year": 2024,
+   "source_ids": [
+    "economic_survey2324"
+   ],
+   "tags": [
+    "jobs",
+    "employment",
+    "structural"
+   ],
+   "detail": "Average needed to absorb the rising workforce as agriculture sheds labour. A demand-side constraint on consumption.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "es_agri_share_2047",
+   "dimension": "jobs",
+   "claim": "Projected agriculture share of workforce, 2047",
+   "value": "25",
+   "unit": "%",
+   "year": 2024,
+   "source_ids": [
+    "economic_survey2324"
+   ],
+   "tags": [
+    "jobs",
+    "agriculture",
+    "structural"
+   ],
+   "detail": "Down from 45.8% in 2023. The transition is the central income-mobility story for mass-market demand.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "es_gig_2030",
+   "dimension": "jobs",
+   "claim": "Projected gig workforce, 2029-30",
+   "value": "23.5",
+   "unit": "million",
+   "year": 2024,
+   "source_ids": [
+    "economic_survey2324",
+    "niti_gig2022"
+   ],
+   "tags": [
+    "gig",
+    "platform",
+    "jobs"
+   ],
+   "detail": "About 6.7% of the non-agricultural workforce. Projection, not an observed count.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "gig_base_2021",
+   "dimension": "jobs",
+   "claim": "Gig workers, 2020-21",
+   "value": "7.7",
+   "unit": "million",
+   "year": 2021,
+   "source_ids": [
+    "niti_gig2022"
+   ],
+   "tags": [
+    "gig",
+    "platform",
+    "jobs"
+   ],
+   "detail": "NITI Aayog baseline. Excludes informal platform-adjacent work, so the true base is contested.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "nfhs_stunting",
+   "dimension": "health",
+   "claim": "Children under 5 who are stunted",
+   "value": "35.5",
+   "unit": "%",
+   "year": 2021,
+   "source_ids": [
+    "nfhs5"
+   ],
+   "tags": [
+    "health",
+    "nutrition",
+    "children"
+   ],
+   "detail": "Down from 38.4% in NFHS-4, but more than one in three. Chronic undernutrition affects lifetime earnings.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "nfhs_wasting",
+   "dimension": "health",
+   "claim": "Children under 5 who are wasted",
+   "value": "19.3",
+   "unit": "%",
+   "year": 2021,
+   "source_ids": [
+    "nfhs5"
+   ],
+   "tags": [
+    "health",
+    "nutrition",
+    "children"
+   ],
+   "detail": "Acute undernutrition. Down from 21.0% in NFHS-4.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "nfhs_anaemia_women",
+   "dimension": "health",
+   "claim": "Women 15-49 who are anaemic",
+   "value": "57.0",
+   "unit": "%",
+   "year": 2021,
+   "source_ids": [
+    "nfhs5"
+   ],
+   "tags": [
+    "health",
+    "nutrition",
+    "gender"
+   ],
+   "detail": "Up from 53.1% in NFHS-4; child anaemia rose to 67.1%. A direct drag on energy, work and learning.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "nfhs_clean_fuel",
+   "dimension": "infrastructure",
+   "claim": "Households using clean cooking fuel",
+   "value": "58.6",
+   "unit": "%",
+   "year": 2021,
+   "source_ids": [
+    "nfhs5"
+   ],
+   "tags": [
+    "energy",
+    "household",
+    "infrastructure"
+   ],
+   "detail": "NFHS-5. Rural 43.2%, urban 89.7%. Fuel stacking remains common, so coverage overstates exclusive use.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "nfhs_health_insurance",
+   "dimension": "finance",
+   "claim": "Households with any member covered by health insurance",
+   "value": "41.0",
+   "unit": "%",
+   "year": 2021,
+   "source_ids": [
+    "nfhs5"
+   ],
+   "tags": [
+    "health",
+    "insurance",
+    "household"
+   ],
+   "detail": "NFHS-5. Rural 42.4%, urban 38.1%; coverage is not the same as adequate cover.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "health_gdp",
+   "dimension": "health",
+   "claim": "Total health expenditure as share of GDP",
+   "value": "3.83",
+   "unit": "% of GDP",
+   "year": 2022,
+   "source_ids": [
+    "nha"
+   ],
+   "tags": [
+    "health",
+    "spending",
+    "gdp"
+   ],
+   "detail": "NHA 2021-22. Government health expenditure was 1.84% of GDP and 48% of total health spending.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "health_oop",
+   "dimension": "health",
+   "claim": "Out-of-pocket share of total health expenditure",
+   "value": "39.4",
+   "unit": "%",
+   "year": 2022,
+   "source_ids": [
+    "nha"
+   ],
+   "tags": [
+    "health",
+    "spending",
+    "household"
+   ],
+   "detail": "NHA 2021-22, down from 48.8% in 2017-18. Still a large household financial shock.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "fin_fi_index",
+   "dimension": "finance",
+   "claim": "RBI Financial Inclusion Index",
+   "value": "64.2",
+   "unit": "index (0-100)",
+   "year": 2024,
+   "source_ids": [
+    "rbi_fi"
+   ],
+   "tags": [
+    "finance",
+    "inclusion",
+    "banking"
+   ],
+   "detail": "March 2024, up from 60.1 in March 2023. Usage improved most; quality and credit depth lag.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "id_literacy",
+   "dimension": "education",
+   "claim": "Literacy rate (7+)",
+   "value": "74.04",
+   "unit": "%",
+   "year": 2011,
+   "source_ids": [
+    "census2011"
+   ],
+   "tags": [
+    "education",
+    "literacy",
+    "census"
+   ],
+   "detail": "Male 82.14%, female 65.46%. The base for adult learning and print/online language demand.",
+   "confidence": "high",
+   "geo": "India"
+  },
+  {
+   "id": "id_disability",
+   "dimension": "health",
+   "claim": "Population with disability",
+   "value": "2.21",
+   "unit": "%",
+   "year": 2011,
+   "source_ids": [
+    "census2011"
+   ],
+   "tags": [
+    "disability",
+    "census",
+    "access"
+   ],
+   "detail": "About 26.8 million people. A design and accessibility constraint, not a niche.",
+   "confidence": "medium",
+   "geo": "India"
+  },
+  {
+   "id": "geo_slum_pop",
+   "dimension": "geography",
+   "claim": "Urban population living in slums",
+   "value": "65.5",
+   "unit": "million",
+   "year": 2011,
+   "source_ids": [
+    "census2011"
+   ],
+   "tags": [
+    "urban",
+    "housing",
+    "poverty"
+   ],
+   "detail": "5.41% of total population and 17.4% of urban population in 2011. Shapes last-mile access and credit.",
    "confidence": "medium",
    "geo": "India"
   }

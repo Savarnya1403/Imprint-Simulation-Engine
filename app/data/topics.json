@@ -982,7 +982,8 @@
    "internet_users",
    "smartphone_hh",
    "nfhs_women_internet",
-   "upi_ten_years"
+   "upi_ten_years",
+   "fi_index"
   ],
   "ground_reality": [
    "The QR code is trusted; the phone call asking for a PIN is not.",
@@ -1288,7 +1289,8 @@
    "ai_usage",
    "english_speakers",
    "gig_workers",
-   "internet_users"
+   "jobs_needed",
+   "census_literacy"
   ],
   "ground_reality": [
    "The threat is task-level, not job-level, but the anxiety is job-level.",
@@ -1596,7 +1598,9 @@
    "internet_hh",
    "nfhs_women_internet",
    "neet_candidates",
-   "languages"
+   "languages",
+   "census_literacy",
+   "nfhs_stunting"
   ],
   "ground_reality": [
    "The winner is not the fanciest app; it is the teacher who replies on WhatsApp.",
@@ -1898,7 +1902,10 @@
    "health_oop",
    "insurance_penetration",
    "mpi",
-   "nfhs_tfr"
+   "health_gdp",
+   "nfhs_insurance",
+   "elderly_pop",
+   "nfhs_anaemia"
   ],
   "ground_reality": [
    "People buy after a hospital event, not before it.",
@@ -2204,7 +2211,8 @@
    "mpce",
    "msme",
    "remittances",
-   "upi_volume"
+   "fi_index",
+   "agri_2047"
   ],
   "ground_reality": [
    "The loan officer is often the only formal financial touchpoint.",
@@ -2507,7 +2515,9 @@
    "mpce",
    "online_shoppers",
    "kirana_share",
-   "dark_patterns"
+   "dark_patterns",
+   "elderly_pop",
+   "agri_2047"
   ],
   "ground_reality": [
    "The ₹5 sachet is a cash-flow product, not a poor person's product.",
@@ -2809,7 +2819,8 @@
    "ott_viewers",
    "internet_users",
    "upi_volume",
-   "dark_patterns"
+   "dark_patterns",
+   "elderly_pop"
   ],
   "ground_reality": [
    "Telecom bundles are the real acquisition channel.",
@@ -3413,7 +3424,8 @@
    "lfpr",
    "ev_2w",
    "upi_volume",
-   "median_age"
+   "gig_2030",
+   "time_use_gap"
   ],
   "ground_reality": [
    "The bike is a capital asset; the rider is the depreciating one.",
@@ -3716,8 +3728,9 @@
    "lfpr",
    "nfhs_women_internet",
    "nfhs_tfr",
-   "internal_migrants",
-   "mpce"
+   "time_use_gap",
+   "nfhs_anaemia",
+   "jobs_needed"
   ],
   "ground_reality": [
    "The unpaid care economy is the hidden subsidy.",
@@ -4324,7 +4337,7 @@
    "agri_workforce",
    "mpi",
    "languages",
-   "remittances"
+   "agri_2047"
   ],
   "ground_reality": [
    "A farmer with 1.5 acres cannot justify owning a drone; the service model is the only path.",
@@ -4627,7 +4640,8 @@
    "median_age",
    "upi_volume",
    "online_shoppers",
-   "dark_patterns"
+   "dark_patterns",
+   "fi_index"
   ],
   "ground_reality": [
    "The 0% EMI is funded by the merchant, not the fairy godmother.",
@@ -4931,7 +4945,8 @@
    "languages",
    "english_speakers",
    "ai_usage",
-   "smartphone_hh"
+   "smartphone_hh",
+   "census_literacy"
   ],
   "ground_reality": [
    "Voice is the interface for the next billion, but dialect accuracy is uneven.",
@@ -5233,7 +5248,9 @@
    "neet_candidates",
    "aser_smartphone",
    "lfpr",
-   "nfhs_tfr"
+   "nfhs_tfr",
+   "jobs_needed",
+   "census_literacy"
   ],
   "ground_reality": [
    "The topper ad is a lottery winner, not a median outcome.",
@@ -5527,7 +5544,8 @@
    "internet_users",
    "lfpr",
    "mpce",
-   "mpi"
+   "mpi",
+   "census_disability"
   ],
   "ground_reality": [
    "India is not one market; it is at least four consumption realities.",

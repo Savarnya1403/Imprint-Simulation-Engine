@@ -63,7 +63,8 @@ def _store_run(result: dict) -> None:
         keep = ("run_id", "provenance", "brief", "question", "topic", "scenario",
                 "scenario_label", "seed", "population", "rounds", "tier_mix",
                 "focus_state", "price", "timeline", "summary", "cognitive",
-                "report", "params", "meta", "audit", "context", "precedents")
+                "report", "params", "meta", "audit", "context", "precedents",
+                "divisions", "diversity", "strategy")
         RUN_BUNDLES[rid] = {k: result.get(k) for k in keep if k in result}
         RUN_BUNDLES.move_to_end(rid)
         while len(RUN_BUNDLES) > MAX_BUNDLES:
@@ -90,7 +91,7 @@ if STATIC.exists():
 
 class SimulateRequest(BaseModel):
     brief: str = Field(default="A ₹1.2 lakh electric scooter for tier-2 India", max_length=400)
-    n_agents: int = Field(default=240, ge=40, le=1600)
+    n_agents: int = Field(default=240, ge=40, le=3000)
     rounds: int = Field(default=36, ge=12, le=120)
     seed: int = Field(default=42, ge=0, le=10_000_000)
     tier_mix: dict[str, float] | None = None
@@ -154,7 +155,7 @@ class IngestRequest(BaseModel):
 
 class ReasonRequest(BaseModel):
     brief: str = Field(default="A ₹1.2 lakh electric scooter for tier-2 India", max_length=400)
-    n_agents: int = Field(default=240, ge=40, le=800)
+    n_agents: int = Field(default=240, ge=40, le=1600)
     rounds: int = Field(default=36, ge=12, le=96)
     seed: int = Field(default=42, ge=0, le=10_000_000)
     tier_mix: dict[str, float] | None = None
@@ -166,7 +167,7 @@ class ReasonRequest(BaseModel):
 
 class ScenarioRequest(BaseModel):
     brief: str = Field(default="A ₹1.2 lakh electric scooter for tier-2 India", max_length=400)
-    n_agents: int = Field(default=200, ge=40, le=800)
+    n_agents: int = Field(default=200, ge=40, le=1600)
     rounds: int = Field(default=36, ge=12, le=120)
     seed: int = 42
     tier_mix: dict[str, float] | None = None
@@ -175,7 +176,7 @@ class ScenarioRequest(BaseModel):
 
 class RobustnessRequest(BaseModel):
     brief: str = Field(default="A ₹1.2 lakh electric scooter for tier-2 India", max_length=400)
-    n_agents: int = Field(default=180, ge=40, le=600)
+    n_agents: int = Field(default=180, ge=40, le=1200)
     rounds: int = Field(default=24, ge=12, le=60)
     seed: int = Field(default=42, ge=0, le=10_000_000)
     tier_mix: dict[str, float] | None = None
@@ -189,7 +190,7 @@ class RobustnessRequest(BaseModel):
 class SensitivityRequest(BaseModel):
     brief: str = Field(default="A ₹1.2 lakh electric scooter for tier-2 India", max_length=400)
     metric: str = Field(default="conversion", pattern="^(conversion|adoption|sentiment)$")
-    n_agents: int = Field(default=150, ge=40, le=500)
+    n_agents: int = Field(default=150, ge=40, le=800)
     rounds: int = Field(default=20, ge=12, le=48)
     seed: int = Field(default=42, ge=0, le=10_000_000)
     tier_mix: dict[str, float] | None = None
@@ -223,7 +224,7 @@ def health():
         "simulation_engine": "Imprint Reasoning Core v2",
         "forecast": forecast.status(),
         "topics": len(store.topics()),
-        "agents_possible": 1600,
+        "agents_possible": 3000,
         "context": {"sources": len(atlas.sources()), "nodes": len(atlas.all_nodes())},
         "calibration": calibration.load_params(),
         "llm": llm.status(),
@@ -442,6 +443,71 @@ def reason(req: ReasonRequest):
             question=req.question,
             replicates=req.replicates,
         )
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"{type(exc).__name__}: {exc}") from exc
+
+
+class StrategyRequest(BaseModel):
+    brief: str = Field(default="A ₹1.2 lakh electric scooter for tier-2 India", max_length=400)
+    n_agents: int = Field(default=800, ge=40, le=3000)
+    rounds: int = Field(default=36, ge=12, le=72)
+    seed: int = Field(default=42, ge=0, le=10_000_000)
+    tier_mix: dict[str, float] | None = None
+    scenario: str = "base"
+    focus_state: str | None = None
+
+
+@app.post("/api/strategy")
+def strategy_endpoint(req: StrategyRequest):
+    """Run (fast) then derive the GTM playbook from its divisions."""
+    try:
+        from . import strategy as _strategy
+
+        result = engine.run_simulation(
+            req.brief,
+            n_agents=req.n_agents,
+            rounds=req.rounds,
+            seed=req.seed,
+            tier_mix=req.tier_mix,
+            scenario=req.scenario,
+            focus_state=req.focus_state,
+            fast=True,
+        )
+        _store_run(result)
+        pb = _strategy.playbook(result)
+        return {
+            "run_id": result.get("run_id"),
+            "brief": req.brief,
+            "population": req.n_agents,
+            "rounds": req.rounds,
+            "topic": result.get("topic"),
+            "summary": result.get("summary"),
+            "divisions": result.get("divisions"),
+            "diversity": result.get("diversity"),
+            "strategy": pb,
+        }
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"{type(exc).__name__}: {exc}") from exc
+
+
+@app.get("/api/strategy/{run_id}")
+def strategy_for_run(run_id: str):
+    bundle = RUN_BUNDLES.get(run_id)
+    if not bundle:
+        raise HTTPException(status_code=404, detail="Run not found or expired (last 24 kept).")
+    try:
+        from . import strategy as _strategy
+
+        # Bundle retains divisions/report/timeline; playbook can rebuild from them.
+        stub = {
+            "topic": bundle.get("topic"),
+            "summary": bundle.get("summary"),
+            "report": bundle.get("report"),
+            "timeline": bundle.get("timeline"),
+            "divisions": bundle.get("divisions"),
+            "agents": [],
+        }
+        return {"run_id": run_id, "strategy": _strategy.playbook(stub)}
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"{type(exc).__name__}: {exc}") from exc
 
@@ -740,7 +806,26 @@ def _export_md(bundle: dict) -> str:
             f"- Granovetter threshold mean: {cog.get('threshold_mean', '—')}",
             f"- Present-bias weight: {cog.get('present_bias_mean', '—')}",
             f"- Trust repair half-life: {cog.get('trust_repair_days', '—')} days",
+            f"- Belief backend: {prov.get('belief_backend', cog.get('belief_backend', '—'))}",
         ]
+    div = bundle.get("divisions") or {}
+    if div.get("leaders"):
+        lines += ["", "## Divisions (leaders by conversion)", ""]
+        for row in div["leaders"][:8]:
+            lines.append(
+                f"- {row.get('axis')}: {row.get('label')} — {row.get('conversion', 0) * 100:.0f}% converted "
+                f"({row.get('adopted')}/{row.get('addressable')}, n={row.get('n')}, lead {row.get('lead_days')})"
+            )
+    st = bundle.get("strategy") or {}
+    if st and not st.get("error"):
+        lines += ["", "## GTM playbook", ""]
+        lines.append(f"- Beachhead tier: {st.get('beachhead', {}).get('tier', '—')}")
+        for line_ in st.get("beachhead", {}).get("lines", [])[:4]:
+            lines.append(f"- {line_}")
+        lines.append(f"- Top blocker: {st.get('top_blocker', '—')}")
+        lines.append(f"- Channels: {', '.join(st.get('channels', []))}")
+        for p in st.get("plan", []):
+            lines.append(f"- {p.get('window')}: {p.get('goal')} — metric: {p.get('metric')}; stop: {p.get('stop_rule')}")
     lines += [
         "",
         "## Limits",

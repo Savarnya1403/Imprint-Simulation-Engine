@@ -86,6 +86,142 @@ ATTIRES = {
 }
 ACCESSORIES = ["bag", "phone", "dupatta", "helmet", "none", "none", "spectacles", "child"]
 
+# ---------------------------------------------------------------------------
+# Diversity axes (48 occupations × ideology × thought × class × education
+# × personality × settlement). All are modelled as structural context with
+# small, explicit effects on trust / risk / conformity — never as claims
+# about what any individual or community believes. Priors are illustrative
+# and anchored to public distributions:
+#  - religion / caste: Census 2011 + Pew (see RELIGION / CASTE above)
+#  - education: Census literacy + UDISE / AISHE attainment
+#  - economic band: HCES MPCE + NITI distributions (household-income proxy)
+#  - ideology: Lokniti-CSDS National Election & Society Surveys (broad
+#    value orientations, not vote intent); used only to vary distrust
+#    in media vs institutions.
+#  - personality (Big Five): McCrae & Costa (1987) NEO dimensions,
+#    derived from the archetype traits below so they stay auditable.
+# ---------------------------------------------------------------------------
+
+SETTLEMENT = {1: "Metro core", 2: "Tier-2 hub", 3: "Small town", 4: "Village / peri-urban"}
+SETTLEMENT_UR = {1: "Urban", 2: "Urban", 3: "Semi-urban", 4: "Rural"}
+
+# Broad orientation priors (not vote choice). Weights are nudged by region,
+# age and education; the nudge is deliberately small.
+IDEOLOGY_BASE = [("Progressive", .24), ("Moderate", .40), ("Traditional", .24), ("Nationalist", .12)]
+IDEOLOGY_REGION_ADJ = {
+    "north": {"Traditional": .06, "Nationalist": .03, "Progressive": -.05},
+    "south": {"Progressive": .06, "Traditional": -.04},
+    "west": {"Moderate": .04},
+    "east": {"Traditional": .04},
+    "central": {"Traditional": .02, "Moderate": .02},
+    "northeast": {"Progressive": .02, "Moderate": .03},
+}
+IDEOLOGY_EFFECT = {
+    "Progressive": {"trust_media": .04, "trust_gov": -.02},
+    "Moderate": {"trust_media": .01, "trust_gov": .01},
+    "Traditional": {"trust_gov": .03, "trust_media": -.02, "conformity": .03},
+    "Nationalist": {"trust_gov": .05, "trust_media": -.03, "status": .02},
+}
+THOUGHT_PROCESS_EFFECT = {
+    "Analytical": {"risk": -.02, "patience": .02},
+    "Deliberative": {"patience": .02},
+    "Intuitive": {"optimism": .02, "risk": .02},
+    "Heuristic-driven": {"conformity": .03},
+}
+
+
+def _age_band(age: int) -> str:
+    if age < 31:
+        return "Young adult (18-30)"
+    if age <= 50:
+        return "Prime (31-50)"
+    return "Older (51+)"
+
+
+def _economic_band(household_income: float) -> str:
+    if household_income < 20000:
+        return "Economically weaker (EWS)"
+    if household_income < 45000:
+        return "Lower-middle (LIG)"
+    if household_income < 100000:
+        return "Middle (MIG)"
+    if household_income < 250000:
+        return "Upper-middle (HIG)"
+    return "Affluent"
+
+
+def _education_band(edu_score: float) -> str:
+    if edu_score < 0.30:
+        return "No formal schooling"
+    if edu_score < 0.44:
+        return "Primary"
+    if edu_score < 0.58:
+        return "Secondary"
+    if edu_score < 0.73:
+        return "Higher secondary"
+    if edu_score < 0.88:
+        return "Graduate"
+    return "Postgraduate / Professional"
+
+
+def _need_for_cognition(traits: dict) -> float:
+    return traits["education"] * 0.55 + (1 - traits["risk"]) * 0.25 + traits["patience"] * 0.20
+
+
+def _thought_process(traits: dict, rng: random.Random) -> str:
+    nfc = _need_for_cognition(traits) + rng.gauss(0, 0.04)
+    if nfc >= 0.62:
+        return "Analytical"
+    if nfc >= 0.50:
+        return "Deliberative"
+    if nfc >= 0.38:
+        return "Intuitive"
+    return "Heuristic-driven"
+
+
+def _ideology(rng: random.Random, region: str, age: int, edu: float, tier: int) -> str:
+    adj = dict(IDEOLOGY_REGION_ADJ.get(region, {}))
+    # Mild structural nudges; kept small so no group is caricatured.
+    if edu >= 0.73:
+        adj["Progressive"] = adj.get("Progressive", 0) + 0.05
+        adj["Moderate"] = adj.get("Moderate", 0) + 0.03
+        adj["Traditional"] = adj.get("Traditional", 0) - 0.05
+    elif edu < 0.44:
+        adj["Traditional"] = adj.get("Traditional", 0) + 0.05
+    if age >= 51:
+        adj["Traditional"] = adj.get("Traditional", 0) + 0.04
+    elif age < 31:
+        adj["Progressive"] = adj.get("Progressive", 0) + 0.03
+    if tier == 1:
+        adj["Progressive"] = adj.get("Progressive", 0) + 0.03
+    pairs = [(label, max(0.02, w + adj.get(label, 0))) for label, w in IDEOLOGY_BASE]
+    return weighted_choice(rng, pairs)
+
+
+def _personality(traits: dict, rng: random.Random) -> dict:
+    o = clamp(traits["digital"] * 0.55 + traits["risk"] * 0.25 + traits["optimism"] * 0.20 + rng.gauss(0, 0.08))
+    c = clamp(traits["patience"] * 0.50 + traits["education"] * 0.30 + (1 - traits["fatalism"]) * 0.20 + rng.gauss(0, 0.08))
+    e = clamp(traits["social_radius"] * 0.45 + traits["voice"] * 0.30 + traits["optimism"] * 0.25 + rng.gauss(0, 0.08))
+    a = clamp(traits["conformity"] * 0.50 + traits["patience"] * 0.30 + traits["trust_gov"] * 0.20 + rng.gauss(0, 0.08))
+    n = clamp((1 - traits["patience"]) * 0.40 + traits["fatalism"] * 0.30 + (1 - traits["risk"]) * 0.30 + rng.gauss(0, 0.08))
+    scores = {
+        "Explorer": o * 0.6 + (1 - n) * 0.4,
+        "Guardian": c * 0.6 + a * 0.4,
+        "Achiever": e * 0.6 + c * 0.4,
+        "Caregiver": a * 0.7 + e * 0.3,
+        "Creator": o * 0.55 + e * 0.45,
+        "Skeptic": n * 0.6 + (1 - a) * 0.4,
+    }
+    cluster = max(scores, key=scores.get)
+    return {
+        "openness": round(o, 3),
+        "conscientiousness": round(c, 3),
+        "extraversion": round(e, 3),
+        "agreeableness": round(a, 3),
+        "neuroticism": round(n, 3),
+        "cluster": cluster,
+    }
+
 
 def weighted_choice(rng: random.Random, pairs):
     total = sum(w for _, w in pairs)
@@ -167,6 +303,14 @@ def build_agent(idx: int, rng: random.Random, tier_dist: dict[int, float], topic
         "student": rng.randint(16, 24), "jobseeker": rng.randint(21, 31),
         "retired": rng.randint(58, 76), "metro_it": rng.randint(23, 45),
         "founder": rng.randint(26, 55), "doctor": rng.randint(28, 62),
+        "call_center": rng.randint(20, 35), "priest": rng.randint(28, 70),
+        "domestic_worker": rng.randint(24, 52), "truck_driver": rng.randint(24, 55),
+        "barber_salon": rng.randint(20, 55), "pharma_rep": rng.randint(24, 45),
+        "tutor_coach": rng.randint(22, 55), "security_guard": rng.randint(22, 55),
+        "dairy_farmer": rng.randint(25, 60), "fisher_worker": rng.randint(22, 56),
+        "powerloom_worker": rng.randint(20, 50), "hotel_owner": rng.randint(28, 58),
+        "carpenter": rng.randint(22, 58), "online_reseller": rng.randint(20, 45),
+        "farmer_fpo": rng.randint(26, 58),
     }.get(arch["id"], rng.randint(23, 60))
     if arch["id"] == "homemaker":
         age = rng.randint(24, 58)
@@ -181,7 +325,13 @@ def build_agent(idx: int, rng: random.Random, tier_dist: dict[int, float], topic
                 "police": .16, "bank_agent": .30, "migrant_worker": .18,
                 "tea_stall": .30, "electrician": .04, "cable_operator": .12,
                 "ngo_worker": .55, "salesperson": .28, "corporate_manager": .38,
-                "govt_employee": .34, "artisan": .48, "retired": .42}.get(arch["id"], .48)
+                "govt_employee": .34, "artisan": .48, "retired": .42,
+                # 15 added occupations (PLFS-consistent gender shares)
+                "domestic_worker": .88, "truck_driver": .02, "barber_salon": .18,
+                "pharma_rep": .30, "tutor_coach": .46, "priest": .04,
+                "security_guard": .06, "dairy_farmer": .30, "fisher_worker": .32,
+                "powerloom_worker": .36, "call_center": .42, "hotel_owner": .24,
+                "carpenter": .05, "online_reseller": .54, "farmer_fpo": .22}.get(arch["id"], .48)
     gender = "female" if rng.random() < female_p else "male"
 
     # names: draw without replacement where possible so a crowd of 240 citizens
@@ -215,6 +365,31 @@ def build_agent(idx: int, rng: random.Random, tier_dist: dict[int, float], topic
     religion = weighted_choice(rng, RELIGION.get(state["name"], DEFAULT_RELIGION))
     caste = weighted_choice(rng, CASTE.get(state["name"], DEFAULT_CASTE))
     lang = LANG.get(state["name"], "Hindi")
+
+    # --- Diversity axes: ideology, thought, class, schooling, personality ---
+    # Derived here, before biases/stance, so their small effects flow into
+    # the decision function. All are structural context, not identity claims.
+    thought = _thought_process(traits, rng)
+    ideology = _ideology(rng, region, age, traits["education"], tier)
+    for k, v in THOUGHT_PROCESS_EFFECT.get(thought, {}).items():
+        traits[k] = clamp(traits[k] + v)
+    for k, v in IDEOLOGY_EFFECT.get(ideology, {}).items():
+        traits[k] = clamp(traits[k] + v)
+    personality = _personality(traits, rng)
+    if personality["neuroticism"] > 0.65:
+        traits["risk"] = clamp(traits["risk"] - 0.03)
+    if personality["openness"] > 0.65:
+        traits["risk"] = clamp(traits["risk"] + 0.02)
+    economic = _economic_band(household_income)
+    if economic.startswith("Economically weaker"):
+        traits["price"] = clamp(traits["price"] + 0.04)
+    elif economic == "Affluent":
+        traits["price"] = clamp(traits["price"] - 0.03)
+    edu_band = _education_band(traits["education"])
+    settlement = SETTLEMENT[tier]
+    settlement_ur = SETTLEMENT_UR[tier]
+    age_band = _age_band(age)
+
     english = sigmoid((traits["education"] - .58) * 3.2 + (tier == 1) * .9 - (age > 40) * .2 + rng.gauss(0, .25))
 
     # media diet
@@ -301,11 +476,14 @@ def build_agent(idx: int, rng: random.Random, tier_dist: dict[int, float], topic
         "name": name,
         "handle": handle,
         "age": age,
+        "age_band": age_band,
         "gender": gender,
         "state": state["name"],
         "region": region,
         "city": city["name"],
         "tier": tier,
+        "settlement": settlement,
+        "settlement_ur": settlement_ur,
         "language": lang,
         "english": round(english, 3),
         "occupation": arch["label"],
@@ -315,10 +493,22 @@ def build_agent(idx: int, rng: random.Random, tier_dist: dict[int, float], topic
         "income_monthly": income,
         "household_income": round(household_income / 500) * 500,
         "household_size": household_size,
+        "economic_status": economic,
         "religion": religion,
         "caste_group": caste,
+        "ideology": ideology,
+        "thought_process": thought,
+        "education_band": edu_band,
         "education": round(traits["education"], 3),
         "digital": round(digital, 3),
+        "personality": personality,
+        "personality_cluster": personality["cluster"],
+        # Backwards-compatible flat copies for segmentation / UI filters.
+        "big5_openness": personality["openness"],
+        "big5_conscientiousness": personality["conscientiousness"],
+        "big5_extraversion": personality["extraversion"],
+        "big5_agreeableness": personality["agreeableness"],
+        "big5_neuroticism": personality["neuroticism"],
         "traits": {k: round(v, 3) for k, v in traits.items()},
         "biases": biases,
         "media": media,

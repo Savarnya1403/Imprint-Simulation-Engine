@@ -144,10 +144,16 @@ function lineChart(el, series, opts = {}) {
 
 function forecastChart(el, data) {
   if (!el) return;
-  const hist = data.history.values, fc = data.forecast.point, lo = data.forecast.p10, hi = data.forecast.p90;
+  const hist = data.history.values, rawFc = data.forecast.point;
+  const rBlock = data.reasoned_forecast;
+  const useReasoned = Array.isArray(rBlock?.point) && rBlock.point.length === rawFc.length
+    && Array.isArray(rBlock.p10) && Array.isArray(rBlock.p90);
+  const fc = useReasoned ? rBlock.point.map(Number) : rawFc;
+  const lo = useReasoned ? rBlock.p10.map(Number) : data.forecast.p10;
+  const hi = useReasoned ? rBlock.p90.map(Number) : data.forecast.p90;
   const labels = [...data.history.labels, ...data.forecast.labels];
   const W = 760, H = 300, L = 40, R = 12, T = 14, B = 24;
-  const all = [...hist, ...hi, ...lo];
+  const all = [...hist, ...hi, ...lo, ...rawFc];
   let min = Math.min(...all), max = Math.max(...all);
   const pad = (max - min) * .12 || 1;
   min -= pad; max += pad;
@@ -171,6 +177,10 @@ function forecastChart(el, data) {
   svg += `<path d="M${histPts.replace(/ /g, ' L')}" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.5" stroke-linejoin="round"/>`;
   const fcPts = [`${px(fStart)},${py(hist.at(-1))}`, ...fc.map((v, i) => `${px(hist.length + i)},${py(v)}`)].join(' ');
   svg += `<path d="M${fcPts.replace(/ /g, ' L')}" fill="none" stroke="#4ADE80" stroke-width="1.8" stroke-linejoin="round"/>`;
+  if (useReasoned && rawFc.some((v, i) => Math.abs(Number(v) - fc[i]) > 1e-9)) {
+    const rawPts = [`${px(fStart)},${py(hist.at(-1))}`, ...rawFc.map((v, i) => `${px(hist.length + i)},${py(v)}`)].join(' ');
+    svg += `<path d="M${rawPts.replace(/ /g, ' L')}" fill="none" stroke="rgba(255,255,255,.38)" stroke-width="1.2" stroke-dasharray="3 4" stroke-linejoin="round"/>`;
+  }
   svg += `<path d="M${px(fStart)},${T} L${px(fStart)},${H - B}" stroke="rgba(255,255,255,.3)" stroke-width="1" stroke-dasharray="2 3"/>`;
   svg += `<circle cx="${px(fStart)}" cy="${py(hist.at(-1))}" r="2.8" fill="#fff" stroke="#0a0a0c" stroke-width="1.4"/>`;
   svg += `<circle cx="${px(n - 1)}" cy="${py(fc.at(-1))}" r="3" fill="#4ADE80" stroke="#0a0a0c" stroke-width="1.4"/>`;
@@ -684,17 +694,46 @@ async function loadForecast() {
     S.forecast = d;
     $('#forecastTitle').textContent = d.topic.label;
     $('#forecastUnit').textContent = d.topic.unit || d.topic.category || '';
-    $('#forecastEngine').textContent = d.engine.name.startsWith('timesfm') ? 'TimesFM 3.0 · MLX' : 'Fallback baseline';
+    const aug = d.test_time_augmentation || {};
+    const isTfm = d.engine.name.startsWith('timesfm');
+    $('#forecastEngine').textContent = isTfm
+      ? `TimesFM 3.0 · ${aug.augmented ? 'aug3' : 'zero-shot'}`
+      : 'Fallback baseline';
     forecastChart(box, d);
     const s = d.summary;
+    const r = d.reasoned || {};
+    const hasR = !!r.available;
+    const rEnd = hasR && r.point?.length ? Number(r.point.at(-1)) : null;
+    const corr = hasR && Number.isFinite(Number(r.correction_pct)) ? Number(r.correction_pct) : 0;
+    const conf = hasR && Number.isFinite(Number(r.confidence)) ? Math.round(Number(r.confidence) * 100) : null;
     $('#forecastStats').innerHTML = `
       <div class="fstat"><span>Last actual</span><b>${s.last_actual}</b><i>${esc(d.history.labels.at(-1))}</i></div>
-      <div class="fstat"><span>End point</span><b>${s.end_point}</b><i>${esc(d.forecast.labels.at(-1))}</i></div>
-      <div class="fstat"><span>Change</span><b>${signed(s.change_pct, 1)}%</b><i>${s.direction}</i></div>
+      <div class="fstat"><span>TimesFM end</span><b>${s.end_point}</b><i>raw foundation</i></div>
+      <div class="fstat"><span>Audited end</span><b>${rEnd == null ? '—' : rEnd.toFixed(2)}</b><i>${hasR ? `${signed(corr, 2)}% vs raw` : 'audit unavailable'}</i></div>
+      <div class="fstat"><span>Confidence</span><b>${conf == null ? '—' : `${conf}%`}</b><i>${hasR ? esc(r.direction || '') : 'no audit'}</i></div>
       <div class="fstat"><span>80% band</span><b>${s.band_width_end}</b><i>p10–p90 at horizon</i></div>`;
-    $('#forecastNote').textContent = `${s.trend_note} The shaded region is the 10th–90th percentile band from ${d.engine.name.startsWith('timesfm') ? 'TimesFM 3.0, zero-shot' : 'a damped-trend fallback'} — not a probability of any single outcome.`;
-    $('#forecastKV').innerHTML = `<div><span>Backend</span><b>${esc(d.engine.backend)}</b></div><div><span>Checkpoint</span><b>${esc(d.engine.checkpoint)}</b></div><div><span>Horizon</span><b>${d.engine.horizon_months} months</b></div><div><span>Mode</span><b>Zero-shot</b></div>`;
+    const augText = aug.augmented
+      ? `Test-time augmentation is active: the path averages TimesFM on the level, log and first-differenced series (${(aug.views || []).join(' + ')}).`
+      : 'Test-time augmentation is inactive for this series; the path is the raw foundation output.';
+    $('#forecastNote').textContent = `${s.trend_note} The shaded region is the 10th–90th percentile band from ${isTfm ? 'TimesFM 3.0, zero-shot' : 'a damped-trend fallback'} — not a probability of any single outcome. ${augText}`;
+    $('#forecastKV').innerHTML = `<div><span>Backend</span><b>${esc(d.engine.backend)}</b></div><div><span>Checkpoint</span><b>${esc(d.engine.checkpoint)}</b></div><div><span>Horizon</span><b>${d.engine.horizon_months} months</b></div><div><span>Views</span><b>${esc((aug.views || ['level']).join(' · '))}</b></div>`;
     $('#forecastLicense').textContent = d.engine.license_note + ' ' + d.engine.caveat;
+
+    // Reasoning audit: named rules, hypothesis weights and the falsifier. The
+    // point path is the foundation path unless a named rule fired.
+    const modeLabel = { foundation_first_with_critique: 'foundation first', foundation_ensemble_blend: 'ensemble blend', ensemble_only: 'ensemble only' }[r.mode] || (hasR ? r.mode : 'unavailable');
+    $('#forecastMode').textContent = modeLabel;
+    if (!hasR) {
+      $('#forecastReason').innerHTML = `<div class="reason-check warn"><i>!</i><div><b>No audit</b><span>${esc(r.reason || 'The reasoning layer did not return a path.')}</span></div></div>`;
+    } else {
+      const weights = Object.entries(r.weights || {}).map(([k, v]) => `${k} ${Math.round(Number(v) * 100)}%`).join(' · ');
+      const rows = (r.critique || []).map((c, i) => `<div class="reason-check ${i === 0 && /No rule fired/i.test(c) ? 'ok' : 'warn'}"><i>${i === 0 && /No rule fired/i.test(c) ? '✓' : '!'}</i><div><b>${i === 0 && /No rule fired/i.test(c) ? 'No rule fired' : `Rule ${i + 1}`}</b><span>${esc(c)}</span></div></div>`).join('');
+      $('#forecastReason').innerHTML = `
+        <div class="reason-check"><i>≡</i><div><b>Hypothesis weights</b><span>${esc(weights)} · foundation ${Math.round(Number(r.foundation_weight || 0) * 100)}%</span></div></div>
+        <div class="reason-check"><i>σ</i><div><b>Rolling error vs drift</b><span>${esc(Object.entries(r.rolling_mae || {}).map(([k, v]) => `${k} ${v}`).join(' · '))} · skill ${signed(Number(r.skill_vs_drift || 0), 2)}</span></div></div>
+        ${rows}
+        <div class="reason-check"><i>✕</i><div><b>Falsifier</b><span>${esc(r.falsifier || '')}</span></div></div>`;
+    }
   } catch (err) {
     box.innerHTML = `<p class="small-copy" style="padding:20px">Forecast unavailable: ${esc(err.message)}</p>`;
     $('#forecastEngine').textContent = 'Unavailable';
@@ -981,7 +1020,7 @@ function renderPrecedents() {
       <div class="prec-card__decision">${esc(c.decision)}</div>
       <p class="prec-card__summary">${esc(c.summary)}</p>
       <div class="prec-card__outcome">
-        <div><span>KPI</span><b style="font-family:var(--sans);font-size:9px">${esc(o.kpi || '—')}</b></div>
+        <div><span>KPI</span><b>${esc(o.kpi || '—')}</b></div>
         <div><span>Direction</span><b style="color:${dir}">${esc(o.direction || '—')}</b></div>
         <div><span>Magnitude</span><b>${o.magnitude_pct != null ? `${o.magnitude_pct > 0 ? '+' : ''}${o.magnitude_pct}%` : '—'}</b></div>
         <div><span>Peak oppose</span><b>Day ${esc(c.peak_oppose_day ?? '—')}</b></div>
@@ -1966,10 +2005,10 @@ function renderValidation() {
 
   $('#valMetrics').innerHTML = [
     metric('Known-answer', `${sum.known_answer_passed || '—'}`, 'analytic identities', sum.known_answer_score === 1 ? 'metric--green' : '', sum.known_answer_score || 0),
-    metric('Backtest MASE', bt.median_vs_drift_timesfm != null ? Number(bt.median_vs_drift_timesfm).toFixed(2) : '—', 'vs drift · below 1 adds value', (bt.median_vs_drift_timesfm != null && bt.median_vs_drift_timesfm < 1) ? 'metric--green' : ''),
-    metric('Trend skill', bt.median_trend_skill != null ? signed(bt.median_trend_skill, 2) : '—', 'beyond an always-up rule'),
+    metric('Forecast skill', (bt.median_vs_drift_timesfm_aug3 ?? bt.median_vs_drift_timesfm) != null ? Number(bt.median_vs_drift_timesfm_aug3 ?? bt.median_vs_drift_timesfm).toFixed(2) : '—', 'aug3 vs drift · below 1 adds value', ((bt.median_vs_drift_timesfm_aug3 ?? bt.median_vs_drift_timesfm) != null && (bt.median_vs_drift_timesfm_aug3 ?? bt.median_vs_drift_timesfm) < 1) ? 'metric--green' : ''),
+    metric('Band coverage', bt.median_coverage_timesfm_reasoned != null ? pct(bt.median_coverage_timesfm_reasoned, 0) : '—', '80% interval · reasoned path'),
+    metric('Trend skill', bt.median_trend_skill_timesfm_aug3 != null ? signed(bt.median_trend_skill_timesfm_aug3, 2) : (bt.median_trend_skill != null ? signed(bt.median_trend_skill, 2) : '—'), 'beyond an always-up rule'),
     metric('Ensemble runs', r ? String(r.runs) : '—', r ? `${r.seeds} seeds × ${r.param_draws} draws` : 'not run yet'),
-    metric('Epistemic share', r ? pct(r.variance.epistemic_share, 0) : '—', 'spread from assumptions'),
     metric('Model card', mc ? `${(mc.limitations || []).length} limits` : '—', mc ? `${mc.population.counts.topics} categories · ${mc.population.counts.evidence} evidence cards` : ''),
   ].join('');
 
@@ -1981,16 +2020,17 @@ function renderValidation() {
   $('#valBacktestMeta').textContent = bt.n_topics ? `${bt.n_topics} categories · horizon ${bt.horizon}m` : '';
   const rows = (bt.topics || []).slice(0, 9);
   $('#valBacktest').innerHTML = rows.length ? (
-    valRow(['Category', 'MASE', 'TFM', 'vs drift', 'skill'], true) +
+    valRow(['Category', 'MASE', 'Raw', 'Aug3', 'vs drift', 'Cover'], true, 'val-row--wide') +
     rows.map(t => valRow([
       `<b>${esc(t.label)}</b>`,
       t.mase != null ? Number(t.mase).toFixed(2) : '—',
       t.mase_timesfm != null ? Number(t.mase_timesfm).toFixed(2) : '—',
-      t.vs_drift_timesfm != null ? `<span style="color:${t.vs_drift_timesfm < 1 ? 'var(--green)' : 'var(--amber)'}">${Number(t.vs_drift_timesfm).toFixed(2)}</span>` : '—',
-      t.trend_skill != null ? signed(t.trend_skill, 2) : '—',
-    ])).join('')
+      t.mase_timesfm_aug3 != null ? Number(t.mase_timesfm_aug3).toFixed(2) : '—',
+      t.vs_drift_timesfm_aug3 != null ? `<span style="color:${t.vs_drift_timesfm_aug3 < 1 ? 'var(--green)' : 'var(--amber)'}">${Number(t.vs_drift_timesfm_aug3).toFixed(2)}</span>` : '—',
+      t.coverage_timesfm_reasoned != null ? pct(t.coverage_timesfm_reasoned, 0) : '—',
+    ], false, 'val-row--wide')).join('')
   ) : '<p class="small-copy">No category history was long enough to backtest.</p>';
-  $('#valBacktestNote').textContent = bt.note || '';
+  $('#valBacktestNote').textContent = [bt.note, bt.augmentation_verdict].filter(Boolean).join(' ');
   if (bt.verdict) $('#valBacktestMeta').textContent += ` · ${bt.verdict.split(';')[0]}`;
 
   renderEnsemble();

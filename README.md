@@ -4,7 +4,7 @@
 
 Imprint Bharat is a local, auditable research instrument for testing a consumer or market decision before spending money on it. It combines:
 
-- an agent-based simulation of 1,600 possible synthetic citizens, stratified by state, tier, income, occupation, gender, age, digital access and identity context;
+- an agent-based simulation of up to 3,000 synthetic citizens across 48 occupations, stratified by state, tier, income, gender, age, digital access, religion, caste, ideology, thought process, economic band, schooling, settlement and Big Five personality — with a batched NumPy belief backend above 600 agents so 3,000 runs in seconds;
 - a cited public-data context graph, so every agent carries inspectable sources;
 - a reconstructed precedent library of Indian market decisions, used as a soft perception prior — not as rigid decision → outcome rules;
 - Google TimesFM 3.0 for numeric forecasting and counterfactuals;
@@ -51,7 +51,7 @@ This is **a synthetic simulation, not a representative survey**. Its confidence 
 - see how similar past perceptions formed and decayed;
 - decide what to validate with real people next.
 
-The context graph is a curated seed, not a 10,000× trained corpus. `app/data/atlas.json` currently contains 60 sources, 123 curated facts, 6 regional packs, 16 norms, 19 category priors and 19 calibration anchors, plus derived state/tier/occupation/category nodes. The ingestion pipeline exists so the corpus can grow; it does not pretend the growth has already happened.
+The context graph is a curated seed, not a 10,000× trained corpus. `app/data/atlas.json` currently contains 64 sources, 147 curated facts, 6 regional packs, 16 norms, 19 category priors and 19 calibration anchors, plus derived state/tier/occupation/category nodes. The ingestion pipeline exists so the corpus can grow; it does not pretend the growth has already happened. Division analytics (`app/segments.py`) and the GTM playbook (`app/strategy.py`) are derived from the same run — no extra simulation — and `/api/strategy` returns the playbook on demand.
 
 ## What is in the box
 

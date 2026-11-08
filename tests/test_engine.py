@@ -47,8 +47,10 @@ def test_price_cut_helps_and_trust_shock_hurts(brief):
 
 
 def test_social_multiplier_is_monotone_across_seeds(brief):
+    # N=240 gives the social field enough mass to be detected; at N=90 the
+    # conversion is 3/10 agents and the test is underpowered (verified).
     def mean_conv(mult: float) -> float:
-        vals = [engine.run_simulation(brief, n_agents=90, rounds=16, seed=s,
+        vals = [engine.run_simulation(brief, n_agents=240, rounds=20, seed=s,
                                       params={**calibration.load_params(), "social_mult": mult},
                                       fast=True)["summary"]["conversion"]
                 for s in (3, 4, 5)]

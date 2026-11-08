@@ -377,6 +377,15 @@ def _memo(run: dict, hypotheses: list[dict], revise: dict, stability: dict, stre
             f" The category history shows a {ca.get('relative_pct', 0):+.1f}% drift against its own "
             f"counterfactual, but that is not the effect of this decision."
         )
+    div = (run.get("divisions") or {})
+    leaders = div.get("leaders") or []
+    if leaders:
+        top_lead = leaders[0]
+        body += (
+            f" Conversion concentrates in {top_lead.get('label')} "
+            f"({top_lead.get('conversion', 0) * 100:.0f}% of its addressable pool, "
+            f"n={top_lead.get('n')}) — the rollout should start there, not everywhere at once."
+        )
     decision = (
         f"{revise['posture']}. Cap the spend at a level that buys a real read on "
         f"“{top['label'].lower()}”, not a national rollout."
@@ -484,9 +493,18 @@ def deliberate(
     stress = _stress(base_row, brief, n_agents, rounds, seed, scenario, focus_state, tier_mix)
     trace.append({"step": "Stress", "status": "done" if stress["robust"] else "weak", "detail": f"{stress['verdict_flips']} verdict flip(s) · max adoption delta {stress['max_adoption_delta_pct']:+.1f}%", "ms": _ms(t)})
 
+    # Division lens: which groups actually carry the verdict?
+    div = base.get("divisions") or {}
+    leaders = div.get("leaders") or []
+    lead_txt = (
+        f"{leaders[0]['label']} ({leaders[0]['conversion'] * 100:.0f}% converted)" if leaders else "no segment clears the mass bar"
+    )
+    trace.append({"step": "Divide", "status": "done" if leaders else "weak",
+                  "detail": f"Lead: {lead_txt} · {len(base.get('diversity') or {})} diversity axes · TimesFM half-plateau day {(div.get('overall') or {}).get('half_plateau_day')}", "ms": 0})
+
     t = time.perf_counter()
     hypotheses = score_hypotheses(base)
-    trace.append({"step": "Challenge", "status": "done", "detail": f"Leading explanation: {hypotheses[0]['label']} ({hypotheses[0]['share']:.0%})", "ms": _ms(t)})
+    trace.append({"step": "Challenge", "status": "done", "detail": f"Leading explanation: {hypotheses[0]['label']} ({hypotheses[0]['share']:.0%}) · division lead: {lead_txt}", "ms": _ms(t)})
 
     t = time.perf_counter()
     ca = _causal_check(topic["id"])
@@ -514,6 +532,13 @@ def deliberate(
         "stability": stability,
         "stress": stress,
         "causal_check": ca,
+        "divisions": {
+            "overall": (base.get("divisions") or {}).get("overall"),
+            "leaders": ((base.get("divisions") or {}).get("leaders") or [])[:4],
+            "diversity": base.get("diversity") or {},
+            "belief_backend": (base.get("provenance") or {}).get("belief_backend"),
+        },
+        "strategy": base.get("strategy"),
         "critique": {
             "checks": checks,
             "passed": sum(1 for c in checks if c["ok"]),

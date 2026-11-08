@@ -22,22 +22,19 @@ API = f"https://api.github.com/repos/{REPO}"
 BRANCH = "main"
 
 FILES = [
-    "app/cognition.py",
-    "app/engine.py",
-    "app/main.py",
+    "app/data/atlas.json",
+    "app/data/evidence.json",
+    "app/data/topics.json",
+    "app/forecast.py",
+    "app/forecast_reasoning.py",
+    "app/mathcore.py",
+    "app/modelcard.py",
+    "app/validation.py",
     "static/css/studio.css",
     "static/js/studio.js",
     "static/studio.html",
+    "tests/test_forecast_reasoning.py",
     "RESEARCH.md",
-    "app/modelcard.py",
-    "app/sensitivity.py",
-    "app/uncertainty.py",
-    "app/validation.py",
-    "tests/conftest.py",
-    "tests/test_cognition.py",
-    "tests/test_engine.py",
-    "tests/test_validation.py",
-    "tests/test_api.py",
     "tools/rest_push.py",
 ]
 

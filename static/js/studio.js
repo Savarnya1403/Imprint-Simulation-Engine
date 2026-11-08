@@ -645,7 +645,56 @@ function renderCognition() {
   $('#traitDrivers').innerHTML = traits.map(t => barRow(t.trait.replace(/_/g, ' '), t.corr)).join('') || '<p class="small-copy">Not enough variance in this run.</p>';
   const biases = (r.report.bias_correlations || []).slice(0, 8);
   $('#biasDrivers').innerHTML = biases.map(b => barRow(b.label, b.corr)).join('') || '<p class="small-copy">Not enough variance in this run.</p>';
+  renderDiversity();
+  renderDivisions();
   renderAgents();
+}
+
+function renderDiversity() {
+  const r = S.run;
+  const el = $('#diversityView');
+  if (!el) return;
+  const div = r?.diversity || r?.cognitive?.diversity || {};
+  $('#diversityMeta').textContent = r ? `${r.population} agents · ${r.provenance?.belief_backend || ''}` : '—';
+  const labels = {
+    occupation_id: 'Occupations', religion: 'Religions', caste_group: 'Caste groups',
+    ideology: 'Ideologies', thought_process: 'Thought processes', economic_status: 'Economic bands',
+    education_band: 'Schooling bands', personality_cluster: 'Personality clusters',
+    settlement: 'Settlements', age_band: 'Age bands', region: 'Regions', state: 'States'
+  };
+  const keys = Object.keys(labels).filter(k => div[k] != null);
+  if (!keys.length) { el.innerHTML = '<p class="small-copy">Run a simulation to see coverage.</p>'; return; }
+  const maxv = Math.max(...keys.map(k => div[k]));
+  el.innerHTML = keys.map(k => {
+    const v = div[k];
+    const w = maxv ? Math.round((v / maxv) * 100) : 0;
+    return `<div class="barrow"><span>${labels[k]}</span><div class="bar"><i style="left:0;width:${Math.max(4, w)}%"></i></div><b>${v}</b></div>`;
+  }).join('') + `<p class="small-copy" style="margin-top:8px">Largest cohort: ${r.population} agents. Belief backend: ${esc(r.provenance?.belief_backend || 'micrograd')}.</p>`;
+}
+
+function divTable(rows, title) {
+  if (!rows || !rows.length) return `<p class="small-copy">${esc(title)}: no rows in this run.</p>`;
+  return `<div class="div-table-wrap"><table class="div-table"><thead><tr><th>${esc(title)}</th><th>Conv</th><th>Adopt</th><th>Lead</th><th>TimesFM</th><th>Blocker</th></tr></thead><tbody>${
+    rows.slice(0, 6).map(x => `<tr><td>${esc(x.label)}${x.small ? '<span class="div-small">small</span>' : ''}</td><td class="num ${x.conversion >= 0.4 ? 'pos' : ''}">${pct(x.conversion, 0)}</td><td class="num">${pct(x.adoption_rate, 0)}</td><td class="num">${x.lead_days == null ? '—' : (x.lead_days < 0 ? `${x.lead_days}d` : `+${x.lead_days}d`)}</td><td class="num">${x.market_corr ? signed(x.market_corr) : '—'}</td><td>${esc(x.top_rejection || '—')}</td></tr>`).join('')
+  }</tbody></table></div>`;
+}
+
+function renderDivisions() {
+  const r = S.run;
+  const el = $('#divisionView');
+  if (!el) return;
+  const div = r?.divisions;
+  if (!div?.axes) { el.innerHTML = '<p class="small-copy">Run a simulation to see divisions.</p>'; return; }
+  const ax = div.axes;
+  el.innerHTML = `
+    <p class="small-copy" style="margin-bottom:8px">${esc(div.overall ? `Overall ${pct(div.overall.adoption_rate)} · ${div.overall.addressable} addressable · half-plateau day ${div.overall.half_plateau_day ?? '—'}` : '')}</p>
+    ${divTable(ax.tier, 'Tier')}
+    ${divTable(ax.state, 'State')}
+    ${divTable(ax.occupation, 'Occupation')}
+    ${divTable(ax.thought_process, 'Thought')}
+    ${divTable(ax.personality_cluster, 'Personality')}
+    ${divTable(ax.economic_status, 'Class')}
+    <p class="causal-note" style="margin-top:8px">Lead &lt;0 = adopts earlier than the room. TimesFM = correlation of the division curve with the TimesFM market trend. Small groups are flagged.</p>`;
 }
 
 function barRow(label, corr) {
@@ -658,10 +707,16 @@ function renderAgents() {
   if (!r) return;
   const q = ($('#agentSearch').value || '').toLowerCase();
   const tier = $('#agentTier').value;
+  const ideo = $('#agentIdeology')?.value || '';
+  const cls = $('#agentClass')?.value || '';
+  const thought = $('#agentThought')?.value || '';
   let agents = r.agents.filter(a => {
     if (tier && String(a.tier) !== tier) return false;
+    if (ideo && a.ideology !== ideo) return false;
+    if (cls && a.economic_status !== cls) return false;
+    if (thought && a.thought_process !== thought) return false;
     if (!q) return true;
-    return `${a.name} ${a.city} ${a.state} ${a.occupation} ${a.language}`.toLowerCase().includes(q);
+    return `${a.name} ${a.city} ${a.state} ${a.occupation} ${a.language} ${a.ideology || ''} ${a.thought_process || ''}`.toLowerCase().includes(q);
   });
   const total = agents.length;
   agents = agents.slice(0, S.agentLimit);
@@ -783,6 +838,41 @@ function renderEvidence() {
   </article>`).join('') || '<p class="small-copy">No evidence matches.</p>';
 }
 
+function renderReportDivisions() {
+  const r = S.run;
+  const el = $('#reportDivisions');
+  if (!el) return;
+  const div = r?.divisions;
+  if (!div?.axes) { el.innerHTML = `<div class="panel__head"><div><span class="panel__eyebrow">Divisions × TimesFM</span><h2 class="panel__title">Where it actually converts</h2></div></div><p class="small-copy">Run a simulation to see division analytics.</p>`; return; }
+  const ax = div.axes;
+  el.innerHTML = `<div class="panel__head"><div><span class="panel__eyebrow">Divisions × TimesFM</span><h2 class="panel__title">Where it actually converts</h2></div><span class="panel__meta">${esc(div.overall ? `overall ${pct(div.overall.adoption_rate)} · ${div.overall.addressable} addressable` : '')}</span></div>
+    <div class="strategy-grid">
+      <div class="strategy-card"><h4>Tier × region</h4>${divTable(ax.tier, 'Tier')}${divTable(ax.region, 'Region')}</div>
+      <div class="strategy-card"><h4>Occupation · schooling</h4>${divTable(ax.occupation, 'Occupation')}${divTable(ax.education_band, 'Schooling')}</div>
+      <div class="strategy-card"><h4>Thought × personality</h4>${divTable(ax.thought_process, 'Thought')}${divTable(ax.personality_cluster, 'Personality')}</div>
+      <div class="strategy-card"><h4>Class × ideology (diagnostic)</h4>${divTable(ax.economic_status, 'Class')}${divTable(ax.ideology, 'Ideology')}</div>
+    </div>
+    <p class="causal-note" style="margin-top:8px">${esc(div.note || '')}</p>`;
+}
+
+function renderReportStrategy() {
+  const r = S.run;
+  const el = $('#reportStrategy');
+  if (!el) return;
+  const st = r?.strategy;
+  if (!st || st.error) { el.innerHTML = `<div class="panel__head"><div><span class="panel__eyebrow">GTM playbook</span><h2 class="panel__title">Who first, who later, what to say</h2></div></div><p class="small-copy">Run a simulation to derive the playbook from its divisions.</p>`; return; }
+  el.innerHTML = `<div class="panel__head"><div><span class="panel__eyebrow">GTM playbook</span><h2 class="panel__title">Who first, who later, what to say</h2></div><span class="panel__meta">${esc(st.conversion_note || '')}</span></div>
+    <p class="report-sub" style="font-size:10.5px">${esc(st.trend_read || '')}</p>
+    <div class="strategy-grid">
+      <div class="strategy-card"><h4>Beachhead · ${esc(st.beachhead?.tier || '')}</h4><ul>${(st.beachhead?.lines || []).map(x => `<li>${esc(x)}</li>`).join('')}</ul><p><b>Top blocker:</b> ${esc(st.top_blocker || '—')} · <b>Channels:</b> ${esc((st.channels || []).join(', '))}</p><p>${esc(st.price_read || '')}</p></div>
+      <div class="strategy-card"><h4>Next wave</h4><ul>${(st.next_wave || []).map(x => `<li>${esc(x)}</li>`).join('') || '<li>—</li>'}</ul><h4 style="margin-top:8px">Do not lead with</h4><ul>${(st.avoid || []).map(x => `<li>${esc(x)}</li>`).join('') || '<li>—</li>'}</ul></div>
+      <div class="strategy-card"><h4>Messaging</h4>${(st.messages || []).map(m => `<p><b>${esc(m.segment)}</b> — ${esc(m.lead_message)}</p><p style="color:rgba(255,255,255,.38)">${esc(m.proof)} · ${esc(m.language)}</p>`).join('') || '<p>—</p>'}</div>
+      <div class="strategy-card"><h4>Equity check (fix, don’t target)</h4><ul>${(st.equity || []).map(x => `<li>${esc(x)}</li>`).join('') || '<li>No protected-axis gap worth flagging.</li>'}</ul><p style="color:rgba(255,255,255,.38)">${esc(st.equity_note || '')}</p></div>
+    </div>
+    <div class="strategy-plan"><h3>90-day plan</h3><div class="strategy-grid">${(st.plan || []).map(p => `<div class="strategy-card"><h4>${esc(p.window)} · ${esc(p.goal)}</h4><ul>${(p.moves || []).map(m => `<li>${esc(m)}</li>`).join('')}</ul><p><b>Metric:</b> ${esc(p.metric)}<br><b>Stop:</b> ${esc(p.stop_rule)}</p></div>`).join('')}</div></div>
+    <div class="strategy-plan"><h3>Falsifiers & risks</h3><div class="strategy-grid"><div class="strategy-card"><h4>Would prove it wrong</h4><ul>${(st.falsifiers || []).map(x => `<li>${esc(x)}</li>`).join('')}</ul></div><div class="strategy-card"><h4>Read before you spend</h4><ul>${(st.risks || []).map(x => `<li>${esc(x)}</li>`).join('')}</ul></div></div></div>`;
+}
+
 /* ---------- report ---------- */
 function renderReport() {
   const r = S.run;
@@ -827,9 +917,12 @@ function renderReport() {
   $('#reportCaveats').innerHTML = `<div class="panel__head"><div><span class="panel__eyebrow">Caveats</span><h2 class="panel__title">Read before you spend</h2></div></div>
     <ul class="report-caveats">${(rep.caveats || []).map(c => `<li>${esc(c)}</li>`).join('')}</ul>`;
 
+  renderReportDivisions();
+  renderReportStrategy();
+
   const pr = r.precedents || {};
   const adj = pr.adjustments || {};
-  $('#reportMethod').innerHTML = `<div class="panel__head"><div><span class="panel__eyebrow">Method</span><h2 class="panel__title">What produced this output</h2></div><span class="panel__meta">${r.population} agents · ${r.rounds} rounds · seed ${r.seed}</span></div>
+  $('#reportMethod').innerHTML = `<div class="panel__head"><div><span class="panel__eyebrow">Method</span><h2 class="panel__title">What produced this output</h2></div><span class="panel__meta">${r.population} agents · ${r.rounds} rounds · seed ${r.seed} · ${esc(r.provenance?.belief_backend || '')}</span></div>
     <div class="method-grid">${(rep.methods || []).map(m => `<div>${esc(m)}</div>`).join('')}</div>
     <div class="report-ctx"><h3>Precedent prior</h3><p class="small-copy">${esc(pr.note || '')}</p><div class="causal-row"><span>Analogous cases</span><b>${(pr.precedents || []).map(c => `${esc(c.brand)} (${esc(c.year)})`).join(' · ') || '—'}</b></div><div class="causal-row"><span>Trust-shock scaling</span><b>${esc(adj.trust_shock_scale ?? '—')} · recovery ${esc(adj.recovery_days ?? '—')}d</b></div><div class="causal-row"><span>Outcome direction</span><b>${esc(adj.outcome_direction || '—')} · negative base rate ${pct(adj.negative_outcome_share || 0, 0)}</b></div></div>
     <div class="report-ctx"><h3>Run audit</h3><div class="causal-row"><span>Checks passed</span><b class="${r.audit?.ok ? 'good' : 'bad'}">${r.audit?.score ?? '—'}% · ${r.audit?.failed ?? 0} failed · ${r.audit?.warnings ?? 0} warnings</b></div><div class="causal-row"><span>Context coverage</span><b>${pct(s.context_coverage || 0, 0)} of agents carry citations</b></div></div>`;
@@ -848,7 +941,7 @@ function openAgent(id) {
   const reflHtml = (mem.reflections || []).slice(0, 3).map(r => `<div class="mem-row mem-row--reflection"><span class="mem-kind">reflection</span><span>${esc(r)}</span></div>`).join('');
   $('#drawerBody').innerHTML = `
     <div class="drawer-profile"><span class="avatar">${avatar(a, 64)}</span><div><div class="drawer-name">${esc(a.name)}</div><div class="drawer-role">${esc(a.occupation)} · ${esc(a.city)}, ${esc(a.state)}<br>${esc(a.language)} · T${a.tier} · ${esc(a.gender)}, ${a.age}</div></div></div>
-    <div class="drawer-chiprow"><span class="${tierClass(a.tier)}">Tier ${a.tier}</span><span class="chip">${esc(a.decision)}</span><span class="chip">${esc(a.caste_group)}</span><span class="chip">${esc(a.religion)}</span></div>
+    <div class="drawer-chiprow"><span class="${tierClass(a.tier)}">Tier ${a.tier}</span><span class="chip">${esc(a.decision)}</span><span class="chip">${esc(a.caste_group)}</span><span class="chip">${esc(a.religion)}</span><span class="chip">${esc(a.ideology || '')}</span><span class="chip">${esc(a.thought_process || '')}</span><span class="chip">${esc(a.economic_status || '')}</span><span class="chip">${esc(a.education_band || '')}</span><span class="chip">${esc(a.personality_cluster || '')}</span><span class="chip">${esc(a.settlement || '')}</span></div>
     <p class="drawer-quote">“${esc(a.quote)}”</p>
     <div class="drawer-kv">
       <div><span>Household income</span><b>${money(a.household_income)}/mo</b></div>
@@ -859,6 +952,7 @@ function openAgent(id) {
       <div><span>Digital access</span><b>${pct(a.digital)}</b></div>
     </div>
     <div class="drawer-section"><h4>Traits</h4>${traits.map(t => `<div class="trait-row"><span>${t.replace(/_/g, ' ')}</span><div class="bar"><i style="width:${(a.traits[t] || 0) * 100}%"></i></div><b>${Math.round((a.traits[t] || 0) * 100)}</b></div>`).join('')}</div>
+    <div class="drawer-section"><h4>Personality · Big Five</h4>${[['Openness', a.big5_openness], ['Conscientiousness', a.big5_conscientiousness], ['Extraversion', a.big5_extraversion], ['Agreeableness', a.big5_agreeableness], ['Neuroticism', a.big5_neuroticism]].map(([k, v]) => `<div class="trait-row"><span>${k}</span><div class="bar"><i style="width:${Math.round((v || 0) * 100)}%"></i></div><b>${Math.round((v || 0) * 100)}</b></div>`).join('')}<p class="small-copy" style="margin-top:6px">Cluster: ${esc(a.personality_cluster || '—')} · Thought: ${esc(a.thought_process || '—')} · ${esc(a.education_band || '')} · ${esc(a.economic_status || '')} · ${esc(a.settlement || '')}</p></div>
     <div class="drawer-section"><h4>Biases</h4>${topBiases.map(([k, v]) => `<div class="trait-row"><span>${esc(k.replace(/_/g, ' '))}</span><div class="bar"><i style="width:${v * 100}%"></i></div><b>${Math.round(v * 100)}</b></div>`).join('')}</div>
     <div class="drawer-section"><h4>Life</h4><p class="small-copy">${esc(a.bio)}</p><p class="small-copy" style="margin-top:6px"><b style="color:rgba(255,255,255,.7)">Aspires:</b> ${esc(a.aspiration)}</p><p class="small-copy" style="margin-top:4px"><b style="color:rgba(255,255,255,.7)">Fears:</b> ${esc((a.fears || []).join(', '))}</p></div>
     ${mem.count ? `<div class="drawer-section"><h4>Memory stream <span style="opacity:.4">(${mem.count})</span></h4>${memHtml}${reflHtml}</div>` : ''}
@@ -1394,7 +1488,7 @@ async function runReasoning() {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         brief: S.run.brief,
-        n_agents: clamp(S.run.population, 40, 800),
+        n_agents: clamp(S.run.population, 40, 1600),
         rounds: clamp(S.run.rounds, 12, 96),
         seed: S.run.seed,
         scenario: S.run.scenario || 'base',
@@ -2417,17 +2511,19 @@ function renderEncounters() {
   const wrap = $('#worldEncounters');
   if (!wrap) return;
   const list = $('#encountersList');
-  const encs = (r && r.encounters) || [];
-  if (!encs.length) { wrap.hidden = true; return; }
+  const raw = (r && r.encounters) || [];
+  const encs = raw.filter(e => e && e.a && e.b);
+  const note = raw.find(e => e && e.note);
+  if (!encs.length && !note) { wrap.hidden = true; return; }
   wrap.hidden = false;
   const mode = $('#encountersMode');
-  if (mode) mode.textContent = 'Concordia GM · ' + (encs[0].gm_mode === 'llm' ? 'LLM-adjudicated' : 'template');
+  if (mode) mode.textContent = 'Concordia GM · ' + (encs[0]?.gm_mode === 'llm' ? 'LLM-adjudicated' : 'template') + (note ? ' · sampled memory' : '');
   list.innerHTML = encs.map(e => `
     <div class="encounter-card">
       <div class="encounter-head"><b>${esc(e.a.name)} × ${esc(e.b.name)}</b><span class="encounter-outcome ${esc(e.outcome)}">${esc(e.outcome)}</span></div>
       <div class="encounter-dialogue">${esc((e.dialogue || e.reason || '').slice(0, 500))}</div>
       <div class="encounter-foot">${esc(e.setting || '')} · stance ${e.stance_delta >= 0 ? '+' : ''}${Math.round((e.stance_delta || 0) * 100)}%</div>
-    </div>`).join('');
+    </div>`).join('') + (note ? `<div class="encounter-card"><div class="encounter-dialogue">${esc(note.note)}</div></div>` : '');
 }
 
 /* ---------- tabs ---------- */
@@ -2468,7 +2564,16 @@ async function boot() {
   $$('.tier-mini input').forEach(el => el.addEventListener('input', updateTierTotal));
   updateTierTotal();
 
-  $('#agentsRange').addEventListener('input', e => $('#agentsVal').textContent = e.target.value);
+  $('#agentsRange').addEventListener('input', e => {
+    $('#agentsVal').textContent = e.target.value;
+    $$('#agentPresets button').forEach(b => b.classList.toggle('active', Number(b.dataset.agents) === Number(e.target.value)));
+  });
+  $$('#agentPresets button').forEach(b => b.addEventListener('click', () => {
+    const v = Number(b.dataset.agents);
+    $('#agentsRange').value = v;
+    $('#agentsVal').textContent = String(v);
+    $$('#agentPresets button').forEach(x => x.classList.toggle('active', x === b));
+  }));
   $('#roundsRange').addEventListener('input', e => $('#roundsVal').textContent = e.target.value);
   $('#runBtn').addEventListener('click', runSimulation);
   document.addEventListener('keydown', e => {
@@ -2528,6 +2633,9 @@ async function boot() {
   });
   $('#agentSearch').addEventListener('input', () => { S.agentLimit = 36; renderAgents(); });
   $('#agentTier').addEventListener('change', () => { S.agentLimit = 36; renderAgents(); });
+  $('#agentIdeology')?.addEventListener('change', () => { S.agentLimit = 36; renderAgents(); });
+  $('#agentClass')?.addEventListener('change', () => { S.agentLimit = 36; renderAgents(); });
+  $('#agentThought')?.addEventListener('change', () => { S.agentLimit = 36; renderAgents(); });
   $('#loadMoreAgents').addEventListener('click', () => { S.agentLimit += 36; renderAgents(); });
   $('#forecastRun').addEventListener('click', loadForecast);
   $('#forecastHorizon').addEventListener('change', loadForecast);
@@ -2613,6 +2721,8 @@ async function boot() {
     renderEvidence();
     updateSysChips();
     renderParamLab();
+    const cc = $('#cognitionChip');
+    if (cc && meta.archetypes?.length) cc.textContent = `4 tiers · ${meta.archetypes.length} occupations · 16 biases`;
     await runSimulation();
   } catch (err) {
     $('#statusText').textContent = 'Offline';

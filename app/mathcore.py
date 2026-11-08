@@ -226,16 +226,24 @@ class TimesFMDemandSignal:
         self.cached_confidence: np.ndarray | None = None
 
     def load(self, topic_id: str, history_values: list[float]) -> None:
-        """Fetch TimesFM forecast for the category's historical series."""
+        """Fetch TimesFM forecast for the category's historical series.
+
+        Uses the reasoning-blended path when the forecast bundle carries one,
+        because that is the path the engine's own audit validates. The raw
+        foundation path remains available in the API response.
+        """
         if self.forecast_fn is None:
             self.cached_demand = np.array(history_values + [history_values[-1]] * self.horizon)
             self.cached_confidence = np.full(len(history_values) + self.horizon, 0.5)
             return
         try:
             res = self.forecast_fn(topic_id=topic_id, horizon=self.horizon, model="auto")
-            point = np.asarray(res.get("point", []), dtype=float)
-            lo = np.asarray(res.get("p10", point), dtype=float)
-            hi = np.asarray(res.get("p90", point), dtype=float)
+            block = res.get("reasoned_forecast") or res.get("forecast") or {}
+            point = np.asarray(block.get("point") or [], dtype=float)
+            if point.size == 0:
+                raise ValueError("forecast bundle carried no point path")
+            lo = np.asarray(block.get("p10", point), dtype=float)
+            hi = np.asarray(block.get("p90", point), dtype=float)
             hist = np.asarray(history_values, dtype=float)
             self.cached_demand = np.concatenate([hist, point])
             width = np.maximum(hi - lo, 1e-6)
@@ -250,15 +258,19 @@ class TimesFMDemandSignal:
 
         Positive = demand forecast is rising (social proof tailwind).
         Negative = demand forecast is falling (social proof headwind).
+
+        The simulation day is mapped onto the monthly forecast timeline by
+        progress, not by raw day index, so a 36-day run reads the whole
+        horizon instead of stopping inside the first month.
         """
         if self.cached_demand is None or len(self.cached_demand) < 2:
             return 0.0
-        idx = min(day, len(self.cached_demand) - 1)
-        hist_len = max(1, len(self.cached_demand) - self.horizon)
-        # Compare recent forecast to pre-forecast baseline
-        pre = float(np.mean(self.cached_demand[max(0, idx - 4):idx]))
-        post = float(np.mean(self.cached_demand[idx:idx + self.horizon]))
-        if pre == 0:
+        n = len(self.cached_demand)
+        frac = min(1.0, max(0.0, float(day) / max(1.0, float(total_days))))
+        idx = int(round(frac * (n - 1)))
+        pre = float(np.mean(self.cached_demand[max(0, idx - 3):idx + 1]))
+        post = float(np.mean(self.cached_demand[idx:min(n, idx + 4)]))
+        if abs(pre) < 1e-9:
             return 0.0
         trend = (post - pre) / abs(pre)
         return float(np.clip(trend * 3, -1, 1))

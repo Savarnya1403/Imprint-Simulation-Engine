@@ -44,8 +44,8 @@
   "note": "Census 2011 measured 31.2%; definitions differ.",
   "topics": [
    "quick-commerce",
-   "ev-car",
-   "real-estate"
+   "premium-fmcg",
+   "health-insurance"
   ]
  },
  {
@@ -357,13 +357,13 @@
   "id": "health_oop",
   "domain": "Health",
   "claim": "Out-of-pocket share of health spending",
-  "value": "47.1",
+  "value": "39.4",
   "unit": "%",
-  "source": "National Health Accounts 2019-20",
+  "source": "National Health Accounts 2021-22",
   "org": "MoHFW",
   "year": 2022,
-  "url": "https://www.nha.gov.in/",
-  "note": "Financial shock is a middle-class reality; insurance penetration is thin.",
+  "url": "https://nhsrcindia.org/national-health-accounts-records",
+  "note": "Down from 48.8% in 2017-18; still a large household financial shock. Insurance coverage is thin.",
   "topics": [
    "health-insurance"
   ]
@@ -629,6 +629,213 @@
   "topics": [
    "upi-rural",
    "bnpl"
+  ]
+ },
+ {
+  "id": "time_use_gap",
+  "domain": "Gender",
+  "claim": "Women's unpaid domestic time relative to men",
+  "value": "3.3",
+  "unit": "x",
+  "source": "Time Use Survey 2024",
+  "org": "MoSPI",
+  "year": 2025,
+  "url": "https://www.mospi.gov.in/sites/default/files/press_release/PR_TUS_25022025.pdf",
+  "note": "289 vs 88 minutes/day (persons 6+). Care load is the binding constraint on paid work, not preference alone.",
+  "topics": [
+   "women-work",
+   "gig-work",
+   "edtech",
+   "quick-commerce"
+  ]
+ },
+ {
+  "id": "elderly_pop",
+  "domain": "Demography",
+  "claim": "Population aged 60+",
+  "value": "138",
+  "unit": "million",
+  "source": "Elderly in India 2021",
+  "org": "MoSPI",
+  "year": 2021,
+  "url": "https://mospi.gov.in/sites/default/files/publication_reports/Elderly%20in%20India%202021.pdf",
+  "note": "10.1% of population in 2021, projected 13.1% by 2031. Ageing is uneven: Kerala 16.5%, Bihar 7.7%.",
+  "topics": [
+   "health-insurance",
+   "premium-fmcg",
+   "ott",
+   "generic"
+  ]
+ },
+ {
+  "id": "jobs_needed",
+  "domain": "Labour",
+  "claim": "Annual non-farm jobs required until 2030",
+  "value": "78.5",
+  "unit": "lakh / year",
+  "source": "Economic Survey 2023-24",
+  "org": "Ministry of Finance",
+  "year": 2024,
+  "url": "https://www.indiabudget.gov.in/economicsurvey/",
+  "note": "The absorption requirement as agriculture sheds labour; a structural constraint on mass-market demand.",
+  "topics": [
+   "ai-jobs",
+   "gig-work",
+   "edtech",
+   "coaching"
+  ]
+ },
+ {
+  "id": "gig_2030",
+  "domain": "Labour",
+  "claim": "Projected gig workforce, 2029-30",
+  "value": "23.5",
+  "unit": "million",
+  "source": "Economic Survey 2023-24 / NITI Aayog 2022",
+  "org": "Ministry of Finance / NITI Aayog",
+  "year": 2024,
+  "url": "https://www.indiabudget.gov.in/economicsurvey/",
+  "note": "From a 7.7 million baseline in 2020-21. Projection with wide definitional bounds.",
+  "topics": [
+   "gig-work",
+   "quick-commerce",
+   "ai-jobs"
+  ]
+ },
+ {
+  "id": "nfhs_stunting",
+  "domain": "Health",
+  "claim": "Children under 5 who are stunted",
+  "value": "35.5",
+  "unit": "%",
+  "source": "NFHS-5 (2019-21)",
+  "org": "MoHFW / IIPS",
+  "year": 2021,
+  "url": "https://rchiips.org/nfhs/NFHS-5Reports/India.pdf",
+  "note": "Down from 38.4% in NFHS-4, still more than one in three. Chronic undernutrition shapes lifetime outcomes.",
+  "topics": [
+   "health-insurance",
+   "edtech",
+   "premium-fmcg"
+  ]
+ },
+ {
+  "id": "nfhs_anaemia",
+  "domain": "Health",
+  "claim": "Women 15-49 who are anaemic",
+  "value": "57.0",
+  "unit": "%",
+  "source": "NFHS-5 (2019-21)",
+  "org": "MoHFW / IIPS",
+  "year": 2021,
+  "url": "https://rchiips.org/nfhs/NFHS-5Reports/India.pdf",
+  "note": "Up from 53.1%; child anaemia 67.1%. Energy, learning and work capacity are directly affected.",
+  "topics": [
+   "health-insurance",
+   "women-work",
+   "edtech"
+  ]
+ },
+ {
+  "id": "nfhs_insurance",
+  "domain": "Insurance",
+  "claim": "Households with any member covered by health insurance",
+  "value": "41.0",
+  "unit": "%",
+  "source": "NFHS-5 (2019-21)",
+  "org": "MoHFW / IIPS",
+  "year": 2021,
+  "url": "https://rchiips.org/nfhs/NFHS-5Reports/India.pdf",
+  "note": "Coverage is not adequacy. OOPE remains 39.4% of health spending (NHA 2021-22).",
+  "topics": [
+   "health-insurance",
+   "rural-credit",
+   "bnpl"
+  ]
+ },
+ {
+  "id": "fi_index",
+  "domain": "Finance",
+  "claim": "RBI Financial Inclusion Index",
+  "value": "64.2",
+  "unit": "index / 100",
+  "source": "Financial Inclusion Index, March 2024",
+  "org": "Reserve Bank of India",
+  "year": 2024,
+  "url": "https://www.rbi.org.in/Scripts/PublicationReportDetails.aspx",
+  "note": "Up from 60.1 in March 2023. Usage led; credit depth and quality lag access.",
+  "topics": [
+   "rural-credit",
+   "bnpl",
+   "upi-rural"
+  ]
+ },
+ {
+  "id": "health_gdp",
+  "domain": "Health",
+  "claim": "Total health expenditure as share of GDP",
+  "value": "3.83",
+  "unit": "% of GDP",
+  "source": "National Health Accounts 2021-22",
+  "org": "MoHFW",
+  "year": 2022,
+  "url": "https://nhsrcindia.org/national-health-accounts-records",
+  "note": "Government health spending 1.84% of GDP; households still carry the largest single share.",
+  "topics": [
+   "health-insurance"
+  ]
+ },
+ {
+  "id": "census_literacy",
+  "domain": "Education",
+  "claim": "Literacy rate (7+)",
+  "value": "74.04",
+  "unit": "%",
+  "source": "Census of India 2011",
+  "org": "Office of the Registrar General & Census Commissioner",
+  "year": 2011,
+  "url": "https://censusindia.gov.in/census.website/",
+  "note": "Male 82.14%, female 65.46%. A structural baseline for language and learning products.",
+  "topics": [
+   "edtech",
+   "language-ai",
+   "ai-jobs",
+   "coaching"
+  ]
+ },
+ {
+  "id": "census_disability",
+  "domain": "Access",
+  "claim": "Population with disability",
+  "value": "2.21",
+  "unit": "%",
+  "source": "Census of India 2011",
+  "org": "Office of the Registrar General & Census Commissioner",
+  "year": 2011,
+  "url": "https://censusindia.gov.in/census.website/",
+  "note": "About 26.8 million people. Accessibility is a mass-market design constraint.",
+  "topics": [
+   "health-insurance",
+   "edtech",
+   "generic"
+  ]
+ },
+ {
+  "id": "agri_2047",
+  "domain": "Labour",
+  "claim": "Projected agriculture share of workforce, 2047",
+  "value": "25",
+  "unit": "%",
+  "source": "Economic Survey 2023-24",
+  "org": "Ministry of Finance",
+  "year": 2024,
+  "url": "https://www.indiabudget.gov.in/economicsurvey/",
+  "note": "Down from 45.8% in 2023. The transition underwrites rural income and consumption forecasts.",
+  "topics": [
+   "agri-tech",
+   "rural-credit",
+   "ai-jobs",
+   "premium-fmcg"
   ]
  }
 ]
